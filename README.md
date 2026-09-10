@@ -11,26 +11,43 @@ Deze bestanden zijn leeg: wie de site opent, krijgt een leeg boek.
 De app staat standaard in het Arabisch. Met de knop rechtsboven (`NL` / `ع`)
 wissel je naar het Nederlands en terug.
 
+## Hoe het in elkaar zit
+
+Drie lagen: een **klant** heeft **opdrachten**, en in een opdracht zitten de
+**klusjes**. Zo hoort alles wat bij één afspraak hoort bij elkaar.
+
+Het geld hangt aan de opdracht. Daar spreek je een prijs af voor het werk en
+daar wordt betaald. Wat een los klusje kost mag je er per klus bij zetten; de
+app laat dan zien of dat samen uitkomt op wat je hebt afgesproken, en hoeveel
+je nog te verdelen hebt. Vul je bij de opdracht geen prijs in, dan telt de app
+gewoon de losse bedragen bij elkaar op.
+
+Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Ze
+tellen vanzelf op naar de opdracht.
+
 ## Wat het bijhoudt
 
 - Klanten met telefoonnummer, plaats en een notitie
-- Per klant zoveel klussen als nodig, met een datum en een omschrijving
+- Opdrachten per klant, met een afgesproken prijs en de betalingen
+- Per opdracht zoveel klusjes als nodig, met een datum en een omschrijving
 - Drie standen per klus: moet nog, bezig, klaar
 - Wat je voor het werk vraagt, apart van wat de materialen kosten
+- Soorten werk als knopjes onder het invulveld, met een plusje om er zelf
+  een bij te zetten (die blijven bewaard)
 - Materialen als lijst: per regel wat je gekocht hebt en wat het kostte,
   met een plusje voor de volgende
 - Een foto van het bonnetje bij elke materiaalregel, gemaakt met de camera
-- Betalingen per klus, ook als er in delen betaald wordt, en wat er nog
+- Betalingen per opdracht, ook als er in delen betaald wordt, en wat er nog
   openstaat
 - Dirham of euro als hoofdmunt, met een instelbare koers en de andere munt
   eronder. Per bedrag kun je kiezen: DH of €
-- Meerdere klussen bij een klant aanvinken; onderin staat meteen wat die
-  samen kosten
+- Meerdere klussen in een opdracht aanvinken; onderin staat meteen wat die
+  samen kosten, en je zet ze in een tik op klaar
 - Van die aangevinkte klussen een overzicht maken en dat via WhatsApp of het
   deelmenu naar de klant sturen, in het Arabisch of het Nederlands
-- Aangevinkte klussen in één tik op betaald zetten
+- Een opdracht in één tik helemaal op betaald zetten
 - Bovenaan: wat er nog te krijgen is, wat er deze maand binnenkwam en hoeveel
-  klussen nog niet betaald zijn
+  opdrachten nog niet betaald zijn
 - Een knop om alle bedragen te verbergen, en een cijferslot van vier cijfers
 - Back-up maken en terugzetten, en vijf herstelpunten op het toestel zelf
 
@@ -46,11 +63,18 @@ wissel je naar het Nederlands en terug.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='6'` bovenaan het script
-2. `sw.js` — `klusboek-v6`
+1. `index.html` — `var VERSIE='7'` bovenaan het script
+2. `sw.js` — `klusboek-v7`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.
+
+## Van een oud boek naar opdrachten
+
+Tot versie 6 hing een klus rechtstreeks aan een klant en stonden de betalingen
+bij de klus. Zet je zo'n back-up terug, dan zet `migreer()` alles om: per klant
+één opdracht met de naam *Eerder werk*, met alle klussen erin en de betalingen
+bij elkaar. Dat draait één keer, bij het opstarten en na het terugzetten.
 
 ## Bonnetjes
 
