@@ -46,10 +46,11 @@ wissel je naar het Nederlands en terug.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='4'` bovenaan het script
-2. `sw.js` — `klusboek-v4`
+1. `index.html` — `var VERSIE='6'` bovenaan het script
+2. `sw.js` — `klusboek-v6`
 
-De regel onderaan de instellingen haalt het nummer daar zelf op.
+Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
+de instellingen.
 
 ## Bonnetjes
 
@@ -65,7 +66,7 @@ bonnetje bewaren, tik het dan aan en gebruik Sturen.
 
 ## Nooit in deze repo
 
-Het back-upbestand uit de instellingen (`klusboek-JJJJ-MM-DD.json`). Daarin
+Het back-upbestand uit de instellingen (`klusboek-JJJJ-MM-DD-uummss.json`). Daarin
 staan klantnamen, telefoonnummers en bedragen. `.gitignore` houdt ze tegen,
 maar kijk voor het uploaden of er niets tussen zit.
 

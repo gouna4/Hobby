@@ -255,7 +255,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='4', VERSIEDATUM='september 2026';
+var VERSIE='6', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -437,6 +437,10 @@ function restBetaling(openDh){
 }
 function toDH(a,cur){return cur==='EUR'?num(a)*(S.rate||1):num(a)}
 function today(){return new Date().toISOString().slice(0,10)}
+function backupNaam(){
+  var d=new Date(), tw=function(n){return (n<10?'0':'')+n};
+  return 'klusboek-'+today()+'-'+tw(d.getHours())+tw(d.getMinutes())+tw(d.getSeconds())+'.json';
+}
 function maandVan(s){return String(s||'').slice(0,7)}
 function dat(s){
   if(!s)return '';
@@ -606,7 +610,7 @@ function render(){
   var h='';
 
   h+='<div class="top"><div class="top-in">'
-   + '<div><div class="title">'+esc(t('app'))+'</div><div class="sub">'+esc(t('sub'))+'</div></div>'
+   + '<div><div class="title">'+esc(t('app'))+'</div><div class="sub">'+esc(t('sub'))+' · v'+VERSIE+'</div></div>'
    + '<div class="knoppen">'
    +   '<button class="icon-btn taalbtn" data-act="taal">'+(ui.lang==='ar'?'NL':'ع')+'</button>'
    +   '<button class="icon-btn'+(S.hide?' on':'')+'" data-act="hide" aria-label="verbergen">'+oogIcoon()+'</button>'
@@ -1492,7 +1496,7 @@ document.addEventListener('click',function(e){
     S.lastBackup=today(); save();
     var txt=backupTekst();
     try{
-      var fl=new File([txt],'klusboek-'+today()+'.json',{type:'application/json'});
+      var fl=new File([txt],backupNaam(),{type:'application/json'});
       if(navigator.canShare&&navigator.canShare({files:[fl]})){navigator.share({files:[fl]}).catch(function(){});return}
     }catch(e){}
     if(navigator.share)navigator.share({text:txt}).catch(function(){});
@@ -1508,7 +1512,7 @@ document.addEventListener('click',function(e){
     S.lastBackup=today(); save();
     var bl=new Blob([backupTekst()],{type:'application/json'});
     var a=document.createElement('a');
-    a.href=URL.createObjectURL(bl); a.download='klusboek-'+today()+'.json';
+    a.href=URL.createObjectURL(bl); a.download=backupNaam();
     document.body.appendChild(a); a.click();
     setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
     return;
