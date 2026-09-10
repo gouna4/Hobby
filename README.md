@@ -109,8 +109,8 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='19'` bovenaan het script
-2. `sw.js` — `klusboek-v19`
+1. `index.html` — `var VERSIE='20'` bovenaan het script
+2. `sw.js` — `klusboek-v20`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.

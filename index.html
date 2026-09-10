@@ -290,7 +290,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='19', VERSIEDATUM='september 2026';
+var VERSIE='20', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -349,7 +349,7 @@ var T={
   geenKlanten:'ما كاين حتى زبون', geenKlantenSub:'زيد الزبون ديالك الأول، من اللور زيد ليه الأعمال.',
   geenKlussen:'ما كاين حتى عمل', geenKlussenSub:'دوس على «عمل جديد» باش تبدا.',
   titel:'شنو هو العمل', titelHint:'مثلا: صباغة الصالون',
-  omschrijving:'تفاصيل', datum:'التاريخ', status:'الحالة',
+  omschrijving:'شنو فيها هاد الخدمة', omschrijvingHint:'شنو خاص يتدار، ولا شنو درتي', datum:'التاريخ', status:'الحالة',
   loon:'اليد العاملة ديالك', loonHint:'الثمن ديال الخدمة، بلا المواد.',
   matKop:'المواد والفاكتورات', matNaam:'شنو شريتي', matBedrag:'الثمن',
   matAdd:'+ زيد مادة ولا فاكتورة', bonFoto:'تصويرة ديال الفاكتورة',
@@ -435,7 +435,7 @@ var T={
   geenKlanten:'Nog geen klanten', geenKlantenSub:'Zet eerst een klant erin, daarna zijn klussen.',
   geenKlussen:'Nog geen klussen', geenKlussenSub:'Tik op Nieuwe klus om te beginnen.',
   titel:'Wat voor klus', titelHint:'Bijvoorbeeld: woonkamer schilderen',
-  omschrijving:'Wat je gedaan hebt', datum:'Datum', status:'Stand',
+  omschrijving:'Wat de klus inhoudt', omschrijvingHint:'Wat er moet gebeuren, of wat je gedaan hebt', datum:'Datum', status:'Stand',
   loon:'Jouw arbeid', loonHint:'Wat je voor het werk vraagt, zonder materialen.',
   matKop:'Materialen en bonnetjes', matNaam:'Wat gekocht', matBedrag:'Bedrag',
   matAdd:'+ Materiaal of bonnetje', bonFoto:'Foto van het bonnetje',
@@ -1661,7 +1661,7 @@ function openKlusForm(klusId,opdrachtId){
    + '<input class="in mono" id="k_datum" type="date" value="'+esc(k?k.datum||today():today())+'">';
 
   h+='<div class="label">'+esc(t('omschrijving'))+'</div>'
-   + '<textarea class="in" id="k_tekst">'+esc(k?k.tekst||'':'')+'</textarea>';
+   + '<textarea class="in" id="k_tekst" placeholder="'+esc(t('omschrijvingHint'))+'">'+esc(k?k.tekst||'':'')+'</textarea>';
 
   h+='<div class="label">'+esc(t('loon'))+'</div>'
    + '<div class="matrow"><div class="op">'
