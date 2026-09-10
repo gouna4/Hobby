@@ -41,6 +41,13 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 - Klanten met telefoonnummer, plaats en een notitie
 - Opdrachten per klant, met een afgesproken prijs en de betalingen
+- Elke opdracht doorloopt vier fasen: mee bezig, opgeleverd, factuur verstuurd,
+  betaald. Een knop zet hem naar de volgende
+- Het hokje voor een klus betekent klaar; wil je klussen kiezen om samen te
+  voegen of te delen, zet dan Klussen kiezen aan
+- Op het hoofdscherm vier cijfers: nog factureren, wacht op betaling, deze
+  maand binnen, materialen voorgeschoten
+- Bij elke klant staan zijn opdrachten er meteen onder, met hun fase
 - Per opdracht zoveel klusjes als nodig, met een datum en een omschrijving
 - Onderdelen binnen een klus: afvinken en per stuk een bedrag
 - Tabblad **Te doen**: alles wat nog openstaat over alle klanten heen, wat het
@@ -53,7 +60,9 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
   sluiten
 - Het tabblad waar je gebleven was wordt onthouden
 - Een klus even vasthouden geeft een menu om hem naar een andere opdracht te
-  verplaatsen
+  verplaatsen. In de stand Klussen kiezen verplaats je er meerdere tegelijk,
+  desnoods naar een gloednieuwe opdracht
+- De vier fasen mag je in de instellingen zelf een naam geven
 - Bij een opdracht kun je zowel het arbeidsbedrag als het materiaalbedrag zelf
   invullen; laat je er een leeg, dan telt de app de losse bedragen op
 - Een strook bovenaan als een opdracht langer dan een maand op betaling wacht
@@ -95,8 +104,8 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='12'` bovenaan het script
-2. `sw.js` — `klusboek-v12`
+1. `index.html` — `var VERSIE='14'` bovenaan het script
+2. `sw.js` — `klusboek-v14`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.
