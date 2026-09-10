@@ -255,7 +255,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='7', VERSIEDATUM='september 2026';
+var VERSIE='8', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -952,10 +952,12 @@ function klantOpslaan(id){
 
 /* ══ het scherm van één opdracht ══
    Hier staan de klusjes bij elkaar, en hier hangt het geld aan. */
-function openOpdracht(oid){
+function openOpdracht(oid,houdPlek){
   var o=opdrachtVan(oid);
   if(!o){closeSheet();return}
   ui.laatsteOpdr=oid;
+  var vorige=document.querySelector('.sheet');
+  var plek=(houdPlek&&vorige)?vorige.scrollTop:0;
   var alle=klussenVanOpdracht(oid).sort(opKlus);
   var gek=ui.gekozen[oid]||{};
   var nGek=0, gLoon=0, gMat=0;
@@ -1046,7 +1048,9 @@ function openOpdracht(oid){
   }
   h+='</div>';
   document.getElementById('sheet').innerHTML=h;
-  window.scrollTo(0,0);
+  var nu=document.querySelector('.sheet');
+  if(nu)nu.scrollTop=plek;
+  if(!houdPlek)window.scrollTo(0,0);
 }
 
 /* ══ opdracht invullen ══ */
@@ -1714,13 +1718,13 @@ document.addEventListener('click',function(e){
     ui.gekozen[id]=ui.gekozen[id]||{};
     var alAan=lijst.length&&lijst.every(function(k){return ui.gekozen[id][k.id]});
     lijst.forEach(function(k){ui.gekozen[id][k.id]=alAan?false:true});
-    openOpdracht(id); return;
+    openOpdracht(id,true); return;
   }
   if(act==='vink'){
     var kid=b.dataset.k;
     ui.gekozen[id]=ui.gekozen[id]||{};
     ui.gekozen[id][kid]=!ui.gekozen[id][kid];
-    openOpdracht(id); return;
+    openOpdracht(id,true); return;
   }
   if(act==='zetklaar'){
     var gek=ui.gekozen[id]||{}, iets=false;
@@ -1729,7 +1733,7 @@ document.addEventListener('click',function(e){
       iets=true; k.status='klaar';
     });
     if(!iets){ui.msg=t('nietsGekozen');render();return}
-    ui.gekozen[id]={}; save(); render(); openOpdracht(id); return;
+    ui.gekozen[id]={}; save(); render(); openOpdracht(id,true); return;
   }
   if(act==='overzicht'){openOverzicht(id);return}
   if(act==='ovwa'){

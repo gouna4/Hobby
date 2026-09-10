@@ -63,8 +63,8 @@ tellen vanzelf op naar de opdracht.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='7'` bovenaan het script
-2. `sw.js` — `klusboek-v7`
+1. `index.html` — `var VERSIE='8'` bovenaan het script
+2. `sw.js` — `klusboek-v8`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.
