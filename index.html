@@ -290,7 +290,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='15', VERSIEDATUM='september 2026';
+var VERSIE='16', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -315,8 +315,8 @@ var T={
   nogFactureren:'خاصك تصيفط الفاتورة', wachtBetaling:'كايتسنى الخلاص',
   voorgeschoten:'مواد خلصتيها من جيبك', bijKlant:'عند {k}',
   verplaatsen:'نقلو ل', verplaatstNaar:'تنقل ل {n}', houdVast:'شد العمل شوية باش تنقلو',
-  matTotaal:'مجموع المواد ديالك', matTotaalHint:'خليه خاوي باش يجمع الفاكتورات بوحدو.',
-  opgeteld:'مجموع الفاكتورات',
+  matTotaal:'مصاريف المواد', matTotaalHint:'اللي خلصتي من جيبك وبغيتي ترجعو. خليه خاوي باش يجمع الفاكتورات.',
+  opgeteld:'من الفاكتورات', bedragenAanpassen:'بدل المبالغ',
   inPlanning:'خدمة مبرمجة', nogTeDoen:'باقي يتدار فهاد الطلب',
   bkHerinner:'هادي {n} يوم ما دريتيش نسخة احتياطية', bkNooit:'مازال ما درتي نسخة احتياطية',
   bkNu:'دير وحدة دابا',
@@ -394,8 +394,8 @@ var T={
   voorgeschoten:'Materialen voorgeschoten', bijKlant:'bij {k}',
   verplaatsen:'Verplaatsen naar', verplaatstNaar:'Verplaatst naar {n}',
   houdVast:'Houd een klus even vast om hem te verplaatsen',
-  matTotaal:'Eigen totaal voor de materialen', matTotaalHint:'Laat leeg om de bonnetjes op te tellen.',
-  opgeteld:'Opgeteld uit de bonnetjes',
+  matTotaal:'Materiaalkosten', matTotaalHint:'Wat je hebt voorgeschoten en terug wilt. Laat je het leeg, dan telt de app je bonnetjes op.',
+  opgeteld:'Uit de bonnetjes', bedragenAanpassen:'Bedragen aanpassen',
   inPlanning:'Werk in de planning', nogTeDoen:'Nog te doen in deze opdracht',
   bkHerinner:'Je maakte al {n} dagen geen back-up', bkNooit:'Je hebt nog geen back-up gemaakt',
   bkNu:'Nu maken',
@@ -1321,7 +1321,7 @@ function openOpdracht(oid,houdPlek){
     h+=bedragRij(t('arbeid'),arbeid);
   }
   if(mat>0){
-    h+=bedragRij(t('materialen'),mat);
+    h+=bedragRij(t('matTotaal'),mat);
     var mVast=toDH(o.matLoon,o.matLoonCur||'MAD'), mOp=opdrMatOpgeteld(o);
     if(mVast>0.5&&mOp>0.5&&Math.abs(mVast-mOp)>=0.5)h+=bedragRij(t('opgeteld'),mOp);
   }
@@ -1333,6 +1333,7 @@ function openOpdracht(oid,houdPlek){
    + '<span class="r" style="color:var(--sky)">'+pv(dh(ligt))+'</span></div>';
   h+='<div class="row"><span>'+esc(t('nogTeKrijgen'))+'</span><span class="r'+(open>0?' op':'')+'">'+pv(dh(open))+'</span></div>';
   if(open>0)h+='<button class="outline groen" data-act="opdrbetaald" data-id="'+o.id+'">'+esc(t('allesBetaald'))+'</button>';
+  h+='<button class="outline quiet" data-act="opdrbew" data-id="'+o.id+'">✎ '+esc(t('bedragenAanpassen'))+'</button>';
   h+='</div>';
 
   var fase=opdrFase(o);
@@ -1470,7 +1471,8 @@ function openOpdrachtForm(oid,klantId){
    +   '<input class="in mono" id="o_mat" inputmode="decimal" placeholder="0" value="'+esc(o&&num(o.matLoon)?String(o.matLoon):'')+'">'
    +   curKnop('omat',formOpdrMatCur)
    + '</div></div>'
-   + '<div class="hint">'+esc(t('matTotaalHint'))+'</div>';
+   + '<div class="hint">'+esc(t('matTotaalHint'))
+   +   (o&&opdrMatOpgeteld(o)>0.5?' '+esc(t('opgeteld'))+': '+dh(opdrMatOpgeteld(o)):'')+'</div>';
 
   h+='<div class="label">'+esc(t('klantNotitie'))+'</div>'
    + '<textarea class="in" id="o_notitie">'+esc(o?o.notitie||'':'')+'</textarea>';
@@ -1515,7 +1517,7 @@ function tekenOpdrSom(){
      + (Math.abs(v)<0.5?'var(--mint)':'var(--saffron)')+'">'
      + (Math.abs(v)<0.5?esc(t('klopt'))+' ✓':dh(Math.abs(v)))+'</span></div>';
   } else h+=bedragRij(t('arbeid'),arbeid);
-  if(mat>0)h+=bedragRij(t('materialen'),mat);
+  if(mat>0)h+=bedragRij(t('matTotaal'),mat);
   if(matVast>0.5&&matOp>0.5){
     var mv=matVast-matOp;
     h+=bedragRij(t('opgeteld'),matOp)
