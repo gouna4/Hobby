@@ -29,7 +29,9 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:var(--night);color:var(--sand);font-family:var(--sans);
   font-size:16px;-webkit-text-size-adjust:100%;overscroll-behavior:none}
-body{min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+body{min-height:100vh}
+#app{display:flex;flex-direction:column;min-height:100vh}
+@supports (min-height:100dvh){#app{min-height:100dvh}}
 /* Bedragen blijven van links naar rechts staan, ook als de app in het Arabisch
    staat. Anders schuift het minteken of de munt naar de verkeerde kant. */
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em;
@@ -39,7 +41,7 @@ button{font-family:inherit;font-size:inherit;cursor:pointer;border:0;background:
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--azure);outline-offset:2px}
 input,select,textarea{font-family:inherit;font-size:16px}
 
-.wrap{max-width:480px;margin:0 auto;padding-bottom:124px}
+.wrap{max-width:480px;width:100%;margin:0 auto;padding-bottom:24px;flex:1 0 auto}
 
 /* ── kop ── */
 .top{position:sticky;top:0;z-index:20;background:var(--night);padding-top:env(safe-area-inset-top)}
@@ -116,20 +118,21 @@ input,select,textarea{font-family:inherit;font-size:16px}
 .thumbs .n{font-size:11px;color:var(--dim);align-self:center}
 
 /* ── onderbalk ── */
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--night);
-  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);
-  transform:translateZ(0);-webkit-backface-visibility:hidden}
-.bar-in{max-width:480px;margin:0 auto;padding:12px 18px 16px;display:flex;gap:8px}
+.bar{position:sticky;bottom:0;z-index:30;background:var(--night);
+  border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.bar-in{max-width:480px;width:100%;margin:0 auto;padding:12px 18px 16px;display:flex;gap:8px}
 .primary{flex:1;background:var(--azure);color:#1B1108;border-radius:13px;padding:14px;
   font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
 .second{flex:0 0 auto;border:1px solid var(--line);color:var(--sand);border-radius:13px;
   padding:14px 16px;font-size:15px;font-weight:600}
 
 /* ── schermen ── */
-.sheet{position:fixed;inset:0;z-index:40;background:var(--night);overflow-y:auto;padding-top:env(safe-area-inset-top)}
-.sheet-in{max-width:480px;margin:0 auto;padding:0 18px 170px}
+.sheet{position:fixed;inset:0;z-index:40;background:var(--night);overflow-y:auto;
+  display:flex;flex-direction:column}
+.sheet-in{max-width:480px;width:100%;margin:0 auto;padding:0 18px 40px;flex:1 0 auto}
 .shead{position:sticky;top:0;background:var(--night);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:10px;padding:15px 18px;margin:0 -18px;z-index:5}
+  display:flex;align-items:center;gap:10px;margin:0 -18px;z-index:5;
+  padding:calc(15px + env(safe-area-inset-top)) 18px 15px}
 .shead .t{font-size:18px;font-weight:650;letter-spacing:-.02em;flex:1;line-height:1.25}
 .back{font-size:24px;line-height:1;padding:2px 8px;flex:0 0 auto}
 html[dir="rtl"] .back{transform:scaleX(-1)}
@@ -150,13 +153,12 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .chip{border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12.5px;color:var(--dim);font-weight:600}
 .chip:active{background:var(--surface2)}
-.sbar{position:fixed;left:0;right:0;bottom:0;background:var(--night);border-top:1px solid var(--line);
-  padding-bottom:env(safe-area-inset-bottom);z-index:45;
-  transform:translateZ(0);-webkit-backface-visibility:hidden}
-.sbar-in{max-width:480px;margin:0 auto;display:flex;gap:8px;padding:12px 18px 16px}
+.sbar{position:sticky;bottom:0;background:var(--night);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);z-index:45}
+.sbar-in{max-width:480px;width:100%;margin:0 auto;display:flex;gap:8px;padding:12px 18px 16px}
 .sbar .cancel{border:1px solid var(--line);color:var(--dim);border-radius:13px;padding:14px 18px;font-size:14px;font-weight:600}
 .sbar .save{flex:1;background:var(--azure);color:#1B1108;border-radius:13px;padding:14px;font-size:15px;font-weight:700}
-.sbar .keuze{max-width:480px;margin:0 auto;padding:11px 18px 0;font-size:13px;color:var(--saffron);
+.sbar .keuze{max-width:480px;width:100%;margin:0 auto;padding:11px 18px 0;font-size:13px;color:var(--saffron);
   display:flex;justify-content:space-between;gap:10px;font-weight:600}
 .sbar .keuze .b{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
 .outline{width:100%;border:1px solid var(--azure);color:var(--azure);border-radius:13px;padding:12px;
@@ -244,7 +246,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 <div id="foto"></div>
 <input type="file" id="bonIn" accept="image/*"
   style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-<input type="file" id="s_file" accept=".json,application/json"
+<input type="file" id="s_file" accept=".json,.txt,application/json,text/plain"
   style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
 
 <script>
@@ -253,7 +255,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='1', VERSIEDATUM='september 2026';
+var VERSIE='4', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -1191,6 +1193,7 @@ function zetTerug(tekst){
   save();
   closeSheet();
   render();
+  controleerBonnen();
 }
 
 /* ══ cijferslot ══ */
@@ -1243,6 +1246,28 @@ function pinKlaar(){
   if(dots){dots.classList.add('bad');dots.parentNode.classList.add('shake');
     setTimeout(function(){var d2=document.getElementById('dots');
       if(d2){d2.classList.remove('bad');d2.parentNode.classList.remove('shake');tekenDots()}},420);}
+}
+
+function controleerBonnen(){
+  var iets=false;
+  S.klussen.forEach(function(k){(k.mats||[]).forEach(function(m){if(m.foto)iets=true})});
+  if(!iets)return;
+  fotoDB(function(db){
+    if(!db)return;
+    try{
+      var cur=db.transaction('bonnen','readonly').objectStore('bonnen').openCursor(), er={};
+      cur.onsuccess=function(e){
+        var c=e.target.result;
+        if(c){er[c.value.id]=1;c.continue();return}
+        var veranderd=false;
+        S.klussen.forEach(function(k){(k.mats||[]).forEach(function(m){
+          if(m.foto&&!er[m.id]){m.foto=false;veranderd=true}
+        })});
+        if(veranderd){save();render()}
+      };
+      cur.onerror=function(){};
+    }catch(e){}
+  });
 }
 
 function closeSheet(){document.getElementById('sheet').innerHTML=''}
@@ -1543,6 +1568,7 @@ document.addEventListener('click',function(e){
 })();
 
 load();
+controleerBonnen();
 if(S.pin){locked=true;render();pinBuf='';pinMode=null;lockScreen(t('app'),t('codeVraag'));}
 else render();
 

@@ -46,8 +46,8 @@ wissel je naar het Nederlands en terug.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='1'` bovenaan het script
-2. `sw.js` — `klusboek-v1`
+1. `index.html` — `var VERSIE='4'` bovenaan het script
+2. `sw.js` — `klusboek-v4`
 
 De regel onderaan de instellingen haalt het nummer daar zelf op.
 
