@@ -31,6 +31,12 @@ raken als afvinkbare lijst.
 Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Ze
 tellen vanzelf op naar de opdracht.
 
+**Nog te krijgen telt alleen werk dat af is.** Een klus die nog op *Moet nog*
+of *Bezig* staat is geen geld maar planning, en staat bovenaan apart als
+*Werk in de planning*. Materialen tellen wel meteen mee: die heb je immers
+voorgeschoten. Staat alles van een opdracht op klaar, dan geldt de prijs die
+je hebt afgesproken; anders tellen alleen de klussen die af zijn.
+
 ## Wat het bijhoudt
 
 - Klanten met telefoonnummer, plaats en een notitie
@@ -46,6 +52,12 @@ tellen vanzelf op naar de opdracht.
 - Terugvegen of de terugknop gaat één scherm terug in plaats van de app te
   sluiten
 - Het tabblad waar je gebleven was wordt onthouden
+- Een klus even vasthouden geeft een menu om hem naar een andere opdracht te
+  verplaatsen
+- Bij een opdracht kun je zowel het arbeidsbedrag als het materiaalbedrag zelf
+  invullen; laat je er een leeg, dan telt de app de losse bedragen op
+- Een strook bovenaan als een opdracht langer dan een maand op betaling wacht
+- Een strook bovenaan als je twee weken geen back-up maakte
 - Drie standen per klus: moet nog, bezig, klaar
 - Wat je voor het werk vraagt, apart van wat de materialen kosten
 - Soorten werk als knopjes onder het invulveld, met een plusje om er zelf
@@ -83,8 +95,8 @@ tellen vanzelf op naar de opdracht.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='10'` bovenaan het script
-2. `sw.js` — `klusboek-v10`
+1. `index.html` — `var VERSIE='12'` bovenaan het script
+2. `sw.js` — `klusboek-v12`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.

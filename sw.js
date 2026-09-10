@@ -1,4 +1,4 @@
-var CACHE = 'klusboek-v10';
+var CACHE = 'klusboek-v12';
 var FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 var WACHT = 2000; /* zo lang wachten we op het netwerk voordat we de opgeslagen versie pakken */
 

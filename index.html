@@ -90,6 +90,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
   border-radius:13px;padding:11px 14px;color:var(--sand);font-size:14px}
 
 /* ── kaarten ── */
+.card,.klusrij{-webkit-touch-callout:none}
 .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px;
   box-shadow:0 1px 0 rgba(255,255,255,.03) inset;animation:rise .24s cubic-bezier(.2,.8,.2,1) both;
   width:100%;text-align:start;display:block}
@@ -270,7 +271,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='10', VERSIEDATUM='september 2026';
+var VERSIE='12', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -281,6 +282,14 @@ var T={
   klanten:'الزبناء', klussen:'الأعمال', zoek:'بحث…',
   onderdelen:'الأجزاء ديال العمل', onderdeelNaam:'شنو خصو يتدار', onderdeelAdd:'+ زيد جزء',
   uitTekst:'دير من اللائحة أجزاء', verdeeldOnder:'مقسم على الأجزاء',
+  verplaatsen:'نقلو ل', verplaatstNaar:'تنقل ل {n}', houdVast:'شد العمل شوية باش تنقلو',
+  matTotaal:'مجموع المواد ديالك', matTotaalHint:'خليه خاوي باش يجمع الفاكتورات بوحدو.',
+  opgeteld:'مجموع الفاكتورات',
+  inPlanning:'خدمة مبرمجة', nogTeDoen:'باقي يتدار فهاد الطلب',
+  bkHerinner:'هادي {n} يوم ما دريتيش نسخة احتياطية', bkNooit:'مازال ما درتي نسخة احتياطية',
+  bkNu:'دير وحدة دابا',
+  laatOpen:'{n} طلبات كايتسناو الخلاص من أكثر من شهر', laatOpen1:'طلب كايتسنى الخلاص من أكثر من شهر',
+  bekijkOpen:'شوفهم',
   teDoen:'باقي يتدار', plakken:'لصق لائحة', plakUitleg:'لصق اللائحة ديالك هنا. كل سطر غادي يولي عمل بوحدو.',
   plakKnop:'دير منهم {n} أعمال', plakNiets:'ما كاين حتى سطر', niksTeDoen:'كولشي سالا',
   niksTeDoenSub:'ما بقا حتى عمل مفتوح.',
@@ -338,6 +347,16 @@ var T={
   klanten:'Klanten', klussen:'Klussen', zoek:'Zoeken…',
   onderdelen:'Onderdelen van deze klus', onderdeelNaam:'Wat moet er gebeuren', onderdeelAdd:'+ Onderdeel',
   uitTekst:'Maak er onderdelen van', verdeeldOnder:'Verdeeld over de onderdelen',
+  verplaatsen:'Verplaatsen naar', verplaatstNaar:'Verplaatst naar {n}',
+  houdVast:'Houd een klus even vast om hem te verplaatsen',
+  matTotaal:'Eigen totaal voor de materialen', matTotaalHint:'Laat leeg om de bonnetjes op te tellen.',
+  opgeteld:'Opgeteld uit de bonnetjes',
+  inPlanning:'Werk in de planning', nogTeDoen:'Nog te doen in deze opdracht',
+  bkHerinner:'Je maakte al {n} dagen geen back-up', bkNooit:'Je hebt nog geen back-up gemaakt',
+  bkNu:'Nu maken',
+  laatOpen:'{n} opdrachten wachten al langer dan een maand op betaling',
+  laatOpen1:'Een opdracht wacht al langer dan een maand op betaling',
+  bekijkOpen:'Bekijken',
   teDoen:'Te doen', plakken:'Lijst plakken', plakUitleg:'Plak hier je lijstje. Elke regel wordt een eigen klus.',
   plakKnop:'Maak er {n} klussen van', plakNiets:'Er staat nog niets in', niksTeDoen:'Alles is klaar',
   niksTeDoenSub:'Er staat geen enkele klus meer open.',
@@ -533,12 +552,35 @@ function opdrArbeid(o){
   var vast=toDH(o.loon,o.loonCur||'MAD');
   return vast>0.5?vast:opdrVerdeeld(o);
 }
-function opdrMat(o){
+function opdrMatOpgeteld(o){
   var s=0; klussenVanOpdracht(o.id).forEach(function(k){s+=matDH(k)}); return s;
+}
+/* Zet je bij de opdracht een eigen bedrag voor de materialen, dan geldt dat.
+   Laat je het leeg, dan telt de app de bonnetjes op. */
+function opdrMat(o){
+  var vast=toDH(o.matLoon,o.matLoonCur||'MAD');
+  return vast>0.5?vast:opdrMatOpgeteld(o);
 }
 function opdrTotaal(o){return opdrArbeid(o)+opdrMat(o)}
 function opdrBetaald(o){var s=0;(o.bet||[]).forEach(function(b){s+=toDH(b.bedrag,b.cur||'MAD')});return s}
-function opdrOpen(o){var v=opdrTotaal(o)-opdrBetaald(o);return v>0.5?v:0}
+
+/* Wat je nu mag vragen is alleen het werk dat af is, plus de materialen die je
+   hebt voorgeschoten. Is alles af, dan geldt de prijs die je hebt afgesproken;
+   anders tellen we alleen de klussen op die op Klaar staan. */
+function opdrArbeidKlaar(o){
+  var l=klussenVanOpdracht(o.id);
+  if(!l.length)return toDH(o.loon,o.loonCur||'MAD');
+  if(l.every(function(k){return (k.status||'todo')==='klaar'}))return opdrArbeid(o);
+  var s=0; l.forEach(function(k){if((k.status||'todo')==='klaar')s+=loonDH(k)});
+  return s;
+}
+/* wat er nog aan werk ligt: dat is nog geen geld, dat is planning */
+function opdrNogTeDoen(o){
+  var s=0;
+  klussenVanOpdracht(o.id).forEach(function(k){if((k.status||'todo')!=='klaar')s+=loonDH(k)});
+  return s;
+}
+function opdrOpen(o){var v=opdrArbeidKlaar(o)+opdrMat(o)-opdrBetaald(o);return v>0.5?v:0}
 function opdrAf(o){
   var l=klussenVanOpdracht(o.id);
   return l.length>0 && l.every(function(k){return (k.status||'todo')==='klaar'});
@@ -567,14 +609,33 @@ function telUit(n,m){
   return (n===1?'1 opdracht':n+' opdrachten')+' bij '+(m===1?'1 klant':m+' klanten');
 }
 
+function dagenSinds(datum){
+  if(!datum)return 0;
+  var d=new Date(datum);
+  if(isNaN(d))return 0;
+  return Math.floor((Date.now()-d.getTime())/86400000);
+}
+/* wanneer er voor het laatst iets aan een opdracht gebeurde */
+function opdrLaatst(o){
+  var laatst=o.datum||'';
+  klussenVanOpdracht(o.id).forEach(function(k){if((k.datum||'')>laatst)laatst=k.datum});
+  (o.bet||[]).forEach(function(b){if((b.datum||'')>laatst)laatst=b.datum});
+  return laatst;
+}
+
 function totalen(){
-  var open=0, nOpdr=0, maand=0, nu=maandVan(today()), klanten={};
+  var open=0, planning=0, nOpdr=0, maand=0, nu=maandVan(today()), klanten={}, oud=0;
   S.opdrachten.forEach(function(o){
     var v=opdrOpen(o);
-    if(v>0){open+=v;nOpdr++;klanten[o.klantId]=1}
+    planning+=opdrNogTeDoen(o);
+    if(v>0){
+      open+=v;nOpdr++;klanten[o.klantId]=1;
+      if(dagenSinds(opdrLaatst(o))>30)oud++;
+    }
     (o.bet||[]).forEach(function(b){if(maandVan(b.datum)===nu)maand+=toDH(b.bedrag,b.cur||'MAD')});
   });
-  return {open:open, nOpdr:nOpdr, nKlant:Object.keys(klanten).length, maand:maand};
+  return {open:open, planning:planning, nOpdr:nOpdr, nKlant:Object.keys(klanten).length,
+          maand:maand, oud:oud};
 }
 
 /* de soorten onder het invulveld: de vaste lijst plus wat je zelf toevoegt */
@@ -742,16 +803,31 @@ function render(){
    +   '<button class="icon-btn" data-act="settings" aria-label="instellingen">'+tandwiel()+'</button>'
    + '</div></div><div class="zellige"></div></div>';
 
+  var nTeDoen=S.klussen.filter(function(k){return (k.status||'todo')!=='klaar'}).length;
+
   h+='<div class="wrap"><div class="pad">';
   if(ui.msg) h+='<div class="melding"><button class="x" data-act="msgweg">×</button>'+esc(ui.msg)+'</div>';
+
+  /* niet vergeten te factureren */
+  if(tot.oud){
+    h+='<div class="melding"><div>'+esc(tot.oud===1?t('laatOpen1'):t('laatOpen',{n:tot.oud}))+'</div>'
+     + '<button class="outline" data-act="naaropen" style="margin-top:10px">'+esc(t('bekijkOpen'))+'</button></div>';
+  }
+  /* niet vergeten een back-up te maken */
+  var bkDagen=S.lastBackup?dagenSinds(S.lastBackup):999;
+  if(S.klussen.length&&bkDagen>13){
+    h+='<div class="melding"><div>'
+     + esc(S.lastBackup?t('bkHerinner',{n:bkDagen}):t('bkNooit'))+'</div>'
+     + '<button class="outline" data-act="settings" style="margin-top:10px">'+esc(t('bkNu'))+'</button></div>';
+  }
 
   h+='<div class="stats">'
    + '<div class="stat"><div class="k">'+esc(t('dezeMaand'))+'</div>'
    +   '<div class="v mono">'+pv(dh(tot.maand))+'</div>'
    +   (S.toonEuro?'<div class="s mono">'+pv(euBij(tot.maand))+'</div>':'')+'</div>'
-   + '<div class="stat"><div class="k">'+esc(t('openKlussen'))+'</div>'
-   +   '<div class="v mono">'+tot.nOpdr+'</div>'
-   +   '<div class="s mono">'+tot.nKlant+' '+esc(t('klanten').toLowerCase())+'</div></div>'
+   + '<div class="stat"><div class="k">'+esc(t('inPlanning'))+'</div>'
+   +   '<div class="v mono">'+pv(dh(tot.planning))+'</div>'
+   +   '<div class="s mono">'+nTeDoen+' '+esc(t('klussen').toLowerCase())+'</div></div>'
    + '</div>';
 
   h+='<div class="band"><div class="k">'+esc(t('nogTeKrijgen'))+'</div>'
@@ -761,7 +837,6 @@ function render(){
    + (tot.nOpdr?'<button class="go" data-act="naaropen">'+esc(t('bekijk'))+'</button>':'')
    + '</div>';
 
-  var nTeDoen=S.klussen.filter(function(k){return (k.status||'todo')!=='klaar'}).length;
   h+='<div class="tabswrap"><div class="tabs">'
    + tabBtn('tedoen',t('teDoen')+' ('+nTeDoen+')')
    + tabBtn('klanten',t('klanten')+' ('+S.klanten.length+')')
@@ -907,7 +982,7 @@ function klusKaart(k,toonWaar){
   var nBon=(k.mats||[]).filter(function(m){return m.foto}).length;
   /* De kaart is een div met daarin één groot vlak dat de klus opent, en
      daarnaast de stand als eigen knopje. Een knop in een knop mag niet. */
-  var h='<div class="card">';
+  var h='<div class="card" data-klus="'+k.id+'">';
   h+='<button class="cardvlak" data-act="klus" data-id="'+k.id+'">'
    + '<div class="cname">'+esc(k.titel||t('geenNaam'))+'</div>'
    + '<div class="cmeta">'+esc(dat(k.datum))
@@ -1147,11 +1222,18 @@ function openOpdracht(oid,houdPlek){
   } else {
     h+=bedragRij(t('arbeid'),arbeid);
   }
-  if(mat>0)h+=bedragRij(t('materialen'),mat);
+  if(mat>0){
+    h+=bedragRij(t('materialen'),mat);
+    var mVast=toDH(o.matLoon,o.matLoonCur||'MAD'), mOp=opdrMatOpgeteld(o);
+    if(mVast>0.5&&mOp>0.5&&Math.abs(mVast-mOp)>=0.5)h+=bedragRij(t('opgeteld'),mOp);
+  }
   h+='<div class="row som"><span>'+esc(t('totaal'))+'</span><span class="r">'+pv(dh(arbeid+mat))
    + (S.toonEuro?'<span class="euro">'+pv(euBij(arbeid+mat))+'</span>':'')+'</span></div>';
   if(bet>0)h+=bedragRij(t('alBetaald'),bet);
-  h+='<div class="row"><span>'+esc(t('openstaand'))+'</span><span class="r'+(open>0?' op':'')+'">'+pv(dh(open))+'</span></div>';
+  var ligt=opdrNogTeDoen(o);
+  if(ligt>0.5)h+='<div class="row"><span class="dim">'+esc(t('nogTeDoen'))+'</span>'
+   + '<span class="r" style="color:var(--sky)">'+pv(dh(ligt))+'</span></div>';
+  h+='<div class="row"><span>'+esc(t('nogTeKrijgen'))+'</span><span class="r'+(open>0?' op':'')+'">'+pv(dh(open))+'</span></div>';
   if(open>0)h+='<button class="outline groen" data-act="opdrbetaald" data-id="'+o.id+'">'+esc(t('allesBetaald'))+'</button>';
   h+='</div>';
 
@@ -1177,7 +1259,7 @@ function openOpdracht(oid,houdPlek){
   } else {
     mijn.forEach(function(k){
       var st=standVan(k), aan=!!gek[k.id], loon=loonDH(k), m=matDH(k);
-      h+='<div class="klusrij'+(aan?' aan':'')+'">'
+      h+='<div class="klusrij'+(aan?' aan':'')+'" data-klus="'+k.id+'">'
        + '<button class="vink" data-act="vink" data-id="'+o.id+'" data-k="'+k.id+'">✓</button>'
        + '<div class="mid">'
        +   '<button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
@@ -1196,6 +1278,7 @@ function openOpdracht(oid,houdPlek){
 
   h+='<button class="outline" data-act="nieuwklusopdr" data-id="'+o.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
   h+='<button class="outline quiet" data-act="plakken" data-id="'+o.id+'">'+esc(t('plakken'))+'</button>';
+  if(alle.length)h+='<div class="note">'+esc(t('houdVast'))+'</div>';
   h+='<button class="outline quiet" data-act="overzicht" data-id="'+o.id+'">'+esc(t('overzicht'))+'</button>';
   h+='<div class="divider"></div>';
   h+='<button class="outline gevaar" data-act="opdrwis" data-id="'+o.id+'">'
@@ -1222,7 +1305,7 @@ function openOpdracht(oid,houdPlek){
 }
 
 /* ══ opdracht invullen ══ */
-var formBet=[], formOpdrId='', formOpdrCur='MAD', formOpdrKlant='';
+var formBet=[], formOpdrId='', formOpdrCur='MAD', formOpdrMatCur='MAD', formOpdrKlant='';
 
 function opdrSuggestie(){
   var m=new Date().toLocaleDateString(ui.lang==='ar'?'fr-MA':'nl-NL',{month:'long'});
@@ -1232,7 +1315,8 @@ function opdrSuggestie(){
 function openOpdrachtForm(oid,klantId){
   var o=oid?opdrachtVan(oid):null;
   formOpdrId=oid||'';
-  formOpdrCur=o?(o.loonCur||'MAD'):S.munt;
+  formOpdrCur=(o&&o.loonCur)?o.loonCur:S.munt;
+  formOpdrMatCur=(o&&o.matLoonCur)?o.matLoonCur:S.munt;
   formOpdrKlant=o?o.klantId:(klantId||(S.klanten[0]&&S.klanten[0].id)||'');
   formBet=o?(o.bet||[]).map(function(b){return {id:b.id||uid(),bedrag:b.bedrag,cur:b.cur||'MAD',datum:b.datum}}):[];
   if(!S.klanten.length){ui.msg=t('geenKlantenSub');render();openKlantForm('');return}
@@ -1259,6 +1343,13 @@ function openOpdrachtForm(oid,klantId){
    + '</div></div>'
    + '<div class="hint">'+esc(t('afgesprokenHint'))+'</div>';
 
+  h+='<div class="label">'+esc(t('matTotaal'))+'</div>'
+   + '<div class="matrow"><div class="op">'
+   +   '<input class="in mono" id="o_mat" inputmode="decimal" placeholder="0" value="'+esc(o&&num(o.matLoon)?String(o.matLoon):'')+'">'
+   +   curKnop('omat',formOpdrMatCur)
+   + '</div></div>'
+   + '<div class="hint">'+esc(t('matTotaalHint'))+'</div>';
+
   h+='<div class="label">'+esc(t('klantNotitie'))+'</div>'
    + '<textarea class="in" id="o_notitie">'+esc(o?o.notitie||'':'')+'</textarea>';
 
@@ -1277,6 +1368,8 @@ function openOpdrachtForm(oid,klantId){
   tekenBet(); tekenOpdrSom();
   var lo=document.getElementById('o_loon');
   if(lo)lo.addEventListener('input',tekenOpdrSom);
+  var mo=document.getElementById('o_mat');
+  if(mo)mo.addEventListener('input',tekenOpdrSom);
 }
 
 function tekenOpdrSom(){
@@ -1286,7 +1379,10 @@ function tekenOpdrSom(){
   var el=document.getElementById('o_loon');
   var vast=toDH(el?el.value:0,formOpdrCur);
   var verdeeld=o?opdrVerdeeld(o):0;
-  var mat=o?opdrMat(o):0;
+  var elm=document.getElementById('o_mat');
+  var matVast=toDH(elm?elm.value:0,formOpdrMatCur);
+  var matOp=o?opdrMatOpgeteld(o):0;
+  var mat=matVast>0.5?matVast:matOp;
   var arbeid=vast>0.5?vast:verdeeld;
   var bet=0; formBet.forEach(function(b){bet+=toDH(b.bedrag,b.cur||'MAD')});
   var h='';
@@ -1298,6 +1394,13 @@ function tekenOpdrSom(){
      + (Math.abs(v)<0.5?esc(t('klopt'))+' ✓':dh(Math.abs(v)))+'</span></div>';
   } else h+=bedragRij(t('arbeid'),arbeid);
   if(mat>0)h+=bedragRij(t('materialen'),mat);
+  if(matVast>0.5&&matOp>0.5){
+    var mv=matVast-matOp;
+    h+=bedragRij(t('opgeteld'),matOp)
+     + '<div class="row"><span class="dim">'+esc(t('verschil'))+'</span><span class="r" style="color:'
+     + (Math.abs(mv)<0.5?'var(--mint)':'var(--saffron)')+'">'
+     + (Math.abs(mv)<0.5?esc(t('klopt'))+' ✓':dh(Math.abs(mv)))+'</span></div>';
+  }
   h+='<div class="row som"><span>'+esc(t('totaal'))+'</span><span class="r">'+dh(arbeid+mat)+'</span></div>';
   if(bet>0)h+=bedragRij(t('alBetaald'),bet);
   var open=arbeid+mat-bet;
@@ -1315,6 +1418,8 @@ function opdrachtOpslaan(oid){
   o.datum=document.getElementById('o_datum').value||today();
   o.loon=num(document.getElementById('o_loon').value);
   o.loonCur=formOpdrCur;
+  o.matLoon=num(document.getElementById('o_mat').value);
+  o.matLoonCur=formOpdrMatCur;
   o.notitie=document.getElementById('o_notitie').value.trim();
   o.bet=formBet.filter(function(b){return num(b.bedrag)>0})
     .map(function(b){return {id:b.id,bedrag:num(b.bedrag),cur:b.cur||'MAD',datum:b.datum||today()}});
@@ -1342,7 +1447,7 @@ function openKlusForm(klusId,opdrachtId){
   var k=klusId?klusById(klusId):null;
   formKlusId=klusId||'';
   formStatus=k?(k.status||'todo'):'todo';
-  formLoonCur=k?(k.loonCur||'MAD'):S.munt;
+  formLoonCur=(k&&k.loonCur)?k.loonCur:S.munt;
   formOpdr=k?k.opdrachtId:(opdrachtId||(opdrachtVan(ui.laatsteOpdr)?ui.laatsteOpdr:''));
   var oo=opdrachtVan(formOpdr);
   formKlant=oo?oo.klantId:((S.klanten[0]&&S.klanten[0].id)||'');
@@ -1701,6 +1806,88 @@ function voegSamen(oid){
   openKlusForm(doel.id,'');
 }
 
+/* ══ lang indrukken om te verplaatsen ══
+   Houd een klus een halve seconde vast en er komt een menu waarin je hem naar
+   een andere opdracht schuift. Sleep je ondertussen (je scrolt), dan gebeurt
+   er niets. */
+var lpTimer=null, lpId='', lpBezig=false, lpX=0, lpY=0;
+
+function lpStop(){
+  if(lpTimer){clearTimeout(lpTimer);lpTimer=null}
+}
+function lpStart(el,x,y){
+  var id=el.getAttribute('data-klus');
+  if(!id)return;
+  lpId=id; lpX=x; lpY=y;
+  lpStop();
+  lpTimer=setTimeout(function(){
+    lpTimer=null; lpBezig=true;
+    openVerplaats(lpId);
+    setTimeout(function(){lpBezig=false},600);
+  },500);
+}
+document.addEventListener('touchstart',function(e){
+  var el=e.target.closest('[data-klus]');
+  if(el&&e.touches&&e.touches[0])lpStart(el,e.touches[0].clientX,e.touches[0].clientY);
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(!lpTimer||!e.touches||!e.touches[0])return;
+  var dx=Math.abs(e.touches[0].clientX-lpX), dy=Math.abs(e.touches[0].clientY-lpY);
+  if(dx>8||dy>8)lpStop();
+},{passive:true});
+document.addEventListener('touchend',lpStop,{passive:true});
+document.addEventListener('touchcancel',lpStop,{passive:true});
+document.addEventListener('mousedown',function(e){
+  var el=e.target.closest('[data-klus]');
+  if(el)lpStart(el,e.clientX,e.clientY);
+});
+document.addEventListener('mouseup',lpStop);
+document.addEventListener('scroll',lpStop,true);
+
+function openVerplaats(klusId){
+  var k=klusById(klusId);
+  if(!k)return;
+  var hier=k.opdrachtId;
+  var h='<div class="sheet"><div class="sheet-in">';
+  h+='<div class="shead"><button class="back" data-act="verplaatsdicht">‹</button>'
+   + '<div class="t">'+esc(t('verplaatsen'))+'</div></div>';
+  h+='<div class="note">'+esc(k.titel||t('geenNaam'))+'</div>';
+
+  /* per klant de opdrachten eronder */
+  S.klanten.slice().sort(function(a,b){
+    return String(a.naam||'').localeCompare(String(b.naam||''));
+  }).forEach(function(c){
+    var lijst=opdrachtenVan(c.id).sort(opOpdracht);
+    if(!lijst.length)return;
+    h+='<div class="label">'+esc(c.naam||t('geenNaam'))+'</div>';
+    lijst.forEach(function(o){
+      var nu=o.id===hier;
+      h+='<button class="outline'+(nu?' quiet':'')+'" data-act="verplaatsnaar" data-k="'+klusId
+       + '" data-id="'+o.id+'"'+(nu?' disabled style="opacity:.5"':'')+'>'
+       + esc(o.naam)+(nu?' ✓':'')+'</button>';
+    });
+  });
+  h+='</div></div>';
+  document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){verplaatsDicht(hier)});
+  window.scrollTo(0,0);
+}
+
+function verplaatsDicht(oid){
+  closeSheet();
+  render();
+  if(oid&&opdrachtVan(oid))openOpdracht(oid);
+}
+
+function verplaatsNaar(klusId,oid){
+  var k=klusById(klusId), o=opdrachtVan(oid);
+  if(!k||!o)return;
+  k.opdrachtId=oid;
+  save();
+  ui.msg=t('verplaatstNaar',{n:o.naam});
+  closeSheet(); render(); openOpdracht(oid);
+}
+
 /* ══ overzicht voor de klant ══ */
 function waNummer(raw){
   var s=String(raw||'').replace(/[^0-9+]/g,'');
@@ -1957,6 +2144,7 @@ document.addEventListener('click',function(e){
   if(!b)return;
   var act=b.dataset.act;
   if(!act)return;
+  if(lpBezig&&act!=='verplaatsnaar'&&act!=='verplaatsdicht')return;
   var id=b.dataset.id||'';
 
   /* ── slot ── */
@@ -2084,6 +2272,8 @@ document.addEventListener('click',function(e){
   }
 
   /* ── klussen ── */
+  if(act==='verplaatsnaar'){verplaatsNaar(b.dataset.k,id);return}
+  if(act==='verplaatsdicht'){var kv=klusById(lpId);verplaatsDicht(kv?kv.opdrachtId:'');return}
   if(act==='standtik'){standDoor(b.dataset.k,id);return}
   if(act==='plakken'){openPlakken(id);return}
   if(act==='plakopslaan'){plakOpslaan(id);return}
@@ -2129,6 +2319,7 @@ document.addEventListener('click',function(e){
     var veld=b.dataset.veld, v=b.dataset.v;
     if(veld==='loon')formLoonCur=v;
     else if(veld==='oloon')formOpdrCur=v;
+    else if(veld==='omat')formOpdrMatCur=v;
     else if(veld.indexOf('taak')===0)formTaken[+veld.slice(4)].cur=v;
     else if(veld.indexOf('mat')===0)formMats[+veld.slice(3)].cur=v;
     else if(veld.indexOf('bet')===0)formBet[+veld.slice(3)].cur=v;
