@@ -290,7 +290,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='18', VERSIEDATUM='september 2026';
+var VERSIE='19', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -315,6 +315,9 @@ var T={
   nogFactureren:'خاصك تصيفط الفاتورة', wachtBetaling:'كايتسنى الخلاص',
   voorgeschoten:'مواد خلصتيها من جيبك', bijKlant:'عند {k}',
   verplaatsen:'نقلو ل', verplaatstNaar:'تنقل ل {n}', houdVast:'شد العمل شوية باش تنقلو',
+  bonKop:'الفاكتورة', bonDeel:'الجزء اللي غادي يمشي', bonDeelHint:'خليه خاوي باش تنقل الفاكتورة كاملة.',
+  bonWaarheen:'فين غادي', bonHele:'للطلب كامل', bonTeVeel:'هادشي أكثر من الفاكتورة',
+  bonGesplitst:'{b} تفصلو ل {k}', bonVerplaatst:'الفاكتورة مشات ل {k}',
   matMee:'{b} ديال المواد مشا معاه', verrekening:'تسوية عند الفصل',
   bonLijst:'الفاكتورات فهاد الطلب', bonVanKlus:'عند: {k}', bonVanOpdracht:'ديال الطلب كامل',
   bonOpdracht:'فاكتورات ديال الطلب كامل', geenBonnen:'ما كاين حتى فاكتورة',
@@ -397,6 +400,9 @@ var T={
   voorgeschoten:'Materialen voorgeschoten', bijKlant:'bij {k}',
   verplaatsen:'Verplaatsen naar', verplaatstNaar:'Verplaatst naar {n}',
   houdVast:'Houd een klus even vast om hem te verplaatsen',
+  bonKop:'Bonnetje', bonDeel:'Deel dat meegaat', bonDeelHint:'Laat leeg om het hele bonnetje te verplaatsen.',
+  bonWaarheen:'Waarheen', bonHele:'Voor de hele opdracht', bonTeVeel:'Dat is meer dan het bonnetje',
+  bonGesplitst:'{b} afgesplitst naar {k}', bonVerplaatst:'Bonnetje naar {k}',
   matMee:'{b} materiaalgeld mee', verrekening:'Verrekening bij het splitsen',
   bonLijst:'De bonnetjes in deze opdracht', bonVanKlus:'bij: {k}', bonVanOpdracht:'voor de hele opdracht',
   bonOpdracht:'Bonnetjes voor de hele opdracht', geenBonnen:'Nog geen bonnetjes',
@@ -1362,7 +1368,7 @@ function openOpdracht(oid,houdPlek){
   if(bonnen.length){
     h+='<div class="label">'+esc(t('bonLijst'))+' ('+bonnen.length+')</div>';
     bonnen.forEach(function(b){
-      h+='<button class="klusrij" style="width:100%" data-act="'+(b.klus?'klus':'opdrbew')+'" data-id="'+(b.klus||o.id)+'">'
+      h+='<button class="klusrij" style="width:100%" data-act="bonnetje" data-id="'+o.id+'" data-k="'+b.m.id+'">'
        + '<div class="mid"><div class="nm">'+esc(b.m.naam||t('geenNaam'))+'</div>'
        +   '<div class="sb">'+esc(b.van?t('bonVanKlus',{k:kort(b.van,34)}):t('bonVanOpdracht'))
        +   (b.m.foto?' · 📷':'')+'</div></div>'
@@ -1947,6 +1953,111 @@ function opruimenFotos(k){
   });
 }
 
+/* ══ een bonnetje verplaatsen of splitsen ══
+   Op één bon staan vaak spullen voor twee klussen. Dan haal je er een bedrag
+   af en zet je dat bij de andere klus. De foto gaat mee: die wordt gekopieerd,
+   zodat je bij allebei de regels dezelfde bon kunt terugzien. */
+function bonZoek(oid,mid){
+  var o=opdrachtVan(oid);
+  if(!o)return null;
+  var uit=null;
+  (o.mats||[]).forEach(function(m){if(m.id===mid)uit={m:m,klus:null,o:o}});
+  klussenVanOpdracht(oid).forEach(function(k){
+    (k.mats||[]).forEach(function(m){if(m.id===mid)uit={m:m,klus:k,o:o}});
+  });
+  return uit;
+}
+
+function openBonnetje(oid,mid){
+  var vondst=bonZoek(oid,mid);
+  if(!vondst){openOpdracht(oid);return}
+  var m=vondst.m, o=vondst.o;
+  var h='<div class="sheet"><div class="sheet-in">';
+  h+='<div class="shead"><button class="back" data-act="opdracht" data-id="'+oid+'">‹</button>'
+   + '<div class="t">'+esc(t('bonKop'))+'</div></div>';
+
+  h+='<div class="rekening">'
+   + '<div class="row"><span>'+esc(m.naam||t('geenNaam'))+'</span>'
+   +   '<span class="r">'+pv(dh(toDH(m.bedrag,m.cur||'MAD')))+'</span></div>'
+   + '<div class="row"><span class="dim">'
+   +   esc(vondst.klus?t('bonVanKlus',{k:vondst.klus.titel}):t('bonVanOpdracht'))+'</span></div>'
+   + '</div>';
+  if(m.foto)h+='<div class="fotorij"><button class="fototh" data-bon="'+m.id+'" data-act="bonkijk" data-k="'+m.id+'"></button></div>';
+
+  h+='<div class="label">'+esc(t('bonDeel'))+'</div>'
+   + '<div class="matrow"><div class="op">'
+   +   '<input class="in mono" id="b_deel" inputmode="decimal" placeholder="0">'
+   +   '<div class="cur"><button class="on" disabled>'+(m.cur==='EUR'?'€':'DH')+'</button></div>'
+   + '</div></div>'
+   + '<div class="hint">'+esc(t('bonDeelHint'))+'</div>';
+
+  h+='<div class="label">'+esc(t('bonWaarheen'))+'</div>';
+  if(vondst.klus)h+='<button class="outline" data-act="bongaat" data-id="'+oid+'" data-k="'+mid+'" data-doel="OPDRACHT">'
+   + esc(t('bonHele'))+'</button>';
+  klussenVanOpdracht(oid).sort(opKlus).forEach(function(k){
+    var hier=vondst.klus&&vondst.klus.id===k.id;
+    h+='<button class="outline'+(hier?' quiet':'')+'" data-act="bongaat" data-id="'+oid+'" data-k="'+mid+'"'
+     + ' data-doel="'+k.id+'"'+(hier?' disabled style="opacity:.5"':'')+'>'
+     + esc(kort(k.titel,44))+(hier?' ✓':'')+'</button>';
+  });
+  h+='</div></div>';
+  document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){openOpdracht(oid)});
+  window.scrollTo(0,0);
+  vulBonnen();
+}
+
+/* het hele bonnetje of alleen een deel ervan naar een andere plek */
+function bonGaat(oid,mid,doel){
+  var vondst=bonZoek(oid,mid);
+  if(!vondst)return;
+  var m=vondst.m, o=vondst.o;
+  var veld=document.getElementById('b_deel');
+  var af=num(veld?veld.value:0);
+  var totaal=num(m.bedrag);
+  if(af>0&&af>=totaal){ui.msg=t('bonTeVeel');openBonnetje(oid,mid);return}
+
+  var doelMats;
+  if(doel==='OPDRACHT'){o.mats=o.mats||[];doelMats=o.mats}
+  else{var dk=klusById(doel);if(!dk)return;dk.mats=dk.mats||[];doelMats=dk.mats}
+  var doelNaam = doel==='OPDRACHT' ? o.naam : klusById(doel).titel;
+
+  if(af>0){
+    /* splitsen: een deel gaat weg, de rest blijft staan */
+    m.bedrag=Math.round((totaal-af)*100)/100;
+    var nieuw={id:uid()+uid(),naam:m.naam,bedrag:Math.round(af*100)/100,cur:m.cur||S.munt,foto:false};
+    doelMats.push(nieuw);
+    save();
+    ui.msg=t('bonGesplitst',{b:dh(toDH(af,m.cur||'MAD')),k:doelNaam});
+    if(m.foto)kopieerBon(m.id,nieuw.id,function(){openOpdracht(oid)});
+    else {render();openOpdracht(oid)}
+  } else {
+    /* het hele bonnetje verhuist */
+    var bron = vondst.klus ? vondst.klus.mats : o.mats;
+    var ix=bron.indexOf(m);
+    if(ix>=0)bron.splice(ix,1);
+    doelMats.push(m);
+    save();
+    ui.msg=t('bonVerplaatst',{k:doelNaam});
+    render(); openOpdracht(oid);
+  }
+}
+
+/* de foto van een bon nog een keer opslaan onder een nieuwe naam */
+function kopieerBon(vanId,naarId,klaar){
+  bonLees(vanId,function(r){
+    if(!r||!r.blob){render();if(klaar)klaar();return}
+    bonSchrijf(naarId,r.blob,function(ok){
+      if(ok){
+        S.opdrachten.forEach(function(o){(o.mats||[]).forEach(function(m){if(m.id===naarId)m.foto=true})});
+        S.klussen.forEach(function(k){(k.mats||[]).forEach(function(m){if(m.id===naarId)m.foto=true})});
+        save();
+      }
+      render(); if(klaar)klaar();
+    });
+  });
+}
+
 /* ══ een opdracht splitsen ══
    Je hebt een paar klussen gedaan en wilt daar een factuur van sturen. Wat nog
    moet gebeuren verhuist naar een nieuwe opdracht, zodat deze afgerond kan
@@ -2508,6 +2619,9 @@ document.addEventListener('click',function(e){
     if(rest>0.5){ob.bet=ob.bet||[];ob.bet.push(restBetaling(rest));save();render()}
     openOpdracht(id); return;
   }
+  if(act==='bonnetje'){openBonnetje(id,b.dataset.k);return}
+  if(act==='bongaat'){bonGaat(id,b.dataset.k,b.dataset.doel);return}
+  if(act==='bonkijk'){openBon(b.dataset.k);return}
   if(act==='splitsen'){
     if(ui.confirm!=='splits'+id){ui.confirm='splits'+id;openOpdracht(id,true);return}
     splitsOpdracht(id); return;
