@@ -290,7 +290,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='14', VERSIEDATUM='september 2026';
+var VERSIE='15', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -301,6 +301,10 @@ var T={
   klanten:'الزبناء', klussen:'الأعمال', zoek:'بحث…',
   onderdelen:'الأجزاء ديال العمل', onderdeelNaam:'شنو خصو يتدار', onderdeelAdd:'+ زيد جزء',
   uitTekst:'دير من اللائحة أجزاء', verdeeldOnder:'مقسم على الأجزاء',
+  splitsen:'فصل الخدمة اللي سالات', splitsZeker:'دوس ثاني باش تفصلهم',
+  splitsUitleg:'اللي باقي غادي يمشي لطلب جديد، وهاد الطلب يبقى للفاتورة.',
+  splitsKan:'خاصك شي أعمال سالات وشي أعمال باقية', vervolg:'— التكملة',
+  gesplitst:'{n} أعمال مشاو ل {k}',
   faseNamen:'الأسماء ديال المراحل', faseHint:'خليه خاوي باش يبقى الاسم العادي.',
   verplaatsKeuze:'نقل المختارين', nieuweLijst:'＋ طلب جديد وحطهم فيه',
   verplaatstAantal:'{n} أعمال تنقلو ل {k}',
@@ -375,6 +379,10 @@ var T={
   klanten:'Klanten', klussen:'Klussen', zoek:'Zoeken…',
   onderdelen:'Onderdelen van deze klus', onderdeelNaam:'Wat moet er gebeuren', onderdeelAdd:'+ Onderdeel',
   uitTekst:'Maak er onderdelen van', verdeeldOnder:'Verdeeld over de onderdelen',
+  splitsen:'Klaar werk apart zetten', splitsZeker:'Nog een keer tikken om te splitsen',
+  splitsUitleg:'Wat nog moet gebeuren gaat naar een nieuwe opdracht, zodat je deze kunt factureren.',
+  splitsKan:'Er moet werk klaar zijn en werk over zijn', vervolg:'— vervolg',
+  gesplitst:'{n} klussen naar {k}',
   faseNamen:'Namen van de fasen', faseHint:'Laat leeg om de gewone naam te houden.',
   verplaatsKeuze:'Verplaatsen', nieuweLijst:'＋ Nieuwe opdracht, en zet ze daarin',
   verplaatstAantal:'{n} klussen verplaatst naar {k}',
@@ -1385,6 +1393,12 @@ function openOpdracht(oid,houdPlek){
 
   h+='<button class="outline" data-act="nieuwklusopdr" data-id="'+o.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
   h+='<button class="outline quiet" data-act="plakken" data-id="'+o.id+'">'+esc(t('plakken'))+'</button>';
+  var nAf=alle.filter(function(k){return (k.status||'todo')==='klaar'}).length;
+  if(nAf&&nAf<alle.length){
+    h+='<button class="outline" data-act="splitsen" data-id="'+o.id+'">'
+     + esc(ui.confirm==='splits'+o.id?t('splitsZeker'):t('splitsen'))+'</button>'
+     + '<div class="note">'+esc(t('splitsUitleg'))+'</div>';
+  }
   if(alle.length)h+='<div class="note">'+esc(t('houdVast'))+'</div>';
   h+='<button class="outline quiet" data-act="overzicht" data-id="'+o.id+'">'+esc(t('overzicht'))+'</button>';
   h+='<div class="divider"></div>';
@@ -1529,7 +1543,7 @@ function opdrachtOpslaan(oid){
   o.matLoon=num(document.getElementById('o_mat').value);
   o.matLoonCur=formOpdrMatCur;
   o.notitie=document.getElementById('o_notitie').value.trim();
-  o.bet=formBet.filter(function(b){return num(b.bedrag)>0})
+  o.bet=formBet.filter(function(b){return num(b.bedrag)!==0})
     .map(function(b){return {id:b.id,bedrag:num(b.bedrag),cur:b.cur||'MAD',datum:b.datum||today()}});
   save();
   closeSheet(); render(); openOpdracht(o.id);
@@ -1859,6 +1873,54 @@ function opruimenFotos(k){
   formNieuweFotos.forEach(function(id){
     if(!houden[id]){bonCacheWeg(id);bonWis(id)}
   });
+}
+
+/* ══ een opdracht splitsen ══
+   Je hebt een paar klussen gedaan en wilt daar een factuur van sturen. Wat nog
+   moet gebeuren verhuist naar een nieuwe opdracht, zodat deze afgerond kan
+   worden. Een afgesproken prijs wordt naar rato meeverdeeld. */
+function splitsOpdracht(oid){
+  var o=opdrachtVan(oid);
+  if(!o)return;
+  var alle=klussenVanOpdracht(oid);
+  var af=[], rest=[];
+  alle.forEach(function(k){((k.status||'todo')==='klaar'?af:rest).push(k)});
+  if(!af.length||!rest.length){
+    ui.msg=t('splitsKan'); ui.confirm=''; render(); openOpdracht(oid,true); return;
+  }
+
+  var nieuw={id:uid(),klantId:o.klantId,naam:((o.naam||'')+' '+t('vervolg')).trim(),
+             datum:today(),loon:0,loonCur:o.loonCur||S.munt,matLoon:0,matLoonCur:S.munt,
+             notitie:'',bet:[],at:Date.now()};
+
+  /* Vanaf nu komt het bedrag uit de klussen zelf: deze opdracht telt de
+     afgeronde klussen op, de nieuwe telt op wat er nog moet gebeuren.
+     Een afgesproken totaalprijs sloeg op het hele pakket en vervalt dus. */
+  o.loon=0;
+  o.matLoon=0;
+
+  S.opdrachten.push(nieuw);
+  rest.forEach(function(k){k.opdrachtId=nieuw.id});
+  o.fase='opgeleverd';
+
+  /* Zijn er materialen meeverhuisd die al vergoed zijn, dan hoort dat geld bij
+     de nieuwe opdracht. Anders vraagt die er nog een keer om terwijl de oude
+     opdracht te veel binnen heeft. We gaan ervan uit dat een betaling eerst de
+     materialen dekt; die schiet je immers voor. Beide regels staan gewoon in
+     het formulier en kun je wissen als het anders lag. */
+  var verhuisdeMat=opdrMatOpgeteld(nieuw), alBetaald=opdrBetaald(o);
+  var mee=Math.min(verhuisdeMat,alBetaald);
+  if(mee>0.5){
+    var bedrag=(S.munt==='EUR')?Math.round(mee/(S.rate||1)*100)/100:Math.round(mee);
+    o.bet=o.bet||[];
+    o.bet.push({id:uid(),bedrag:-bedrag,cur:S.munt,datum:today(),auto:true});
+    nieuw.bet.push({id:uid(),bedrag:bedrag,cur:S.munt,datum:today(),auto:true});
+  }
+  ui.gekozen[oid]={};
+  save();
+  ui.msg=t('gesplitst',{n:rest.length,k:nieuw.naam})+' · '+t('nogTeKrijgen')+' '+dh(opdrOpen(o));
+  ui.confirm='';
+  render(); openOpdracht(oid);
 }
 
 /* ══ klussen samenvoegen ══
@@ -2367,6 +2429,10 @@ document.addEventListener('click',function(e){
     var rest=opdrOpen(ob);
     if(rest>0.5){ob.bet=ob.bet||[];ob.bet.push(restBetaling(rest));save();render()}
     openOpdracht(id); return;
+  }
+  if(act==='splitsen'){
+    if(ui.confirm!=='splits'+id){ui.confirm='splits'+id;openOpdracht(id,true);return}
+    splitsOpdracht(id); return;
   }
   if(act==='fasezet'){faseZetten(id,b.dataset.v);return}
   if(act==='kiesmodus'){ui.kies=!ui.kies;if(!ui.kies)ui.gekozen[id]={};openOpdracht(id,true);return}

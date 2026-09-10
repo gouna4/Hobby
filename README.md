@@ -41,6 +41,9 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 - Klanten met telefoonnummer, plaats en een notitie
 - Opdrachten per klant, met een afgesproken prijs en de betalingen
+- Een opdracht splitsen: het afgeronde werk blijft staan om te factureren, de
+  rest verhuist naar een vervolgopdracht. Het bedrag komt daarna uit de klussen
+  zelf, dus een afgesproken totaalprijs vervalt bij het splitsen
 - Elke opdracht doorloopt vier fasen: mee bezig, opgeleverd, factuur verstuurd,
   betaald. Een knop zet hem naar de volgende
 - Het hokje voor een klus betekent klaar; wil je klussen kiezen om samen te
@@ -104,8 +107,8 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='14'` bovenaan het script
-2. `sw.js` — `klusboek-v14`
+1. `index.html` — `var VERSIE='15'` bovenaan het script
+2. `sw.js` — `klusboek-v15`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.
