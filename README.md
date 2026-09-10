@@ -28,8 +28,10 @@ zet je bij de klus een bedrag, dan telt dat; anders telt de app de onderdelen
 op. Zo kun je twaalf klusjes tot één klus samenvoegen zonder ze kwijt te
 raken als afvinkbare lijst.
 
-Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Ze
-tellen vanzelf op naar de opdracht.
+Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Koop je
+iets voor de hele opdracht, dan hang je het bonnetje aan de opdracht zelf. Alle
+bonnetjes staan bij elkaar op het opdrachtscherm, met erbij waar ze vandaan
+komen, en tellen op tot de materiaalkosten.
 
 **Nog te krijgen telt alleen werk dat af is.** Een klus die nog op *Moet nog*
 of *Bezig* staat is geen geld maar planning, en staat bovenaan apart als
@@ -107,8 +109,8 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='16'` bovenaan het script
-2. `sw.js` — `klusboek-v16`
+1. `index.html` — `var VERSIE='18'` bovenaan het script
+2. `sw.js` — `klusboek-v18`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.

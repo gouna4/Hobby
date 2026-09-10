@@ -134,7 +134,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
 .opdrrij .sb{font-size:12px;color:var(--dim);margin-top:3px}
 .opdrrij .val{flex:0 0 auto;font-family:var(--mono);font-size:13px;white-space:nowrap;
   direction:ltr;unicode-bidi:isolate}
-.klusrij.af .vink{background:var(--mint);border-color:var(--mint);color:#0C2119}
+.klusrij.af.aan .vink{background:var(--mint);border-color:var(--mint);color:#0C2119}
 .row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:14px;margin-top:9px}
 .row .r{font-family:var(--mono);text-align:end;letter-spacing:-.01em;white-space:nowrap;
   direction:ltr;unicode-bidi:isolate}
@@ -290,7 +290,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='16', VERSIEDATUM='september 2026';
+var VERSIE='18', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -315,6 +315,9 @@ var T={
   nogFactureren:'خاصك تصيفط الفاتورة', wachtBetaling:'كايتسنى الخلاص',
   voorgeschoten:'مواد خلصتيها من جيبك', bijKlant:'عند {k}',
   verplaatsen:'نقلو ل', verplaatstNaar:'تنقل ل {n}', houdVast:'شد العمل شوية باش تنقلو',
+  matMee:'{b} ديال المواد مشا معاه', verrekening:'تسوية عند الفصل',
+  bonLijst:'الفاكتورات فهاد الطلب', bonVanKlus:'عند: {k}', bonVanOpdracht:'ديال الطلب كامل',
+  bonOpdracht:'فاكتورات ديال الطلب كامل', geenBonnen:'ما كاين حتى فاكتورة',
   matTotaal:'مصاريف المواد', matTotaalHint:'اللي خلصتي من جيبك وبغيتي ترجعو. خليه خاوي باش يجمع الفاكتورات.',
   opgeteld:'من الفاكتورات', bedragenAanpassen:'بدل المبالغ',
   inPlanning:'خدمة مبرمجة', nogTeDoen:'باقي يتدار فهاد الطلب',
@@ -394,6 +397,9 @@ var T={
   voorgeschoten:'Materialen voorgeschoten', bijKlant:'bij {k}',
   verplaatsen:'Verplaatsen naar', verplaatstNaar:'Verplaatst naar {n}',
   houdVast:'Houd een klus even vast om hem te verplaatsen',
+  matMee:'{b} materiaalgeld mee', verrekening:'Verrekening bij het splitsen',
+  bonLijst:'De bonnetjes in deze opdracht', bonVanKlus:'bij: {k}', bonVanOpdracht:'voor de hele opdracht',
+  bonOpdracht:'Bonnetjes voor de hele opdracht', geenBonnen:'Nog geen bonnetjes',
   matTotaal:'Materiaalkosten', matTotaalHint:'Wat je hebt voorgeschoten en terug wilt. Laat je het leeg, dan telt de app je bonnetjes op.',
   opgeteld:'Uit de bonnetjes', bedragenAanpassen:'Bedragen aanpassen',
   inPlanning:'Werk in de planning', nogTeDoen:'Nog te doen in deze opdracht',
@@ -600,8 +606,23 @@ function opdrArbeid(o){
   var vast=toDH(o.loon,o.loonCur||'MAD');
   return vast>0.5?vast:opdrVerdeeld(o);
 }
+function opdrEigenMat(o){
+  var s=0;(o.mats||[]).forEach(function(m){s+=toDH(m.bedrag,m.cur||'MAD')});return s;
+}
+/* alle bonnetjes bij elkaar: die van de klussen plus die van de opdracht zelf */
 function opdrMatOpgeteld(o){
-  var s=0; klussenVanOpdracht(o.id).forEach(function(k){s+=matDH(k)}); return s;
+  var s=opdrEigenMat(o);
+  klussenVanOpdracht(o.id).forEach(function(k){s+=matDH(k)});
+  return s;
+}
+/* alle bonnetjes op een rij, met erbij waar ze vandaan komen */
+function alleBonnen(o){
+  var uit=[];
+  (o.mats||[]).forEach(function(m){uit.push({m:m,van:'',klus:''})});
+  klussenVanOpdracht(o.id).sort(opKlus).forEach(function(k){
+    (k.mats||[]).forEach(function(m){uit.push({m:m,van:k.titel,klus:k.id})});
+  });
+  return uit;
 }
 /* Zet je bij de opdracht een eigen bedrag voor de materialen, dan geldt dat.
    Laat je het leeg, dan telt de app de bonnetjes op. */
@@ -1337,6 +1358,20 @@ function openOpdracht(oid,houdPlek){
   h+='</div>';
 
   var fase=opdrFase(o);
+  var bonnen=alleBonnen(o);
+  if(bonnen.length){
+    h+='<div class="label">'+esc(t('bonLijst'))+' ('+bonnen.length+')</div>';
+    bonnen.forEach(function(b){
+      h+='<button class="klusrij" style="width:100%" data-act="'+(b.klus?'klus':'opdrbew')+'" data-id="'+(b.klus||o.id)+'">'
+       + '<div class="mid"><div class="nm">'+esc(b.m.naam||t('geenNaam'))+'</div>'
+       +   '<div class="sb">'+esc(b.van?t('bonVanKlus',{k:kort(b.van,34)}):t('bonVanOpdracht'))
+       +   (b.m.foto?' · 📷':'')+'</div></div>'
+       + '<div class="val">'+pv(dh(toDH(b.m.bedrag,b.m.cur||'MAD')))+'</div></button>';
+    });
+    h+='<div class="row som"><span>'+esc(t('opgeteld'))+'</span><span class="r">'
+     + pv(dh(opdrMatOpgeteld(o)))+'</span></div>';
+  }
+
   h+='<div class="label">'+esc(t('fase'))+'</div><div class="seg four">'
    + FASEN.map(function(f){
        return '<button data-act="fasezet" data-id="'+o.id+'" data-v="'+f+'" class="'
@@ -1428,7 +1463,7 @@ function openOpdracht(oid,houdPlek){
 }
 
 /* ══ opdracht invullen ══ */
-var formBet=[], formOpdrId='', formOpdrCur='MAD', formOpdrMatCur='MAD', formOpdrKlant='';
+var formBet=[], formOmats=[], formOpdrId='', formOpdrCur='MAD', formOpdrMatCur='MAD', formOpdrKlant='';
 
 function opdrSuggestie(){
   var m=new Date().toLocaleDateString(ui.lang==='ar'?'fr-MA':'nl-NL',{month:'long'});
@@ -1441,7 +1476,8 @@ function openOpdrachtForm(oid,klantId){
   formOpdrCur=(o&&o.loonCur)?o.loonCur:S.munt;
   formOpdrMatCur=(o&&o.matLoonCur)?o.matLoonCur:S.munt;
   formOpdrKlant=o?o.klantId:(klantId||(S.klanten[0]&&S.klanten[0].id)||'');
-  formBet=o?(o.bet||[]).map(function(b){return {id:b.id||uid(),bedrag:b.bedrag,cur:b.cur||'MAD',datum:b.datum}}):[];
+  formBet=o?(o.bet||[]).map(function(b){return {id:b.id||uid(),bedrag:b.bedrag,cur:b.cur||'MAD',datum:b.datum,auto:b.auto}}):[];
+  formOmats=o?(o.mats||[]).map(function(m){return {id:m.id,naam:m.naam,bedrag:m.bedrag,cur:m.cur||'MAD',foto:!!m.foto}}):[];
   if(!S.klanten.length){ui.msg=t('geenKlantenSub');render();openKlantForm('');return}
 
   var h='<div class="sheet"><div class="sheet-in">';
@@ -1474,6 +1510,9 @@ function openOpdrachtForm(oid,klantId){
    + '<div class="hint">'+esc(t('matTotaalHint'))
    +   (o&&opdrMatOpgeteld(o)>0.5?' '+esc(t('opgeteld'))+': '+dh(opdrMatOpgeteld(o)):'')+'</div>';
 
+  h+='<div class="label">'+esc(t('bonOpdracht'))+'</div><div id="o_mats"></div>'
+   + '<button class="matadd" data-act="omatadd">'+esc(t('matAdd'))+'</button>';
+
   h+='<div class="label">'+esc(t('klantNotitie'))+'</div>'
    + '<textarea class="in" id="o_notitie">'+esc(o?o.notitie||'':'')+'</textarea>';
 
@@ -1489,7 +1528,7 @@ function openOpdrachtForm(oid,klantId){
   document.getElementById('sheet').innerHTML=h;
   terugAan(function(){if(oid&&opdrachtVan(oid))openOpdracht(oid);else if(formOpdrKlant&&klantVan(formOpdrKlant))openKlant(formOpdrKlant);else{closeSheet();render()}});
   window.scrollTo(0,0);
-  tekenBet(); tekenOpdrSom();
+  tekenBet(); tekenOmats(); tekenOpdrSom();
   var lo=document.getElementById('o_loon');
   if(lo)lo.addEventListener('input',tekenOpdrSom);
   var mo=document.getElementById('o_mat');
@@ -1505,7 +1544,8 @@ function tekenOpdrSom(){
   var verdeeld=o?opdrVerdeeld(o):0;
   var elm=document.getElementById('o_mat');
   var matVast=toDH(elm?elm.value:0,formOpdrMatCur);
-  var matOp=o?opdrMatOpgeteld(o):0;
+  var eigen=0; formOmats.forEach(function(m){eigen+=toDH(m.bedrag,m.cur||'MAD')});
+  var matOp=eigen+(o?opdrMatOpgeteld(o)-opdrEigenMat(o):0);
   var mat=matVast>0.5?matVast:matOp;
   var arbeid=vast>0.5?vast:verdeeld;
   var bet=0; formBet.forEach(function(b){bet+=toDH(b.bedrag,b.cur||'MAD')});
@@ -1545,6 +1585,8 @@ function opdrachtOpslaan(oid){
   o.matLoon=num(document.getElementById('o_mat').value);
   o.matLoonCur=formOpdrMatCur;
   o.notitie=document.getElementById('o_notitie').value.trim();
+  o.mats=formOmats.filter(function(m){return (m.naam&&String(m.naam).trim())||num(m.bedrag)||m.foto})
+    .map(function(m){return {id:m.id,naam:String(m.naam||'').trim(),bedrag:num(m.bedrag),cur:m.cur||'MAD',foto:!!m.foto}});
   o.bet=formBet.filter(function(b){return num(b.bedrag)!==0})
     .map(function(b){return {id:b.id,bedrag:num(b.bedrag),cur:b.cur||'MAD',datum:b.datum||today()}});
   save();
@@ -1787,6 +1829,33 @@ function tekenMats(){
   vulBonnen();
 }
 
+/* dezelfde regels als bij een klus, maar dan voor de opdracht zelf */
+function tekenOmats(){
+  var box=document.getElementById('o_mats');
+  if(!box)return;
+  var h='';
+  formOmats.forEach(function(m,i){
+    h+='<div class="matrow">'
+     + '<input class="in" data-omat="naam" data-i="'+i+'" placeholder="'+esc(t('matNaam'))+'" value="'+esc(m.naam||'')+'">'
+     + '<div class="op">'
+     +   '<button class="bon'+(m.foto?' heeft':'')+'" data-act="obonpak" data-i="'+i+'"'
+     +     (m.foto?' data-bon="'+m.id+'"':'')+' title="'+esc(t('bonFoto'))+'">'+(m.foto?'':'📷')+'</button>'
+     +   '<input class="in mono" data-omat="bedrag" data-i="'+i+'" inputmode="decimal" placeholder="'+esc(t('matBedrag'))+'" value="'+esc(num(m.bedrag)?String(m.bedrag):'')+'">'
+     +   curKnop('omt'+i,m.cur||'MAD')
+     +   '<button class="weg" data-act="omatweg" data-i="'+i+'">×</button>'
+     + '</div></div>';
+  });
+  box.innerHTML=h;
+  Array.prototype.forEach.call(box.querySelectorAll('[data-omat]'),function(el){
+    el.addEventListener('input',function(){
+      var i=+el.getAttribute('data-i');
+      formOmats[i][el.getAttribute('data-omat')]=el.value;
+      tekenOpdrSom();
+    });
+  });
+  vulBonnen();
+}
+
 function tekenBet(){
   var box=document.getElementById('o_bet');
   if(!box)return;
@@ -1798,6 +1867,7 @@ function tekenBet(){
      + '<button class="weg" data-act="betweg" data-i="'+i+'">×</button>'
      + '</div>'
      + '<div class="op"><input class="in mono" data-bet="datum" data-i="'+i+'" type="date" value="'+esc(b.datum||today())+'"></div>'
+     + (b.auto?'<div class="hint" style="margin-top:6px">'+esc(t('verrekening'))+'</div>':'')
      + '</div>';
   });
   box.innerHTML=h;
@@ -1920,7 +1990,8 @@ function splitsOpdracht(oid){
   }
   ui.gekozen[oid]={};
   save();
-  ui.msg=t('gesplitst',{n:rest.length,k:nieuw.naam})+' · '+t('nogTeKrijgen')+' '+dh(opdrOpen(o));
+  ui.msg=t('gesplitst',{n:rest.length,k:nieuw.naam})+' · '+t('nogTeKrijgen')+' '+dh(opdrOpen(o))
+        +(mee>0.5?' · '+t('matMee',{b:dh(mee)}):'');
   ui.confirm='';
   render(); openOpdracht(oid);
 }
@@ -2313,6 +2384,7 @@ function pinKlaar(){
 function controleerBonnen(){
   var iets=false;
   S.klussen.forEach(function(k){(k.mats||[]).forEach(function(m){if(m.foto)iets=true})});
+  S.opdrachten.forEach(function(o){(o.mats||[]).forEach(function(m){if(m.foto)iets=true})});
   if(!iets)return;
   fotoDB(function(db){
     if(!db)return;
@@ -2323,6 +2395,9 @@ function controleerBonnen(){
         if(c){er[c.value.id]=1;c.continue();return}
         var veranderd=false;
         S.klussen.forEach(function(k){(k.mats||[]).forEach(function(m){
+          if(m.foto&&!er[m.id]){m.foto=false;veranderd=true}
+        })});
+        S.opdrachten.forEach(function(o){(o.mats||[]).forEach(function(m){
           if(m.foto&&!er[m.id]){m.foto=false;veranderd=true}
         })});
         if(veranderd){save();render()}
@@ -2419,6 +2494,7 @@ document.addEventListener('click',function(e){
     klussenVanOpdracht(id).forEach(function(k){
       (k.mats||[]).forEach(function(m){if(m.foto){bonCacheWeg(m.id);bonWis(m.id)}});
     });
+    if(o0)(o0.mats||[]).forEach(function(m){if(m.foto){bonCacheWeg(m.id);bonWis(m.id)}});
     S.klussen=S.klussen.filter(function(k){return k.opdrachtId!==id});
     S.opdrachten=S.opdrachten.filter(function(o){return o.id!==id});
     ui.confirm=''; save(); closeSheet(); render();
@@ -2548,6 +2624,7 @@ document.addEventListener('click',function(e){
     if(veld==='loon')formLoonCur=v;
     else if(veld==='oloon')formOpdrCur=v;
     else if(veld==='omat')formOpdrMatCur=v;
+    else if(veld.indexOf('omt')===0)formOmats[+veld.slice(3)].cur=v;
     else if(veld.indexOf('taak')===0)formTaken[+veld.slice(4)].cur=v;
     else if(veld.indexOf('mat')===0)formMats[+veld.slice(3)].cur=v;
     else if(veld.indexOf('bet')===0)formBet[+veld.slice(3)].cur=v;
@@ -2568,6 +2645,20 @@ document.addEventListener('click',function(e){
     return;
   }
   if(act==='uittekst'){uitTekstMaken();return}
+  if(act==='omatadd'){formOmats.push({id:uid()+uid(),naam:'',bedrag:'',cur:S.munt,foto:false});tekenOmats();tekenOpdrSom();return}
+  if(act==='omatweg'){
+    var oi=+b.dataset.i, om=formOmats[oi];
+    if(om&&om.foto){bonCacheWeg(om.id);bonWis(om.id)}
+    formOmats.splice(oi,1); tekenOmats(); tekenOpdrSom(); return;
+  }
+  if(act==='obonpak'){
+    var obi=+b.dataset.i, obm=formOmats[obi];
+    if(!obm)return;
+    if(obm.foto){openBon(obm.id);return}
+    bonDoel=obm.id;
+    document.getElementById('bonIn').click();
+    return;
+  }
   if(act==='matadd'){formMats.push({id:uid()+uid(),naam:'',bedrag:'',cur:S.munt,foto:false});tekenMats();tekenSom();return}
   if(act==='matweg'){
     var mi=+b.dataset.i, mm=formMats[mi];
@@ -2612,6 +2703,8 @@ document.addEventListener('click',function(e){
   if(act==='bonweg'){
     bonCacheWeg(id); bonWis(id);
     formMats.forEach(function(m){if(m.id===id)m.foto=false});
+    formOmats.forEach(function(m){if(m.id===id)m.foto=false});
+    tekenOmats();
     var kb=formKlusId?klusById(formKlusId):null;
     if(kb)(kb.mats||[]).forEach(function(m){if(m.id===id)m.foto=false});
     if(kb)save();
@@ -2689,10 +2782,12 @@ document.addEventListener('click',function(e){
     verklein(f,function(blob){
       bonSchrijf(doel,blob,function(ok){
         if(!ok){ui.msg=t('opslaanMislukt');render();return}
-        formMats.forEach(function(m){if(m.id===doel)m.foto=true});
+        var raak=false;
+        formMats.forEach(function(m){if(m.id===doel){m.foto=true;raak=true}});
+        formOmats.forEach(function(m){if(m.id===doel){m.foto=true;raak=true}});
         formNieuweFotos.push(doel);
         bonCacheWeg(doel);
-        tekenMats();
+        tekenMats(); tekenOmats();
       });
     });
   });
