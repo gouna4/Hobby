@@ -290,7 +290,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='20', VERSIEDATUM='september 2026';
+var VERSIE='21', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -348,7 +348,7 @@ var T={
   arbeid:'اليد العاملة', materialen:'المواد', totaal:'المجموع', alBetaald:'المدفوع', openstaand:'الباقي',
   geenKlanten:'ما كاين حتى زبون', geenKlantenSub:'زيد الزبون ديالك الأول، من اللور زيد ليه الأعمال.',
   geenKlussen:'ما كاين حتى عمل', geenKlussenSub:'دوس على «عمل جديد» باش تبدا.',
-  titel:'شنو هو العمل', titelHint:'مثلا: صباغة الصالون',
+  titel:'شنو هو العمل', titelHint:'مثلا: صباغة الممر', chipHint:'دوس على نوع وكتب من بعد فين',
   omschrijving:'شنو فيها هاد الخدمة', omschrijvingHint:'شنو خاص يتدار، ولا شنو درتي', datum:'التاريخ', status:'الحالة',
   loon:'اليد العاملة ديالك', loonHint:'الثمن ديال الخدمة، بلا المواد.',
   matKop:'المواد والفاكتورات', matNaam:'شنو شريتي', matBedrag:'الثمن',
@@ -434,7 +434,7 @@ var T={
   arbeid:'Arbeid', materialen:'Materialen', totaal:'Totaal', alBetaald:'Betaald', openstaand:'Openstaand',
   geenKlanten:'Nog geen klanten', geenKlantenSub:'Zet eerst een klant erin, daarna zijn klussen.',
   geenKlussen:'Nog geen klussen', geenKlussenSub:'Tik op Nieuwe klus om te beginnen.',
-  titel:'Wat voor klus', titelHint:'Bijvoorbeeld: woonkamer schilderen',
+  titel:'Wat voor klus', titelHint:'Bijvoorbeeld: Schilderen gang', chipHint:'Tik een soort aan en typ erachter waar het is',
   omschrijving:'Wat de klus inhoudt', omschrijvingHint:'Wat er moet gebeuren, of wat je gedaan hebt', datum:'Datum', status:'Stand',
   loon:'Jouw arbeid', loonHint:'Wat je voor het werk vraagt, zonder materialen.',
   matKop:'Materialen en bonnetjes', matNaam:'Wat gekocht', matBedrag:'Bedrag',
@@ -1647,6 +1647,7 @@ function openKlusForm(klusId,opdrachtId){
   h+='<div class="label">'+esc(t('titel'))+'</div>'
    + '<input class="in" id="k_titel" placeholder="'+esc(t('titelHint'))+'" value="'+esc(k?k.titel:'')+'">'
    + '<div class="chips" id="k_chips"></div>'
+   + '<div class="hint">'+esc(t('chipHint'))+'</div>'
    + '<div id="k_soortnieuw" hidden><div style="display:flex;gap:8px;margin-top:9px">'
    +   '<input class="in" id="k_soortin" placeholder="'+esc(t('soortNieuw'))+'">'
    +   '<button class="chip" data-act="soortok" style="flex:0 0 auto;padding:0 16px">✓</button>'
@@ -2700,7 +2701,20 @@ document.addEventListener('click',function(e){
   if(act==='nieuwklusopdr'){ui.confirm='';openKlusForm('',id);return}
   if(act==='chip'){
     var ti=document.getElementById('k_titel');
-    if(ti){ti.value=b.dataset.v;ti.focus()}
+    if(!ti)return;
+    var soort=b.dataset.v, rest=ti.value.replace(/^\s+/,'').replace(/\s+$/,'');
+    /* stond er al een soort voorop, dan wisselt die; wat je zelf typte blijft */
+    var bekend=soortenLijst();
+    for(var ci=0;ci<bekend.length;ci++){
+      var w=bekend[ci];
+      if(rest===w||rest.indexOf(w+' ')===0){
+        rest=rest.slice(w.length).replace(/^\s+/,'');
+        break;
+      }
+    }
+    ti.value=rest?(soort+' '+rest):(soort+' ');
+    ti.focus();
+    try{ti.setSelectionRange(ti.value.length,ti.value.length)}catch(e){}
     return;
   }
   if(act==='soortadd'){
