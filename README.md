@@ -22,6 +22,12 @@ app laat dan zien of dat samen uitkomt op wat je hebt afgesproken, en hoeveel
 je nog te verdelen hebt. Vul je bij de opdracht geen prijs in, dan telt de app
 gewoon de losse bedragen bij elkaar op.
 
+Een klus mag zelf ook weer uit **onderdelen** bestaan: losse regels die je
+afvinkt en die elk een eigen bedrag mogen hebben. Dezelfde regel geldt daar:
+zet je bij de klus een bedrag, dan telt dat; anders telt de app de onderdelen
+op. Zo kun je twaalf klusjes tot één klus samenvoegen zonder ze kwijt te
+raken als afvinkbare lijst.
+
 Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Ze
 tellen vanzelf op naar de opdracht.
 
@@ -30,6 +36,16 @@ tellen vanzelf op naar de opdracht.
 - Klanten met telefoonnummer, plaats en een notitie
 - Opdrachten per klant, met een afgesproken prijs en de betalingen
 - Per opdracht zoveel klusjes als nodig, met een datum en een omschrijving
+- Onderdelen binnen een klus: afvinken en per stuk een bedrag
+- Tabblad **Te doen**: alles wat nog openstaat over alle klanten heen, wat het
+  langst ligt bovenaan. Dit is ook het startscherm
+- De stand van een klus met een tik doorzetten: moet nog, bezig, klaar. Werkt
+  op de kaart en in de lijst van een opdracht
+- **Lijst plakken**: plak een lijstje uit de groepsapp en elke regel wordt een
+  eigen klus. Streepjes, bolletjes en nummers gaan er vanzelf af
+- Terugvegen of de terugknop gaat één scherm terug in plaats van de app te
+  sluiten
+- Het tabblad waar je gebleven was wordt onthouden
 - Drie standen per klus: moet nog, bezig, klaar
 - Wat je voor het werk vraagt, apart van wat de materialen kosten
 - Soorten werk als knopjes onder het invulveld, met een plusje om er zelf
@@ -44,8 +60,9 @@ tellen vanzelf op naar de opdracht.
 - Meerdere klussen in een opdracht aanvinken; onderin staat meteen wat die
   samen kosten, en je zet ze in een tik op klaar
 - Aangevinkte klussen samenvoegen tot een klus: de oudste blijft staan, de
-  titels van de rest komen als lijst in de omschrijving, bedragen worden
-  opgeteld en de materialen met hun bonnetjes verhuizen mee
+  andere worden onderdelen die je kunt afvinken en beprijzen, en de materialen
+  met hun bonnetjes verhuizen mee. Een klus die eerder tot platte tekst was
+  samengevoegd repareer je met de knop *Maak er onderdelen van*
 - Van die aangevinkte klussen een overzicht maken en dat via WhatsApp of het
   deelmenu naar de klant sturen, in het Arabisch of het Nederlands
 - Een opdracht in één tik helemaal op betaald zetten
@@ -66,8 +83,8 @@ tellen vanzelf op naar de opdracht.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='9'` bovenaan het script
-2. `sw.js` — `klusboek-v9`
+1. `index.html` — `var VERSIE='10'` bovenaan het script
+2. `sw.js` — `klusboek-v10`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.

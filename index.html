@@ -90,7 +90,7 @@ input,select,textarea{font-family:inherit;font-size:16px}
   border-radius:13px;padding:11px 14px;color:var(--sand);font-size:14px}
 
 /* ── kaarten ── */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px;
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px;
   box-shadow:0 1px 0 rgba(255,255,255,.03) inset;animation:rise .24s cubic-bezier(.2,.8,.2,1) both;
   width:100%;text-align:start;display:block}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -99,6 +99,18 @@ input,select,textarea{font-family:inherit;font-size:16px}
 .cmeta{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.4}
 .pill{flex:0 0 auto;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:700;white-space:nowrap;
   letter-spacing:.04em}
+/* de stand als knopje: één tik zet hem door naar de volgende stand */
+.pill.tik{position:absolute;top:14px;inset-inline-end:14px;z-index:2}
+.pill.tik:active{transform:scale(.94)}
+.cardvlak{display:block;width:100%;text-align:start;padding:0;background:none;border:0;color:inherit}
+.cardvlak .cname{padding-inline-end:96px}
+.ministand{border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700;letter-spacing:.03em;
+  vertical-align:1px;margin-inline-end:4px}
+.ministand.todo{border:1px solid var(--line);color:var(--dim)}
+.ministand.bezig{background:var(--sky);color:#0B1226}
+.ministand.klaar{background:transparent;border:1px solid var(--teal);color:var(--teal)}
+.klusrij .mid{flex:1;min-width:0}
+.klusrij .nmbtn{display:block;width:100%;text-align:start;padding:0;background:none;border:0;color:inherit}
 .pill.todo{background:transparent;color:var(--dim);border:1px solid var(--line)}
 .pill.bezig{background:var(--sky);color:#0B1226;border:1px solid var(--sky)}
 .pill.klaar{background:transparent;color:var(--teal);border:1px solid var(--teal)}
@@ -197,6 +209,9 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 .klusrij .vink{flex:0 0 auto;width:25px;height:25px;border-radius:8px;border:1px solid var(--line);
   display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:transparent;margin-top:2px}
 .klusrij.aan .vink{background:var(--azure);border-color:var(--azure);color:#1B1108}
+.matrow .vink{flex:0 0 auto;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:transparent}
+.matrow .vink.aan{background:var(--mint);border-color:var(--mint);color:#0C2119}
 .klusrij .mid{flex:1;min-width:0}
 .klusrij .nm{font-size:14.5px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
 .klusrij .sb{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.45}
@@ -255,7 +270,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='9', VERSIEDATUM='september 2026';
+var VERSIE='10', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -264,6 +279,11 @@ var T={
  ar:{
   app:'دفتر الخدمة', sub:'الأعمال والزبناء',
   klanten:'الزبناء', klussen:'الأعمال', zoek:'بحث…',
+  onderdelen:'الأجزاء ديال العمل', onderdeelNaam:'شنو خصو يتدار', onderdeelAdd:'+ زيد جزء',
+  uitTekst:'دير من اللائحة أجزاء', verdeeldOnder:'مقسم على الأجزاء',
+  teDoen:'باقي يتدار', plakken:'لصق لائحة', plakUitleg:'لصق اللائحة ديالك هنا. كل سطر غادي يولي عمل بوحدو.',
+  plakKnop:'دير منهم {n} أعمال', plakNiets:'ما كاين حتى سطر', niksTeDoen:'كولشي سالا',
+  niksTeDoenSub:'ما بقا حتى عمل مفتوح.',
   opdracht:'الطلب', opdrachten:'الطلبات', nieuweOpdracht:'طلب جديد',
   opdrNaam:'اسم الطلب', opdrNaamHint:'مثلا: خدمة شهر شتنبر',
   bijOpdracht:'عند أي طلب', maakOpdracht:'＋ طلب جديد',
@@ -316,6 +336,11 @@ var T={
  nl:{
   app:'Klusboek', sub:'Klussen en klanten',
   klanten:'Klanten', klussen:'Klussen', zoek:'Zoeken…',
+  onderdelen:'Onderdelen van deze klus', onderdeelNaam:'Wat moet er gebeuren', onderdeelAdd:'+ Onderdeel',
+  uitTekst:'Maak er onderdelen van', verdeeldOnder:'Verdeeld over de onderdelen',
+  teDoen:'Te doen', plakken:'Lijst plakken', plakUitleg:'Plak hier je lijstje. Elke regel wordt een eigen klus.',
+  plakKnop:'Maak er {n} klussen van', plakNiets:'Er staat nog niets in', niksTeDoen:'Alles is klaar',
+  niksTeDoenSub:'Er staat geen enkele klus meer open.',
   opdracht:'Opdracht', opdrachten:'Opdrachten', nieuweOpdracht:'Nieuwe opdracht',
   opdrNaam:'Naam van de opdracht', opdrNaamHint:'Bijvoorbeeld: werk september',
   bijOpdracht:'Bij welke opdracht', maakOpdracht:'＋ Nieuwe opdracht',
@@ -379,9 +404,9 @@ var VAAK={
 };
 
 /* ── wat er bewaard wordt ── */
-var S={rate:10.8, lang:'ar', munt:'MAD', toonEuro:true, klanten:[], opdrachten:[], klussen:[],
+var S={rate:10.8, lang:'ar', munt:'MAD', toonEuro:true, tab:'tedoen', klanten:[], opdrachten:[], klussen:[],
   soorten:[], pin:'', hide:false, snaps:[], lastBackup:''};
-var ui={lang:'ar', tab:'klanten', kfil:'alles', kfilOpdr:'alles', laatsteOpdr:'', q:'', msg:'', confirm:'', gekozen:{}};
+var ui={lang:'ar', tab:'tedoen', kfil:'alles', kfilOpdr:'alles', laatsteOpdr:'', q:'', msg:'', confirm:'', gekozen:{}};
 
 function load(){
   try{
@@ -391,6 +416,7 @@ function load(){
       if(d.rate)S.rate=d.rate;
       if(d.lang)S.lang=d.lang;
       if(d.munt)S.munt=d.munt;
+      if(d.tab)ui.tab=d.tab;
       if(typeof d.toonEuro==='boolean')S.toonEuro=d.toonEuro;
       if(Array.isArray(d.klanten))S.klanten=d.klanten;
       if(Array.isArray(d.opdrachten))S.opdrachten=d.opdrachten;
@@ -426,7 +452,7 @@ function save(){
   snapshotBij();
   for(var poging=0;poging<4;poging++){
     try{
-      localStorage.setItem(KEY,JSON.stringify({v:1,rate:S.rate,lang:ui.lang,munt:S.munt,toonEuro:S.toonEuro,
+      localStorage.setItem(KEY,JSON.stringify({v:1,rate:S.rate,lang:ui.lang,munt:S.munt,tab:ui.tab,toonEuro:S.toonEuro,
         klanten:S.klanten,opdrachten:S.opdrachten,klussen:S.klussen,soorten:S.soorten,pin:S.pin,hide:S.hide,snaps:S.snaps,lastBackup:S.lastBackup}));
       return true;
     }catch(e){
@@ -479,7 +505,6 @@ function pv(s){return S.hide?'••••':s}
    Het geld hoort bij de opdracht: daar spreek je een prijs af en daar wordt
    betaald. Wat een los klusje kost mag je er per klus bij zetten; de app laat
    zien of dat samen uitkomt op wat je hebt afgesproken. */
-function loonDH(k){return toDH(k.loon,k.loonCur||'MAD')}
 function matDH(k){var s=0;(k.mats||[]).forEach(function(m){s+=toDH(m.bedrag,m.cur||'MAD')});return s}
 function totaalDH(k){return loonDH(k)+matDH(k)}
 function standVan(k){return k.status||'todo'}
@@ -736,7 +761,9 @@ function render(){
    + (tot.nOpdr?'<button class="go" data-act="naaropen">'+esc(t('bekijk'))+'</button>':'')
    + '</div>';
 
+  var nTeDoen=S.klussen.filter(function(k){return (k.status||'todo')!=='klaar'}).length;
   h+='<div class="tabswrap"><div class="tabs">'
+   + tabBtn('tedoen',t('teDoen')+' ('+nTeDoen+')')
    + tabBtn('klanten',t('klanten')+' ('+S.klanten.length+')')
    + tabBtn('opdrachten',t('opdrachten')+' ('+S.opdrachten.length+')')
    + tabBtn('klussen',t('klussen')+' ('+S.klussen.length+')')
@@ -752,7 +779,21 @@ function render(){
   h+='<input class="search" id="zoek" placeholder="'+esc(t('zoek'))+'" value="'+esc(ui.q)+'">';
 
   var q=ui.q.trim().toLowerCase();
-  if(ui.tab==='klanten'){
+  if(ui.tab==='tedoen'){
+    /* alles wat nog moet, over alle klanten heen; wat het langst ligt bovenaan */
+    var td=S.klussen.filter(function(k){return (k.status||'todo')!=='klaar'});
+    if(q)td=td.filter(function(k){
+      return ((k.titel||'')+' '+(k.tekst||'')+' '+opdrachtNaam(k.opdrachtId)+' '
+             +klantNaam(klantVanKlus(k))).toLowerCase().indexOf(q)>=0;
+    });
+    td.sort(function(a,b){
+      return String(a.datum||'').localeCompare(String(b.datum||''))||((a.at||0)-(b.at||0));
+    });
+    if(!td.length){
+      h+='<div class="empty"><b>'+esc(t('niksTeDoen'))+'</b><span>'+esc(t('niksTeDoenSub'))+'</span></div>';
+    } else td.forEach(function(k){h+=klusKaart(k,true)});
+
+  } else if(ui.tab==='klanten'){
     var kl=S.klanten.slice().sort(function(a,b){return String(a.naam||'').localeCompare(String(b.naam||''))});
     if(q)kl=kl.filter(function(c){
       return (c.naam+' '+(c.plaats||'')+' '+(c.tel||'')).toLowerCase().indexOf(q)>=0;
@@ -864,19 +905,133 @@ function opdrachtKaart(o){
 function klusKaart(k,toonWaar){
   var st=standVan(k), loon=loonDH(k), mat=matDH(k);
   var nBon=(k.mats||[]).filter(function(m){return m.foto}).length;
-  var h='<button class="card" data-act="klus" data-id="'+k.id+'">';
-  h+='<div class="chead"><div><div class="cname">'+esc(k.titel||t('geenNaam'))+'</div>'
+  /* De kaart is een div met daarin één groot vlak dat de klus opent, en
+     daarnaast de stand als eigen knopje. Een knop in een knop mag niet. */
+  var h='<div class="card">';
+  h+='<button class="cardvlak" data-act="klus" data-id="'+k.id+'">'
+   + '<div class="cname">'+esc(k.titel||t('geenNaam'))+'</div>'
    + '<div class="cmeta">'+esc(dat(k.datum))
-   + (toonWaar?' · '+esc(klantNaam(klantVanKlus(k)))+' · '+esc(opdrachtNaam(k.opdrachtId)):'')+'</div></div>'
-   + '<span class="pill '+st+'">'+esc(t(st))+'</span></div>';
+   + (toonWaar?' · '+esc(klantNaam(klantVanKlus(k)))+' · '+esc(opdrachtNaam(k.opdrachtId)):'')+'</div>';
   if(k.tekst)h+='<div class="cmeta" style="margin:10px 0 0;white-space:pre-wrap">'+esc(kort(k.tekst,150))+'</div>';
+  if((k.taken||[]).length)h+='<div class="row"><span class="dim">'+esc(t('onderdelen'))+'</span>'
+   + '<span class="r">'+takenKlaar(k)+' / '+k.taken.length+'</span></div>';
   if(loon>0)h+='<div class="row"><span class="dim">'+esc(t('arbeid'))+'</span><span class="r">'+pv(dh(loon))+'</span></div>';
   if(mat>0)h+='<div class="row"><span class="dim">'+esc(t('materialen'))+(nBon?' · '+nBon+' '+esc(t('bonnetjes')):'')
    + '</span><span class="r">'+pv(dh(mat))+'</span></div>';
   if(loon+mat>0)h+='<div class="row som"><span>'+esc(t('totaal'))+'</span><span class="r">'+pv(dh(loon+mat))+'</span></div>';
   h+='</button>';
+  h+='<button class="pill tik '+st+'" data-act="standtik" data-k="'+k.id+'">'+esc(t(st))+'</button>';
+  h+='</div>';
   return h;
 }
+
+/* het hoofdscherm opnieuw tekenen zonder dat je je plek kwijtraakt */
+function hertekenOpPlek(){
+  var y=window.scrollY||window.pageYOffset||0;
+  render();
+  window.scrollTo(0,y);
+}
+
+/* de stand doorzetten: moet nog -> bezig -> klaar -> moet nog */
+var STANDEN=['todo','bezig','klaar'];
+function standDoor(klusId,opdrachtId){
+  var k=klusById(klusId);
+  if(!k)return;
+  var i=STANDEN.indexOf(k.status||'todo');
+  k.status=STANDEN[(i+1)%STANDEN.length];
+  save();
+  if(opdrachtId&&opdrachtVan(opdrachtId)){render();openOpdracht(opdrachtId,true)}
+  else hertekenOpPlek();
+}
+
+/* ══ een lijstje plakken ══
+   Je krijgt de opdrachten in de groepsapp als lijstje binnen. Plak dat hier
+   en elke regel wordt een eigen klus. Streepjes, bolletjes en nummers voor
+   de regel halen we eraf. */
+function plakRegels(tekst){
+  var uit=[];
+  String(tekst||'').split(NR).forEach(function(r){
+    r=String(r).replace(/^[\s •●–—*+.\-]+/,'');
+    r=r.replace(/^[0-9]+[.):]\s*/,'');
+    r=r.replace(/\s+$/,'');
+    if(r)uit.push(r);
+  });
+  return uit;
+}
+
+function openPlakken(oid){
+  var o=opdrachtVan(oid);
+  if(!o){closeSheet();return}
+  var h='<div class="sheet"><div class="sheet-in">';
+  h+='<div class="shead"><button class="back" data-act="opdracht" data-id="'+oid+'">‹</button>'
+   + '<div class="t">'+esc(t('plakken'))+'</div></div>';
+  h+='<div class="note">'+esc(o.naam)+' · '+esc(klantNaam(o.klantId))+'</div>';
+  h+='<div class="hint">'+esc(t('plakUitleg'))+'</div>';
+  h+='<textarea class="in" id="pl_txt" style="min-height:220px;margin-top:10px"></textarea>';
+  h+='<div class="rekening" id="pl_uit"></div>';
+  h+='</div>';
+  h+='<div class="sbar"><div class="sbar-in">'
+   + '<button class="cancel" data-act="opdracht" data-id="'+oid+'">'+esc(t('annuleer'))+'</button>'
+   + '<button class="save" id="pl_knop" data-act="plakopslaan" data-id="'+oid+'">'+esc(t('plakKnop',{n:0}))+'</button>'
+   + '</div></div></div>';
+  document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){openOpdracht(oid)});
+  window.scrollTo(0,0);
+  var vak=document.getElementById('pl_txt');
+  vak.addEventListener('input',tekenPlak);
+  vak.focus();
+  tekenPlak();
+}
+
+/* terwijl je plakt meteen laten zien wat eruit gaat komen */
+function tekenPlak(){
+  var vak=document.getElementById('pl_txt');
+  if(!vak)return;
+  var regels=plakRegels(vak.value);
+  var knop=document.getElementById('pl_knop');
+  if(knop)knop.textContent=t('plakKnop',{n:regels.length});
+  var box=document.getElementById('pl_uit');
+  if(!box)return;
+  if(!regels.length){box.innerHTML='<div class="row"><span class="dim">'+esc(t('plakNiets'))+'</span></div>';return}
+  box.innerHTML=regels.slice(0,12).map(function(r,i){
+    return '<div class="row"><span>'+(i+1)+'. '+esc(kort(r,60))+'</span></div>';
+  }).join('')+(regels.length>12?'<div class="row"><span class="dim">…</span></div>':'');
+}
+
+function plakOpslaan(oid){
+  var vak=document.getElementById('pl_txt');
+  var regels=plakRegels(vak?vak.value:'');
+  if(!regels.length){if(vak)vak.focus();return}
+  var nu=Date.now();
+  regels.forEach(function(r,i){
+    S.klussen.push({id:uid(),opdrachtId:oid,titel:r,tekst:'',datum:today(),
+      status:'todo',loon:0,loonCur:S.munt,mats:[],at:nu+i});
+  });
+  save(); closeSheet(); render(); openOpdracht(oid);
+}
+
+/* ══ terugvegen en de terugknop ══
+   Zonder dit sluit een veeg naar rechts de hele app. Nu doet hij hetzelfde
+   als het pijltje linksboven: één scherm terug. Zolang er een scherm open
+   staat houden we precies één extra stap in de geschiedenis klaar. */
+var terugNu=null, terugKlaar=false;
+
+function terugAan(fn){
+  terugNu=fn;
+  if(!terugKlaar){
+    try{history.pushState({kb:1},'')}catch(e){}
+    terugKlaar=true;
+  }
+}
+function terugUit(){terugNu=null;terugKlaar=false}
+
+window.addEventListener('popstate',function(){
+  if(!terugKlaar)return;          /* niets open: laat de browser zijn gang gaan */
+  terugKlaar=false;
+  var fn=terugNu; terugNu=null;
+  if(fn)fn();
+  if(!document.querySelector('.sheet'))terugUit();
+});
 
 /* ══ het scherm van één klant ══ */
 function openKlant(id){
@@ -911,6 +1066,7 @@ function openKlant(id){
   h+='<div class="note">'+esc(t('klantWisUitleg'))+'</div>';
   h+='</div></div>';
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){closeSheet();render()});
   window.scrollTo(0,0);
 }
 
@@ -934,6 +1090,7 @@ function openKlantForm(id){
    + '<button class="save" data-act="klantopslaan" data-id="'+(c?c.id:'')+'">'+esc(t('bewaar'))+'</button>'
    + '</div></div></div>';
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){if(c&&klantVan(c.id))openKlant(c.id);else{closeSheet();render()}});
   window.scrollTo(0,0);
   var n=document.getElementById('c_naam'); if(n&&!c)n.focus();
 }
@@ -1022,17 +1179,23 @@ function openOpdracht(oid,houdPlek){
       var st=standVan(k), aan=!!gek[k.id], loon=loonDH(k), m=matDH(k);
       h+='<div class="klusrij'+(aan?' aan':'')+'">'
        + '<button class="vink" data-act="vink" data-id="'+o.id+'" data-k="'+k.id+'">✓</button>'
-       + '<button class="mid" style="background:none;border:0;padding:0;text-align:start" data-act="klus" data-id="'+k.id+'">'
-       +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div>'
-       +   '<div class="sb">'+esc(dat(k.datum))+' · '+esc(t(st))
-       +   (m>0?' · '+esc(t('materialen'))+' '+pv(dh(m)):'')+'</div>'
-       + '</button>'
+       + '<div class="mid">'
+       +   '<button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
+       +     '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
+       +   '<div class="sb">'
+       +     '<button class="ministand '+st+'" data-act="standtik" data-k="'+k.id+'" data-id="'+o.id+'">'+esc(t(st))+'</button>'
+       +     esc(dat(k.datum))
+       +     ((k.taken||[]).length?' · '+takenKlaar(k)+'/'+k.taken.length:'')
+       +     (m>0?' · '+esc(t('materialen'))+' '+pv(dh(m)):'')
+       +   '</div>'
+       + '</div>'
        + '<div class="val">'+(loon>0?pv(dh(loon)):'<span class="dim">–</span>')
        + '</div></div>';
     });
   }
 
   h+='<button class="outline" data-act="nieuwklusopdr" data-id="'+o.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
+  h+='<button class="outline quiet" data-act="plakken" data-id="'+o.id+'">'+esc(t('plakken'))+'</button>';
   h+='<button class="outline quiet" data-act="overzicht" data-id="'+o.id+'">'+esc(t('overzicht'))+'</button>';
   h+='<div class="divider"></div>';
   h+='<button class="outline gevaar" data-act="opdrwis" data-id="'+o.id+'">'
@@ -1052,6 +1215,7 @@ function openOpdracht(oid,houdPlek){
   }
   h+='</div>';
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){openKlant(o.klantId)});
   var nu=document.querySelector('.sheet');
   if(nu)nu.scrollTop=plek;
   if(!houdPlek)window.scrollTo(0,0);
@@ -1108,6 +1272,7 @@ function openOpdrachtForm(oid,klantId){
    + '<button class="save" data-act="opdropslaan" data-id="'+(o?o.id:'')+'">'+esc(t('bewaar'))+'</button>'
    + '</div></div></div>';
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){if(oid&&opdrachtVan(oid))openOpdracht(oid);else if(formOpdrKlant&&klantVan(formOpdrKlant))openKlant(formOpdrKlant);else{closeSheet();render()}});
   window.scrollTo(0,0);
   tekenBet(); tekenOpdrSom();
   var lo=document.getElementById('o_loon');
@@ -1160,7 +1325,7 @@ function opdrachtOpslaan(oid){
 /* ══ klus invullen ══
    De materiaalregels staan tijdens het invullen in een lijstje;
    pas bij Bewaren gaan ze het boek in. */
-var formMats=[], formKlusId='', formStatus='todo', formLoonCur='MAD',
+var formMats=[], formTaken=[], formKlusId='', formStatus='todo', formLoonCur='MAD',
     formKlant='', formOpdr='', formNieuweFotos=[];
 
 function opdrachtOpties(klantId,sel){
@@ -1182,6 +1347,7 @@ function openKlusForm(klusId,opdrachtId){
   var oo=opdrachtVan(formOpdr);
   formKlant=oo?oo.klantId:((S.klanten[0]&&S.klanten[0].id)||'');
   formMats=k?(k.mats||[]).map(function(m){return {id:m.id,naam:m.naam,bedrag:m.bedrag,cur:m.cur||'MAD',foto:!!m.foto}}):[];
+  formTaken=k?(k.taken||[]).map(function(x){return {id:x.id||uid(),titel:x.titel,klaar:!!x.klaar,bedrag:x.bedrag,cur:x.cur||'MAD'}}):[];
   formNieuweFotos=[];
 
   if(!S.klanten.length){ui.msg=t('geenKlantenSub');render();openKlantForm('');return}
@@ -1227,6 +1393,11 @@ function openKlusForm(klusId,opdrachtId){
    + '</div></div>'
    + '<div class="hint">'+esc(t('loonHint'))+'</div>';
 
+  h+='<div class="label">'+esc(t('onderdelen'))+'</div><div id="k_taken"></div>'
+   + '<button class="matadd" data-act="taakadd">'+esc(t('onderdeelAdd'))+'</button>'
+   + '<button class="outline quiet" id="k_uittekst" data-act="uittekst"'
+   +   (k&&bulletRegels(k.tekst).length?'':' hidden')+'>'+esc(t('uitTekst'))+'</button>';
+
   h+='<div class="label">'+esc(t('matKop'))+'</div><div id="k_mats"></div>'
    + '<button class="matadd" data-act="matadd">'+esc(t('matAdd'))+'</button>';
 
@@ -1244,8 +1415,9 @@ function openKlusForm(klusId,opdrachtId){
    + '</div></div></div>';
 
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){var q=document.querySelector('[data-act="formterug"]');if(q)q.click()});
   window.scrollTo(0,0);
-  tekenChips(); tekenMats(); tekenSom();
+  tekenChips(); tekenTaken(); tekenMats(); tekenSom();
   var lo=document.getElementById('k_loon');
   if(lo)lo.addEventListener('input',tekenSom);
   /* van klant wisselen betekent andere opdrachten in de lijst eronder */
@@ -1261,6 +1433,87 @@ function openKlusForm(klusId,opdrachtId){
     document.getElementById('k_opdrnieuw').hidden=!!formOpdr;
   });
   var ti=document.getElementById('k_titel'); if(ti&&!k)ti.focus();
+}
+
+/* ── onderdelen van een klus ──
+   Een klus mag uit losse onderdelen bestaan die je apart afvinkt en apart een
+   bedrag geeft. Zet je bij de klus zelf een bedrag, dan geldt dat; anders
+   telt de app de onderdelen bij elkaar op. Precies zoals bij een opdracht. */
+function takenDH(k){
+  var s=0;(k.taken||[]).forEach(function(x){s+=toDH(x.bedrag,x.cur||'MAD')});
+  return s;
+}
+function takenKlaar(k){
+  var n=0;(k.taken||[]).forEach(function(x){if(x.klaar)n++});
+  return n;
+}
+function loonDH(k){
+  var v=toDH(k.loon,k.loonCur||'MAD');
+  return v>0.5?v:takenDH(k);
+}
+
+/* de regels in het formulier */
+function tekenTaken(){
+  var box=document.getElementById('k_taken');
+  if(!box)return;
+  var h='';
+  formTaken.forEach(function(x,i){
+    h+='<div class="matrow">'
+     + '<div class="op">'
+     +   '<button class="vink'+(x.klaar?' aan':'')+'" data-act="taaktik" data-i="'+i+'">✓</button>'
+     +   '<input class="in" data-taak="titel" data-i="'+i+'" placeholder="'+esc(t('onderdeelNaam'))+'" value="'+esc(x.titel||'')+'">'
+     + '</div>'
+     + '<div class="op">'
+     +   '<input class="in mono" data-taak="bedrag" data-i="'+i+'" inputmode="decimal" placeholder="0" value="'+esc(num(x.bedrag)?String(x.bedrag):'')+'">'
+     +   curKnop('taak'+i,x.cur||'MAD')
+     +   '<button class="weg" data-act="taakweg" data-i="'+i+'">×</button>'
+     + '</div></div>';
+  });
+  box.innerHTML=h;
+  Array.prototype.forEach.call(box.querySelectorAll('[data-taak]'),function(el){
+    el.addEventListener('input',function(){
+      var i=+el.getAttribute('data-i');
+      formTaken[i][el.getAttribute('data-taak')]=el.value;
+      tekenSom();
+    });
+  });
+}
+
+function formTakenDH(){
+  var s=0; formTaken.forEach(function(x){s+=toDH(x.bedrag,x.cur||'MAD')}); return s;
+}
+
+/* Heb je eerder klussen samengevoegd tot losse tekst, dan zet deze knop die
+   regels alsnog om in onderdelen die je kunt afvinken. */
+function bulletRegels(tekst){
+  var uit=[];
+  String(tekst||'').split(NR).forEach(function(r){
+    r=String(r);
+    if(r.indexOf('•')!==0)return;
+    r=r.replace(/^•\s*/,'').replace(/\s+$/,'');
+    if(r)uit.push(r);
+  });
+  return uit;
+}
+
+function uitTekstMaken(){
+  var vak=document.getElementById('k_tekst');
+  var regels=bulletRegels(vak?vak.value:'');
+  if(!regels.length)return;
+  regels.forEach(function(r){
+    formTaken.push({id:uid(),titel:r,klaar:false,bedrag:'',cur:S.munt});
+  });
+  /* de bulletregels weghalen, wat eronder stond blijft staan */
+  if(vak){
+    var rest=[];
+    String(vak.value).split(NR).forEach(function(r){
+      if(String(r).indexOf('•')!==0)rest.push(r);
+    });
+    vak.value=rest.join(NR).replace(/^\s+/,'');
+  }
+  tekenTaken(); tekenSom();
+  var knop=document.getElementById('k_uittekst');
+  if(knop)knop.hidden=true;
 }
 
 /* de knopjes met soorten werk; de laatste is een plusje om er zelf een bij te zetten */
@@ -1338,8 +1591,17 @@ function formMatDH(){
 function tekenSom(){
   var box=document.getElementById('k_som');
   if(!box)return;
-  var loon=formLoonDH(), mat=formMatDH();
-  box.innerHTML=bedragRij(t('arbeid'),loon)+bedragRij(t('materialen'),mat)
+  var vast=formLoonDH(), taken=formTakenDH(), mat=formMatDH();
+  var loon=vast>0.5?vast:taken;
+  var extra='';
+  if(vast>0.5&&taken>0.5){
+    var vs=vast-taken;
+    extra=bedragRij(t('verdeeldOnder'),taken)
+      + '<div class="row"><span class="dim">'+esc(t('verschil'))+'</span><span class="r" style="color:'
+      + (Math.abs(vs)<0.5?'var(--mint)':'var(--saffron)')+'">'
+      + (Math.abs(vs)<0.5?esc(t('klopt'))+' ✓':dh(Math.abs(vs)))+'</span></div>';
+  }
+  box.innerHTML=bedragRij(t('arbeid'),loon)+extra+bedragRij(t('materialen'),mat)
    + '<div class="row som"><span>'+esc(t('totaal'))+'</span><span class="r">'+dh(loon+mat)
    + (S.toonEuro?'<span class="euro">'+euBij(loon+mat)+'</span>':'')+'</span></div>';
 }
@@ -1365,6 +1627,9 @@ function klusOpslaan(){
   k.status=formStatus;
   k.loon=num(document.getElementById('k_loon').value);
   k.loonCur=formLoonCur;
+  k.taken=formTaken.filter(function(x){return (x.titel&&String(x.titel).trim())||num(x.bedrag)})
+    .map(function(x){return {id:x.id,titel:String(x.titel||'').trim(),klaar:!!x.klaar,
+      bedrag:num(x.bedrag),cur:x.cur||'MAD'}});
   k.mats=formMats.filter(function(m){return (m.naam&&String(m.naam).trim())||num(m.bedrag)||m.foto})
     .map(function(m){return {id:m.id,naam:String(m.naam||'').trim(),bedrag:num(m.bedrag),cur:m.cur||'MAD',foto:!!m.foto}});
   opruimenFotos(k);
@@ -1404,20 +1669,16 @@ function voegSamen(oid){
   /* bedragen optellen; staan ze in dezelfde munt, dan houden we die aan */
   var munten={};
   lijst.forEach(function(k){if(num(k.loon))munten[k.loonCur||'MAD']=1});
-  var soorten=Object.keys(munten), loon=0, cur;
-  if(soorten.length<=1){
-    cur=soorten[0]||doel.loonCur||S.munt;
-    lijst.forEach(function(k){loon+=num(k.loon)});
-  } else {
-    cur=S.munt;
-    var totDH=0; lijst.forEach(function(k){totDH+=loonDH(k)});
-    loon = cur==='EUR' ? Math.round(totDH/(S.rate||1)*100)/100 : Math.round(totDH);
-  }
+  var soorten=Object.keys(munten);
+  var cur=soorten.length===1?soorten[0]:(doel.loonCur||S.munt);
 
-  var regels=[], mats=[];
+  var regels=[], mats=[], taken=[];
   lijst.forEach(function(k){
-    regels.push('• '+(k.titel||''));
-    if(k.tekst)regels.push('   '+String(k.tekst).split(NR).join(NR+'   '));
+    /* elke klus wordt een onderdeel: af te vinken en met een eigen bedrag */
+    taken.push({id:uid(),titel:k.titel||'',klaar:(k.status||'todo')==='klaar',
+                bedrag:num(k.loon)||'',cur:k.loonCur||S.munt});
+    (k.taken||[]).forEach(function(x){taken.push(x)});
+    if(k.tekst)regels.push((k.titel||'')+': '+k.tekst);
     (k.mats||[]).forEach(function(m){mats.push(m)});
   });
 
@@ -1425,7 +1686,9 @@ function voegSamen(oid){
   var iemandBezig=lijst.some(function(k){return (k.status||'todo')==='bezig'});
 
   doel.tekst=regels.join(NR);
-  doel.loon=loon; doel.loonCur=cur;
+  doel.taken=taken;
+  /* het bedrag staat nu bij de onderdelen, dus de klus zelf laten we leeg */
+  doel.loon=0; doel.loonCur=cur;
   doel.mats=mats;
   doel.status=allesKlaar?'klaar':(iemandBezig?'bezig':'todo');
 
@@ -1500,6 +1763,7 @@ function openOverzicht(oid){
   h+='<button class="outline quiet" data-act="ovkopie" data-id="'+oid+'">'+esc(t('kopieer'))+'</button>';
   h+='</div></div>';
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){openOpdracht(oid)});
   window.scrollTo(0,0);
 }
 
@@ -1562,6 +1826,7 @@ function openSettings(){
   h+='<div class="ver">Klusboek v'+VERSIE+' · '+VERSIEDATUM+'</div>';
   h+='</div></div>';
   document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){closeSheet();render()});
   window.scrollTo(0,0);
   var r=document.getElementById('s_rate');
   if(r)r.addEventListener('change',function(){
@@ -1819,6 +2084,9 @@ document.addEventListener('click',function(e){
   }
 
   /* ── klussen ── */
+  if(act==='standtik'){standDoor(b.dataset.k,id);return}
+  if(act==='plakken'){openPlakken(id);return}
+  if(act==='plakopslaan'){plakOpslaan(id);return}
   if(act==='klus'){ui.confirm='';openKlusForm(id,'');return}
   if(act==='nieuwklus'){ui.confirm='';openKlusForm('','');return}
   if(act==='nieuwklusopdr'){ui.confirm='';openKlusForm('',id);return}
@@ -1861,6 +2129,7 @@ document.addEventListener('click',function(e){
     var veld=b.dataset.veld, v=b.dataset.v;
     if(veld==='loon')formLoonCur=v;
     else if(veld==='oloon')formOpdrCur=v;
+    else if(veld.indexOf('taak')===0)formTaken[+veld.slice(4)].cur=v;
     else if(veld.indexOf('mat')===0)formMats[+veld.slice(3)].cur=v;
     else if(veld.indexOf('bet')===0)formBet[+veld.slice(3)].cur=v;
     var doos2=b.parentNode;
@@ -1871,6 +2140,15 @@ document.addEventListener('click',function(e){
     if(document.getElementById('o_som'))tekenOpdrSom();
     return;
   }
+  if(act==='taakadd'){formTaken.push({id:uid(),titel:'',klaar:false,bedrag:'',cur:S.munt});tekenTaken();tekenSom();return}
+  if(act==='taakweg'){formTaken.splice(+b.dataset.i,1);tekenTaken();tekenSom();return}
+  if(act==='taaktik'){
+    var ti3=+b.dataset.i;
+    formTaken[ti3].klaar=!formTaken[ti3].klaar;
+    b.className='vink'+(formTaken[ti3].klaar?' aan':'');
+    return;
+  }
+  if(act==='uittekst'){uitTekstMaken();return}
   if(act==='matadd'){formMats.push({id:uid()+uid(),naam:'',bedrag:'',cur:S.munt,foto:false});tekenMats();tekenSom();return}
   if(act==='matweg'){
     var mi=+b.dataset.i, mm=formMats[mi];
@@ -1978,7 +2256,7 @@ document.addEventListener('click',function(e){
     });
     bonUrls={}; ui.confirm=''; save(); closeSheet(); render(); return;
   }
-  if(act==='close'){ui.confirm='';closeSheet();render();return}
+  if(act==='close'){ui.confirm='';terugUit();closeSheet();render();return}
 });
 
 /* een foto van een bonnetje kiezen of maken */
