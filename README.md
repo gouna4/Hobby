@@ -22,12 +22,6 @@ app laat dan zien of dat samen uitkomt op wat je hebt afgesproken, en hoeveel
 je nog te verdelen hebt. Vul je bij de opdracht geen prijs in, dan telt de app
 gewoon de losse bedragen bij elkaar op.
 
-Een klus mag zelf ook weer uit **onderdelen** bestaan: losse regels die je
-afvinkt en die elk een eigen bedrag mogen hebben. Dezelfde regel geldt daar:
-zet je bij de klus een bedrag, dan telt dat; anders telt de app de onderdelen
-op. Zo kun je twaalf klusjes tot één klus samenvoegen zonder ze kwijt te
-raken als afvinkbare lijst.
-
 Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Koop je
 iets voor de hele opdracht, dan hang je het bonnetje aan de opdracht zelf. Alle
 bonnetjes staan bij elkaar op het opdrachtscherm, met erbij waar ze vandaan
@@ -48,25 +42,23 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
   zelf, dus een afgesproken totaalprijs vervalt bij het splitsen
 - Elke opdracht doorloopt vier fasen: mee bezig, opgeleverd, factuur verstuurd,
   betaald. Een knop zet hem naar de volgende
-- Het hokje voor een klus betekent klaar; wil je klussen kiezen om samen te
-  voegen of te delen, zet dan Klussen kiezen aan
+- Het hokje voor een klus betekent klaar; wil je klussen kiezen om te
+  verplaatsen of door te sturen, zet dan Klussen kiezen aan
 - Op het hoofdscherm vier cijfers: nog factureren, wacht op betaling, deze
   maand binnen, materialen voorgeschoten
 - Bij elke klant staan zijn opdrachten er meteen onder, met hun fase
 - Per opdracht zoveel klusjes als nodig, met een datum en een omschrijving
-- Onderdelen binnen een klus: afvinken en per stuk een bedrag
-- Tabblad **Te doen**: alles wat nog openstaat over alle klanten heen, wat het
-  langst ligt bovenaan. Dit is ook het startscherm
-- De stand van een klus met een tik doorzetten: moet nog, bezig, klaar. Werkt
-  op de kaart en in de lijst van een opdracht
+- Twee tabbladen: **Te doen** (alles wat nog openstaat over alle klanten heen,
+  wat het langst ligt bovenaan) en **Klanten**, met per klant zijn opdrachten
+- Een klus is af of niet: tik het hokje aan, of de stand op de kaart. Meteen
+  bewaard, geen opslaan nodig
 - **Lijst plakken**: plak een lijstje uit de groepsapp en elke regel wordt een
   eigen klus. Streepjes, bolletjes en nummers gaan er vanzelf af
 - Terugvegen of de terugknop gaat één scherm terug in plaats van de app te
   sluiten
 - Het tabblad waar je gebleven was wordt onthouden
-- Een klus even vasthouden geeft een menu om hem naar een andere opdracht te
-  verplaatsen. In de stand Klussen kiezen verplaats je er meerdere tegelijk,
-  desnoods naar een gloednieuwe opdracht
+- In de stand Klussen kiezen verplaats je er een of meerdere tegelijk naar een
+  andere opdracht, desnoods naar een gloednieuwe
 - De vier fasen mag je in de instellingen zelf een naam geven
 - Bij een opdracht kun je zowel het arbeidsbedrag als het materiaalbedrag zelf
   invullen; laat je er een leeg, dan telt de app de losse bedragen op
@@ -85,10 +77,6 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
   eronder. Per bedrag kun je kiezen: DH of €
 - Meerdere klussen in een opdracht aanvinken; onderin staat meteen wat die
   samen kosten, en je zet ze in een tik op klaar
-- Aangevinkte klussen samenvoegen tot een klus: de oudste blijft staan, de
-  andere worden onderdelen die je kunt afvinken en beprijzen, en de materialen
-  met hun bonnetjes verhuizen mee. Een klus die eerder tot platte tekst was
-  samengevoegd repareer je met de knop *Maak er onderdelen van*
 - Van die aangevinkte klussen een overzicht maken en dat via WhatsApp of het
   deelmenu naar de klant sturen, in het Arabisch of het Nederlands
 - Een opdracht in één tik helemaal op betaald zetten
@@ -109,11 +97,19 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='21'` bovenaan het script
-2. `sw.js` — `klusboek-v21`
+1. `index.html` — `var VERSIE='23'` bovenaan het script
+2. `sw.js` — `klusboek-v23`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.
+
+## Opgeruimd in versie 22
+
+De app was uitgedijd met dingen die dubbel deden wat er al was. Eruit gegaan:
+onderdelen binnen een klus (die zijn nu gewone klussen in dezelfde opdracht),
+het samenvoegen van klussen, de stand *bezig* bij een los klusje, het lang
+indrukken, en twee van de vier tabbladen. `opschonen()` zet oude gegevens bij
+het opstarten om, dus je raakt niets kwijt.
 
 ## Van een oud boek naar opdrachten
 
