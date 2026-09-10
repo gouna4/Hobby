@@ -43,6 +43,9 @@ tellen vanzelf op naar de opdracht.
   eronder. Per bedrag kun je kiezen: DH of €
 - Meerdere klussen in een opdracht aanvinken; onderin staat meteen wat die
   samen kosten, en je zet ze in een tik op klaar
+- Aangevinkte klussen samenvoegen tot een klus: de oudste blijft staan, de
+  titels van de rest komen als lijst in de omschrijving, bedragen worden
+  opgeteld en de materialen met hun bonnetjes verhuizen mee
 - Van die aangevinkte klussen een overzicht maken en dat via WhatsApp of het
   deelmenu naar de klant sturen, in het Arabisch of het Nederlands
 - Een opdracht in één tik helemaal op betaald zetten
@@ -63,8 +66,8 @@ tellen vanzelf op naar de opdracht.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='8'` bovenaan het script
-2. `sw.js` — `klusboek-v8`
+1. `index.html` — `var VERSIE='9'` bovenaan het script
+2. `sw.js` — `klusboek-v9`
 
 Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
 de instellingen.

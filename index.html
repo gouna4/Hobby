@@ -255,7 +255,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='8', VERSIEDATUM='september 2026';
+var VERSIE='9', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -271,7 +271,8 @@ var T={
   afgesprokenHint:'خليه خاوي إلا كتحط الثمن عند كل عمل بوحدو.',
   verdeeld:'مقسم على الأعمال', verschil:'الفرق', klopt:'كولشي متوازن',
   geenOpdrachten:'ما كاين حتى طلب', geenOpdrachtenSub:'زيد طلب، من اللور زيد ليه الأعمال.',
-  zetKlaar:'دير سالا', opdrWis:'مسح الطلب', opdrWisUitleg:'الأعمال ديالو كاملة غادي يمسحو معاه.',
+  zetKlaar:'دير سالا', samenvoegen:'جمعهم فواحد',
+  samenZeker:'دوس ثاني باش تجمعهم', minstensTwee:'ختار على الأقل جوج', opdrWis:'مسح الطلب', opdrWisUitleg:'الأعمال ديالو كاملة غادي يمسحو معاه.',
   eerderWerk:'خدمة سابقة', soorten:'أنواع الأعمال', soortNieuw:'زيد نوع جديد',
   nogTeKrijgen:'الباقي لك', dezeMaand:'مقبوض هذا الشهر', openKlussen:'أعمال غير خالصة',
    bekijk:'شوف الأعمال غير الخالصة',
@@ -322,7 +323,8 @@ var T={
   afgesprokenHint:'Laat leeg als je het bedrag per klus invult.',
   verdeeld:'Verdeeld over de klussen', verschil:'Verschil', klopt:'Komt uit',
   geenOpdrachten:'Nog geen opdrachten', geenOpdrachtenSub:'Maak een opdracht en zet daar de klussen in.',
-  zetKlaar:'Op klaar zetten', opdrWis:'Opdracht verwijderen', opdrWisUitleg:'Alle klussen erin gaan mee weg.',
+  zetKlaar:'Op klaar zetten', samenvoegen:'Samenvoegen',
+  samenZeker:'Nog een keer tikken om samen te voegen', minstensTwee:'Vink er minstens twee aan', opdrWis:'Opdracht verwijderen', opdrWisUitleg:'Alle klussen erin gaan mee weg.',
   eerderWerk:'Eerder werk', soorten:'Soorten klussen', soortNieuw:'Nieuw soort toevoegen',
   nogTeKrijgen:'Nog te krijgen', dezeMaand:'Deze maand binnen', openKlussen:'Nog niet betaald',
    bekijk:'Bekijk wat openstaat',
@@ -1041,9 +1043,11 @@ function openOpdracht(oid,houdPlek){
   if(nGek){
     h+='<div class="sbar"><div class="keuze"><span>'+esc(t('gekozen',{n:nGek}))+'</span>'
      + '<span class="b">'+pv(dh(gLoon+gMat))+'</span></div>'
-     + '<div class="sbar-in">'
-     + '<button class="cancel" data-act="zetklaar" data-id="'+o.id+'">'+esc(t('zetKlaar'))+'</button>'
-     + '<button class="save" data-act="overzicht" data-id="'+o.id+'">'+esc(t('overzicht'))+'</button>'
+     + '<div class="sbar-in" style="flex-wrap:wrap">'
+     + '<button class="cancel" style="flex:1" data-act="samenvoegen" data-id="'+o.id+'">'
+     +   esc(ui.confirm==='samen'+o.id?t('samenZeker'):t('samenvoegen'))+'</button>'
+     + '<button class="cancel" style="flex:1" data-act="zetklaar" data-id="'+o.id+'">'+esc(t('zetKlaar'))+'</button>'
+     + '<button class="save" style="flex-basis:100%" data-act="overzicht" data-id="'+o.id+'">'+esc(t('overzicht'))+'</button>'
      + '</div></div>';
   }
   h+='</div>';
@@ -1377,6 +1381,61 @@ function opruimenFotos(k){
   formNieuweFotos.forEach(function(id){
     if(!houden[id]){bonCacheWeg(id);bonWis(id)}
   });
+}
+
+/* ══ klussen samenvoegen ══
+   Meerdere klusjes worden één klus. De oudste blijft staan en krijgt alles:
+   de titels van de rest komen als regels in de omschrijving, de bedragen
+   worden opgeteld en alle materialen met hun bonnetjes verhuizen mee.
+   De foto's hangen aan de materiaalregel, dus die raak je niet kwijt. */
+var NR=String.fromCharCode(10);
+
+function voegSamen(oid){
+  var gek=ui.gekozen[oid]||{};
+  var lijst=klussenVanOpdracht(oid).filter(function(k){return gek[k.id]});
+  if(lijst.length<2){
+    ui.msg=t('minstensTwee'); ui.confirm=''; render(); openOpdracht(oid,true); return;
+  }
+  lijst.sort(function(a,b){
+    return String(a.datum||'').localeCompare(String(b.datum||''))||((a.at||0)-(b.at||0));
+  });
+  var doel=lijst[0];
+
+  /* bedragen optellen; staan ze in dezelfde munt, dan houden we die aan */
+  var munten={};
+  lijst.forEach(function(k){if(num(k.loon))munten[k.loonCur||'MAD']=1});
+  var soorten=Object.keys(munten), loon=0, cur;
+  if(soorten.length<=1){
+    cur=soorten[0]||doel.loonCur||S.munt;
+    lijst.forEach(function(k){loon+=num(k.loon)});
+  } else {
+    cur=S.munt;
+    var totDH=0; lijst.forEach(function(k){totDH+=loonDH(k)});
+    loon = cur==='EUR' ? Math.round(totDH/(S.rate||1)*100)/100 : Math.round(totDH);
+  }
+
+  var regels=[], mats=[];
+  lijst.forEach(function(k){
+    regels.push('• '+(k.titel||''));
+    if(k.tekst)regels.push('   '+String(k.tekst).split(NR).join(NR+'   '));
+    (k.mats||[]).forEach(function(m){mats.push(m)});
+  });
+
+  var allesKlaar=lijst.every(function(k){return (k.status||'todo')==='klaar'});
+  var iemandBezig=lijst.some(function(k){return (k.status||'todo')==='bezig'});
+
+  doel.tekst=regels.join(NR);
+  doel.loon=loon; doel.loonCur=cur;
+  doel.mats=mats;
+  doel.status=allesKlaar?'klaar':(iemandBezig?'bezig':'todo');
+
+  var weg={};
+  lijst.slice(1).forEach(function(k){weg[k.id]=1});
+  S.klussen=S.klussen.filter(function(k){return !weg[k.id]});
+
+  ui.gekozen[oid]={}; ui.confirm=''; save(); render();
+  /* meteen het formulier open, zodat je de titel kunt bijschaven */
+  openKlusForm(doel.id,'');
 }
 
 /* ══ overzicht voor de klant ══ */
@@ -1734,6 +1793,10 @@ document.addEventListener('click',function(e){
     });
     if(!iets){ui.msg=t('nietsGekozen');render();return}
     ui.gekozen[id]={}; save(); render(); openOpdracht(id,true); return;
+  }
+  if(act==='samenvoegen'){
+    if(ui.confirm!=='samen'+id){ui.confirm='samen'+id;openOpdracht(id,true);return}
+    voegSamen(id); return;
   }
   if(act==='overzicht'){openOverzicht(id);return}
   if(act==='ovwa'){
