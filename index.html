@@ -61,6 +61,17 @@ input,select,textarea{font-family:inherit;font-size:16px}
 
 /* ── cijfers bovenaan ── */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+/* de cijfers op een rij, zodat het werk hoger op het scherm begint */
+.cijfers{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cijfers::-webkit-scrollbar{display:none}
+.cijfer{flex:0 0 auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:9px 13px;text-align:start}
+.cijfer .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);white-space:nowrap}
+.cijfer .v{font-family:var(--mono);font-size:15px;font-weight:600;margin-top:3px;white-space:nowrap;
+  direction:ltr;unicode-bidi:isolate}
+.zoekrij{display:flex;gap:8px;align-items:center;margin-top:20px}
+.zoekrij .tabs{flex:1;margin:0}
+.zoekrij .icon-btn{flex:0 0 auto}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:15px 14px;
   display:block;width:100%;text-align:start}
 .stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--dim)}
@@ -69,12 +80,13 @@ input,select,textarea{font-family:inherit;font-size:16px}
 .stat .s{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:3px;direction:ltr;unicode-bidi:isolate}
 
 .band{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--surface2),var(--surface));
-  border:1px solid var(--saffron);border-radius:18px;padding:16px;margin-top:12px}
+  border:1px solid var(--saffron);border-radius:18px;padding:13px 15px;margin-top:14px;
+  width:100%;text-align:start;display:block}
 .band:before{content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;background:var(--saffron)}
 .band .k{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--saffron);font-weight:600}
-.band .v{font-family:var(--mono);font-size:25px;font-weight:600;margin-top:8px;letter-spacing:-.03em;
+.band .v{font-family:var(--mono);font-size:24px;font-weight:600;margin-top:6px;letter-spacing:-.03em;
   direction:ltr;unicode-bidi:isolate}
-.band .s{font-size:12px;color:var(--dim);margin-top:5px;line-height:1.5}
+.band .s{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.4}
 .band .go{width:100%;margin-top:14px;background:var(--azure);color:#1B1108;border-radius:12px;padding:13px;
   font-size:14px;font-weight:700}
 
@@ -202,9 +214,12 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 .note{font-size:12px;color:var(--dim);margin-top:11px;line-height:1.55}
 .warn{background:#2E1A14;border:1px solid var(--clay);border-radius:13px;padding:13px;margin-top:12px;
   font-size:14px;line-height:1.5}
-.melding{background:var(--surface);border:1px solid var(--saffron);border-radius:13px;padding:13px;
-  margin-top:12px;font-size:13.5px;line-height:1.5}
-.melding .x{float:inline-end;color:var(--dim);padding:0 0 10px 14px;font-size:18px;line-height:1}
+.melding{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--saffron);
+  border-radius:13px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.35}
+.melding > div{flex:1;min-width:0}
+.melding .doe{flex:0 0 auto;border:1px solid var(--saffron);color:var(--saffron);border-radius:10px;
+  padding:7px 11px;font-size:12px;font-weight:600;white-space:nowrap}
+.melding .x{flex:0 0 auto;color:var(--dim);padding:0 2px;font-size:18px;line-height:1}
 
 /* ── materiaalregels en bonnetjes ── */
 .matrow{background:var(--night);border:1px solid var(--line);border-radius:14px;padding:11px;margin-top:9px}
@@ -290,7 +305,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='23', VERSIEDATUM='september 2026';
+var VERSIE='24', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 /* ── de twee talen ──
@@ -319,11 +334,11 @@ var T={
   bonWaarheen:'فين غادي', bonHele:'للطلب كامل', bonTeVeel:'هادشي أكثر من الفاكتورة',
   bonGesplitst:'{b} تفصلو ل {k}', bonVerplaatst:'الفاكتورة مشات ل {k}',
   matMee:'{b} ديال المواد مشا معاه', verrekening:'تسوية عند الفصل',
-  bonLijst:'الفاكتورات فهاد الطلب', bonVanKlus:'عند: {k}', bonVanOpdracht:'ديال الطلب كامل',
+  bonLijst:'الفاكتورات', meer:'المزيد', zoeken:'بحث', bonVanKlus:'عند: {k}', bonVanOpdracht:'ديال الطلب كامل',
   bonOpdracht:'فاكتورات ديال الطلب كامل', geenBonnen:'ما كاين حتى فاكتورة',
   matTotaal:'مصاريف المواد', matTotaalHint:'اللي خلصتي من جيبك وبغيتي ترجعو. خليه خاوي باش يجمع الفاكتورات.',
   opgeteld:'من الفاكتورات', bedragenAanpassen:'بدل المبالغ',
-  inPlanning:'خدمة مبرمجة', nogTeDoen:'باقي يتدار فهاد الطلب',
+  inPlanning:'خدمة مبرمجة', nogTeDoen:'باقي يتدار',
   bkHerinner:'هادي {n} يوم ما دريتيش نسخة احتياطية', bkNooit:'مازال ما درتي نسخة احتياطية',
   bkNu:'دير وحدة دابا',
   laatOpen:'{n} طلبات كايتسناو الخلاص من أكثر من شهر', laatOpen1:'طلب كايتسنى الخلاص من أكثر من شهر',
@@ -334,7 +349,7 @@ var T={
   opdracht:'الطلب', opdrachten:'الطلبات', nieuweOpdracht:'طلب جديد',
   opdrNaam:'اسم الطلب', opdrNaamHint:'مثلا: خدمة شهر شتنبر',
   bijOpdracht:'عند أي طلب', maakOpdracht:'＋ طلب جديد',
-  afgesproken:'الثمن المتفق عليه ديال الخدمة',
+  afgesproken:'الثمن المتفق عليه',
   afgesprokenHint:'خليه خاوي إلا كتحط الثمن عند كل عمل بوحدو.',
   verdeeld:'مقسم على الأعمال', verschil:'الفرق', klopt:'كولشي متوازن',
   geenOpdrachten:'ما كاين حتى طلب', geenOpdrachtenSub:'زيد طلب، من اللور زيد ليه الأعمال.', opdrWis:'مسح الطلب', opdrWisUitleg:'الأعمال ديالو كاملة غادي يمسحو معاه.',
@@ -401,11 +416,11 @@ var T={
   bonWaarheen:'Waarheen', bonHele:'Voor de hele opdracht', bonTeVeel:'Dat is meer dan het bonnetje',
   bonGesplitst:'{b} afgesplitst naar {k}', bonVerplaatst:'Bonnetje naar {k}',
   matMee:'{b} materiaalgeld mee', verrekening:'Verrekening bij het splitsen',
-  bonLijst:'De bonnetjes in deze opdracht', bonVanKlus:'bij: {k}', bonVanOpdracht:'voor de hele opdracht',
+  bonLijst:'Bonnetjes', meer:'Meer', zoeken:'Zoeken', bonVanKlus:'bij: {k}', bonVanOpdracht:'voor de hele opdracht',
   bonOpdracht:'Bonnetjes voor de hele opdracht', geenBonnen:'Nog geen bonnetjes',
   matTotaal:'Materiaalkosten', matTotaalHint:'Wat je hebt voorgeschoten en terug wilt. Laat je het leeg, dan telt de app je bonnetjes op.',
   opgeteld:'Uit de bonnetjes', bedragenAanpassen:'Bedragen aanpassen',
-  inPlanning:'Werk in de planning', nogTeDoen:'Nog te doen in deze opdracht',
+  inPlanning:'Werk in de planning', nogTeDoen:'Nog te doen',
   bkHerinner:'Je maakte al {n} dagen geen back-up', bkNooit:'Je hebt nog geen back-up gemaakt',
   bkNu:'Nu maken',
   laatOpen:'{n} opdrachten wachten al langer dan een maand op betaling',
@@ -417,7 +432,7 @@ var T={
   opdracht:'Opdracht', opdrachten:'Opdrachten', nieuweOpdracht:'Nieuwe opdracht',
   opdrNaam:'Naam van de opdracht', opdrNaamHint:'Bijvoorbeeld: werk september',
   bijOpdracht:'Bij welke opdracht', maakOpdracht:'＋ Nieuwe opdracht',
-  afgesproken:'Afgesproken prijs voor het werk',
+  afgesproken:'Afgesproken prijs',
   afgesprokenHint:'Laat leeg als je het bedrag per klus invult.',
   verdeeld:'Verdeeld over de klussen', verschil:'Verschil', klopt:'Komt uit',
   geenOpdrachten:'Nog geen opdrachten', geenOpdrachtenSub:'Maak een opdracht en zet daar de klussen in.', opdrWis:'Opdracht verwijderen', opdrWisUitleg:'Alle klussen erin gaan mee weg.',
@@ -478,7 +493,7 @@ var VAAK={
 var S={rate:10.8, lang:'ar', munt:'MAD', toonEuro:true, tab:'tedoen', faseNamen:{},
   klanten:[], opdrachten:[], klussen:[],
   soorten:[], pin:'', hide:false, snaps:[], lastBackup:''};
-var ui={lang:'ar', tab:'tedoen', kies:false, verplaatsLijst:[], verplaatsTerug:'', kfil:'alles', kfilOpdr:'alles', laatsteOpdr:'', q:'', msg:'', confirm:'', gekozen:{}};
+var ui={lang:'ar', tab:'tedoen', kies:false, zoekOpen:false, bonOpen:false, meer:false, verplaatsLijst:[], verplaatsTerug:'', kfil:'alles', kfilOpdr:'alles', laatsteOpdr:'', q:'', msg:'', confirm:'', gekozen:{}};
 
 function load(){
   try{
@@ -949,52 +964,52 @@ function render(){
   var nTeDoen=S.klussen.filter(function(k){return (k.status||'todo')!=='klaar'}).length;
 
   h+='<div class="wrap"><div class="pad">';
-  if(ui.msg) h+='<div class="melding"><button class="x" data-act="msgweg">×</button>'+esc(ui.msg)+'</div>';
+  if(ui.msg) h+='<div class="melding"><div>'+esc(ui.msg)+'</div>'
+   + '<button class="x" data-act="msgweg">×</button></div>';
 
   /* niet vergeten te factureren */
   if(tot.oud){
     h+='<div class="melding"><div>'+esc(tot.oud===1?t('laatOpen1'):t('laatOpen',{n:tot.oud}))+'</div>'
-     + '<button class="outline" data-act="naaropen" style="margin-top:10px">'+esc(t('bekijkOpen'))+'</button></div>';
+     + '<button class="doe" data-act="cijfer" data-k="open">'+esc(t('bekijkOpen'))+'</button></div>';
   }
   /* niet vergeten een back-up te maken */
   var bkDagen=S.lastBackup?dagenSinds(S.lastBackup):999;
   if(S.klussen.length&&bkDagen>13){
     h+='<div class="melding"><div>'
      + esc(S.lastBackup?t('bkHerinner',{n:bkDagen}):t('bkNooit'))+'</div>'
-     + '<button class="outline" data-act="settings" style="margin-top:10px">'+esc(t('bkNu'))+'</button></div>';
+     + '<button class="doe" data-act="settings">'+esc(t('bkNu'))+'</button></div>';
   }
 
   function tegel(soort,kleur){
     var lijst=cijferLijst(soort), som=0;
     lijst.forEach(function(r){som+=r.bedrag});
-    var een=lijst.length===1;
-    var wat=soort==='maand' ? t(een?'betalingKort':'betalingenKort')
-                            : t(een?'opdrachtKort':'opdrachtenKort');
-    return '<button class="stat" data-act="cijfer" data-k="'+soort+'">'
+    return '<button class="cijfer" data-act="cijfer" data-k="'+soort+'">'
      + '<div class="k">'+esc(cijferKop(soort))+'</div>'
-     + '<div class="v mono"'+(kleur?' style="color:'+kleur+'"':'')+'>'+pv(dh(som))+'</div>'
-     + '<div class="s mono">'+(lijst.length?lijst.length+' '+esc(wat):'—')+'</div></button>';
+     + '<div class="v"'+(kleur?' style="color:'+kleur+'"':'')+'>'+pv(dh(som))+'</div></button>';
   }
-  h+='<div class="stats">'
+  h+='<div class="cijfers">'
    + tegel('factureren','var(--saffron)')
    + tegel('wacht','var(--sky)')
    + tegel('maand','var(--mint)')
    + tegel('voorgeschoten','')
+   + '<div class="cijfer"><div class="k">'+esc(t('inPlanning'))+'</div>'
+   +   '<div class="v" style="color:var(--dim)">'+pv(dh(tot.planning))+'</div></div>'
    + '</div>';
 
-  h+='<div class="band"><div class="k">'+esc(t('nogTeKrijgen'))+'</div>'
+  h+='<button class="band" data-act="cijfer" data-k="open"><div class="k">'+esc(t('nogTeKrijgen'))+'</div>'
    + '<div class="v mono">'+pv(dh(tot.open))+'</div>'
    + '<div class="s">'+(S.toonEuro?'<span class="mono">'+pv(euBij(tot.open))+'</span> · ':'')
-   +   esc(telUit(tot.nOpdr,tot.nKlant))+' · '+esc(t('inPlanning').toLowerCase())+' '+pv(dh(tot.planning))+'</div>'
-   + (tot.nOpdr?'<button class="go" data-act="cijfer" data-k="open">'+esc(t('bekijk'))+'</button>':'')
-   + '</div>';
+   +   esc(telUit(tot.nOpdr,tot.nKlant))+'</div></button>';
 
-  h+='<div class="tabswrap"><div class="tabs">'
+  h+='<div class="zoekrij"><div class="tabs">'
    + tabBtn('tedoen',t('teDoen')+' ('+nTeDoen+')')
    + tabBtn('klanten',t('klanten')+' ('+S.klanten.length+')')
-   + '</div></div>';
+   + '</div>'
+   + '<button class="icon-btn'+(ui.zoekOpen||ui.q?' on':'')+'" data-act="zoekaan" aria-label="'+esc(t('zoeken'))+'">'
+   +   vergrootglas()+'</button></div>';
 
-  h+='<input class="search" id="zoek" placeholder="'+esc(t('zoek'))+'" value="'+esc(ui.q)+'">';
+  if(ui.zoekOpen||ui.q)
+    h+='<input class="search" id="zoek" placeholder="'+esc(t('zoek'))+'" value="'+esc(ui.q)+'">';
 
   var q=ui.q.trim().toLowerCase();
   if(ui.tab==='tedoen'){
@@ -1053,6 +1068,9 @@ function filBtn(k,label){
 }
 function oogIcoon(){
   return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+}
+function vergrootglas(){
+  return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
 }
 function tandwiel(){
   return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
@@ -1401,6 +1419,19 @@ function openOpdracht(oid,houdPlek){
   h+='<div class="note">'+esc(klantNaam(o.klantId))+' · '+esc(dat(o.datum))+'</div>';
   if(o.notitie)h+='<div class="note" style="white-space:pre-wrap">'+esc(o.notitie)+'</div>';
 
+  h+='<div class="label">'+esc(t('fase'))+'</div><div class="seg four">'
+   + FASEN.map(function(f){
+       return '<button data-act="fasezet" data-id="'+o.id+'" data-v="'+f+'" class="'
+            + (fase===f?'on-f-'+f:'')+'">'+esc(faseNaam(f))+'</button>';
+     }).join('')+'</div>';
+  if(fase!=='betaald'){
+    var volgende=FASEN[FASEN.indexOf(fase)+1];
+    /* de knop noemt de fase zoals jij hem genoemd hebt */
+    h+='<button class="primary" style="margin-top:10px" data-act="fasezet" data-id="'+o.id+'" data-v="'+volgende+'">'
+     + esc(faseNaam(volgende))+' →</button>';
+  } else h+='<div class="note" style="color:var(--mint)">'+esc(t('afgerond'))+' ✓</div>';
+
+
   h+='<div class="rekening">';
   if(vast>0.5){
     h+=bedragRij(t('afgesproken'),vast);
@@ -1433,32 +1464,6 @@ function openOpdracht(oid,houdPlek){
   h+='</div>';
 
   var fase=opdrFase(o);
-  var bonnen=alleBonnen(o);
-  if(bonnen.length){
-    h+='<div class="label">'+esc(t('bonLijst'))+' ('+bonnen.length+')</div>';
-    bonnen.forEach(function(b){
-      h+='<button class="klusrij" style="width:100%" data-act="bonnetje" data-id="'+o.id+'" data-k="'+b.m.id+'">'
-       + '<div class="mid"><div class="nm">'+esc(b.m.naam||t('geenNaam'))+'</div>'
-       +   '<div class="sb">'+esc(b.van?t('bonVanKlus',{k:kort(b.van,34)}):t('bonVanOpdracht'))
-       +   (b.m.foto?' · 📷':'')+'</div></div>'
-       + '<div class="val">'+pv(dh(toDH(b.m.bedrag,b.m.cur||'MAD')))+'</div></button>';
-    });
-    h+='<div class="row som"><span>'+esc(t('opgeteld'))+'</span><span class="r">'
-     + pv(dh(opdrMatOpgeteld(o)))+'</span></div>';
-  }
-
-  h+='<div class="label">'+esc(t('fase'))+'</div><div class="seg four">'
-   + FASEN.map(function(f){
-       return '<button data-act="fasezet" data-id="'+o.id+'" data-v="'+f+'" class="'
-            + (fase===f?'on-f-'+f:'')+'">'+esc(faseNaam(f))+'</button>';
-     }).join('')+'</div>';
-  if(fase!=='betaald'){
-    var volgende=FASEN[FASEN.indexOf(fase)+1];
-    /* de knop noemt de fase zoals jij hem genoemd hebt */
-    h+='<button class="primary" style="margin-top:10px" data-act="fasezet" data-id="'+o.id+'" data-v="'+volgende+'">'
-     + esc(faseNaam(volgende))+' →</button>';
-  } else h+='<div class="note" style="color:var(--mint)">'+esc(t('afgerond'))+' ✓</div>';
-
   h+='<div class="label">'+esc(t('klussen'))+' ('+alle.length+')</div>';
   var mijn=alle;
   if(alle.length>3){
@@ -1500,19 +1505,39 @@ function openOpdracht(oid,houdPlek){
     });
   }
 
-  h+='<button class="outline" data-act="nieuwklusopdr" data-id="'+o.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
-  h+='<button class="outline quiet" data-act="plakken" data-id="'+o.id+'">'+esc(t('plakken'))+'</button>';
-  var nAf=alle.filter(function(k){return (k.status||'todo')==='klaar'}).length;
-  if(nAf&&nAf<alle.length){
-    h+='<button class="outline" data-act="splitsen" data-id="'+o.id+'">'
-     + esc(ui.confirm==='splits'+o.id?t('splitsZeker'):t('splitsen'))+'</button>'
-     + '<div class="note">'+esc(t('splitsUitleg'))+'</div>';
+  var bonnen=alleBonnen(o);
+  if(bonnen.length){
+    h+='<button class="outline quiet" data-act="bonopen" data-id="'+o.id+'">'
+     + esc(t('bonLijst'))+' ('+bonnen.length+') · '+pv(dh(opdrMatOpgeteld(o)))
+     + (ui.bonOpen?' ▲':' ▼')+'</button>';
+    if(ui.bonOpen){
+      bonnen.forEach(function(b){
+        h+='<button class="klusrij" style="width:100%" data-act="bonnetje" data-id="'+o.id+'" data-k="'+b.m.id+'">'
+         + '<div class="mid"><div class="nm">'+esc(b.m.naam||t('geenNaam'))+'</div>'
+         +   '<div class="sb">'+esc(b.van?t('bonVanKlus',{k:kort(b.van,34)}):t('bonVanOpdracht'))
+         +   (b.m.foto?' · 📷':'')+'</div></div>'
+         + '<div class="val">'+pv(dh(toDH(b.m.bedrag,b.m.cur||'MAD')))+'</div></button>';
+      });
+    }
   }
+
+  h+='<button class="outline" data-act="nieuwklusopdr" data-id="'+o.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
   h+='<button class="outline quiet" data-act="overzicht" data-id="'+o.id+'">'+esc(t('overzicht'))+'</button>';
-  h+='<div class="divider"></div>';
-  h+='<button class="outline gevaar" data-act="opdrwis" data-id="'+o.id+'">'
-   + esc(ui.confirm==='opdr'+o.id?t('wisZeker'):t('opdrWis'))+'</button>';
-  h+='<div class="note">'+esc(t('opdrWisUitleg'))+'</div>';
+
+  h+='<button class="outline quiet" data-act="meer" data-id="'+o.id+'">'+esc(t('meer'))+(ui.meer?' ▲':' ▼')+'</button>';
+  if(ui.meer){
+    h+='<button class="outline quiet" data-act="plakken" data-id="'+o.id+'">'+esc(t('plakken'))+'</button>';
+    var nAf=alle.filter(function(k){return (k.status||'todo')==='klaar'}).length;
+    if(nAf&&nAf<alle.length){
+      h+='<button class="outline" data-act="splitsen" data-id="'+o.id+'">'
+       + esc(ui.confirm==='splits'+o.id?t('splitsZeker'):t('splitsen'))+'</button>'
+       + '<div class="note">'+esc(t('splitsUitleg'))+'</div>';
+    }
+    h+='<div class="divider"></div>';
+    h+='<button class="outline gevaar" data-act="opdrwis" data-id="'+o.id+'">'
+     + esc(ui.confirm==='opdr'+o.id?t('wisZeker'):t('opdrWis'))+'</button>';
+    h+='<div class="note">'+esc(t('opdrWisUitleg'))+'</div>';
+  }
   h+='</div>';
 
   if(nGek&&ui.kies){
@@ -2446,6 +2471,14 @@ document.addEventListener('click',function(e){
   if(act==='settings'){openSettings();return}
   if(act==='msgweg'){ui.msg='';render();return}
   if(act==='tab'){ui.tab=b.dataset.k;ui.q='';render();return}
+  if(act==='zoekaan'){
+    ui.zoekOpen=!ui.zoekOpen; if(!ui.zoekOpen)ui.q='';
+    render();
+    var z=document.getElementById('zoek'); if(z)z.focus();
+    return;
+  }
+  if(act==='bonopen'){ui.bonOpen=!ui.bonOpen;openOpdracht(id,true);return}
+  if(act==='meer'){ui.meer=!ui.meer;openOpdracht(id,true);return}
   if(act==='cijfer'){openCijfer(b.dataset.k);return}
 
   /* ── klanten ── */
