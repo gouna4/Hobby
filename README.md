@@ -1,8 +1,6 @@
 # Klusboek
 
-Klussen, klanten en bonnetjes bijhouden voor een klusjesman. Per klant zoveel
-klussen als je wilt, met wat je voor het werk vraagt en wat de materialen
-kosten. Bonnetjes maak je met de camera van je telefoon.
+Klussen, bonnetjes en facturen bijhouden voor een klusjesman.
 
 **Geen server, geen account, geen internet nodig.** Wat je invult blijft in de
 opslag van de browser op je eigen toestel en wordt nergens naartoe gestuurd.
@@ -13,75 +11,52 @@ wissel je naar het Nederlands en terug.
 
 ## Hoe het in elkaar zit
 
-Drie lagen: een **klant** heeft **opdrachten**, en in een opdracht zitten de
-**klusjes**. Zo hoort alles wat bij één afspraak hoort bij elkaar.
+Zo eenvoudig als het kan:
 
-Het geld hangt aan de opdracht. Daar spreek je een prijs af voor het werk en
-daar wordt betaald. Wat een los klusje kost mag je er per klus bij zetten; de
-app laat dan zien of dat samen uitkomt op wat je hebt afgesproken, en hoeveel
-je nog te verdelen hebt. Vul je bij de opdracht geen prijs in, dan telt de app
-gewoon de losse bedragen bij elkaar op.
+    een KLANT heeft KLUSSEN
+    een klus is af of niet, en heeft een bedrag, bonnetjes en foto's
+    wat af is en nog niet op een factuur staat, zet je op een FACTUUR
+    op die factuur komen de betalingen
 
-Materialen en bonnetjes horen bij een klus, want daar koop je ze voor. Koop je
-iets voor de hele opdracht, dan hang je het bonnetje aan de opdracht zelf. Alle
-bonnetjes staan bij elkaar op het opdrachtscherm, met erbij waar ze vandaan
-komen, en tellen op tot de materiaalkosten.
+Een bedrag staat op precies twee plekken: **bij de klus** (je arbeid) en **op
+het bonnetje** (je materiaal). Er is geen tweede bedrag dat daaroverheen gaat,
+dus een totaal is altijd gewoon de optelsom.
 
-**Nog te krijgen telt alleen werk dat af is.** Een klus die nog op *Moet nog*
-of *Bezig* staat is geen geld maar planning, en staat bovenaan apart als
-*Werk in de planning*. Materialen tellen wel meteen mee: die heb je immers
-voorgeschoten. Staat alles van een opdracht op klaar, dan geldt de prijs die
-je hebt afgesproken; anders tellen alleen de klussen die af zijn.
+Bij een klant zie je drie groepen die de app zelf maakt:
+
+    Nog te doen                     wat er nog ligt
+    Klaar, nog niet gefactureerd    wat je kunt versturen
+    Facturen                        wat je verstuurd hebt
+
+Een factuur is een momentopname: de klussen met hun bedrag en het materiaal bij
+elkaar. Pas je later een klus aan, dan blijft de factuur zoals je hem stuurde.
+Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 ## Wat het bijhoudt
 
 - Klanten met telefoonnummer, plaats en een notitie
-- Opdrachten per klant, met een afgesproken prijs en de betalingen
-- Een opdracht splitsen: het afgeronde werk blijft staan om te factureren, de
-  rest verhuist naar een vervolgopdracht. Het bedrag komt daarna uit de klussen
-  zelf, dus een afgesproken totaalprijs vervalt bij het splitsen
-- Elke opdracht doorloopt vier fasen: mee bezig, opgeleverd, factuur verstuurd,
-  betaald. Een knop zet hem naar de volgende
-- Het hokje voor een klus betekent klaar; wil je klussen kiezen om te
-  verplaatsen of door te sturen, zet dan Klussen kiezen aan
-- Op het hoofdscherm vier cijfers: nog factureren, wacht op betaling, deze
-  maand binnen, materialen voorgeschoten
-- Bij elke klant staan zijn opdrachten er meteen onder, met hun fase
-- Per opdracht zoveel klusjes als nodig, met een datum en een omschrijving
-- Twee tabbladen: **Te doen** (alles wat nog openstaat over alle klanten heen,
-  wat het langst ligt bovenaan) en **Klanten**, met per klant zijn opdrachten
-- Een klus is af of niet: tik het hokje aan, of de stand op de kaart. Meteen
-  bewaard, geen opslaan nodig
-- **Lijst plakken**: plak een lijstje uit de groepsapp en elke regel wordt een
-  eigen klus. Streepjes, bolletjes en nummers gaan er vanzelf af
-- Terugvegen of de terugknop gaat één scherm terug in plaats van de app te
-  sluiten
-- Het tabblad waar je gebleven was wordt onthouden
-- In de stand Klussen kiezen verplaats je er een of meerdere tegelijk naar een
-  andere opdracht, desnoods naar een gloednieuwe
-- De vier fasen mag je in de instellingen zelf een naam geven
-- Bij een opdracht kun je zowel het arbeidsbedrag als het materiaalbedrag zelf
-  invullen; laat je er een leeg, dan telt de app de losse bedragen op
-- Een strook bovenaan als een opdracht langer dan een maand op betaling wacht
-- Een strook bovenaan als je twee weken geen back-up maakte
-- Drie standen per klus: moet nog, bezig, klaar
-- Wat je voor het werk vraagt, apart van wat de materialen kosten
-- Soorten werk als knopjes onder het invulveld, met een plusje om er zelf
-  een bij te zetten (die blijven bewaard)
-- Materialen als lijst: per regel wat je gekocht hebt en wat het kostte,
-  met een plusje voor de volgende
-- Een foto van het bonnetje bij elke materiaalregel, gemaakt met de camera
-- Betalingen per opdracht, ook als er in delen betaald wordt, en wat er nog
-  openstaat
-- Dirham of euro als hoofdmunt, met een instelbare koers en de andere munt
-  eronder. Per bedrag kun je kiezen: DH of €
-- Meerdere klussen in een opdracht aanvinken; onderin staat meteen wat die
-  samen kosten, en je zet ze in een tik op klaar
-- Van die aangevinkte klussen een overzicht maken en dat via WhatsApp of het
-  deelmenu naar de klant sturen, in het Arabisch of het Nederlands
-- Een opdracht in één tik helemaal op betaald zetten
-- Bovenaan: wat er nog te krijgen is, wat er deze maand binnenkwam en hoeveel
-  opdrachten nog niet betaald zijn
+- Klussen met een datum, een omschrijving en je arbeidsbedrag
+- Een klus is af of niet; de app onthoudt op welke dag je hem afvinkte
+- Tot zes foto's van het werk per klus
+- Materialen als lijst, met een foto van het bonnetje per regel
+- Facturen met hun betalingen, ook in delen. Betaal je meer dan er op staat,
+  dan heet dat *Vooruitbetaald*
+- Dirham of euro als hoofdmunt, met een instelbare koers; per bedrag kies je DH of €
+- Het overzicht naar de klant sturen via WhatsApp of het deelmenu, of afdrukken
+  en als PDF bewaren
+- Vijf cijfers bovenaan, allemaal aan te tikken om te zien waar ze vandaan komen:
+  nog factureren, wacht op betaling, deze maand binnen, werk in de planning,
+  en dit jaar
+- Maand voor maand terugkijken: wat je afrondde en wat er binnenkwam
+- **Lijst plakken**: plak een lijstje uit de groepsapp en elke regel wordt een klus
+- Soorten werk als knopjes onder het invulveld, met een plusje om er zelf een
+  bij te zetten
+- Zoeken door alles heen: klanten, klussen en facturen
+- Een klus kopiëren, en een klus naar een andere klant verplaatsen door in het
+  formulier een andere klant te kiezen
+- Terugvegen gaat één scherm terug in plaats van de app te sluiten
+- Een strook bovenaan als een factuur langer dan een maand wacht, of als je twee
+  weken geen back-up maakte
 - Een knop om alle bedragen te verbergen, en een cijferslot van vier cijfers
 - Back-up maken en terugzetten, en vijf herstelpunten op het toestel zelf
 
@@ -97,44 +72,39 @@ je hebt afgesproken; anders tellen alleen de klussen die af zijn.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='27'` bovenaan het script
-2. `sw.js` — `klusboek-v27`
+1. `index.html` — `var VERSIE='29'` bovenaan het script
+2. `sw.js` — `klusboek-v29`
 
-Het nummer verschijnt vanzelf onder de titel op het hoofdscherm en onderaan
-de instellingen.
+Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
-## Opgeruimd in versie 22
+## Van een ouder boek naar deze versie
 
-De app was uitgedijd met dingen die dubbel deden wat er al was. Eruit gegaan:
-onderdelen binnen een klus (die zijn nu gewone klussen in dezelfde opdracht),
-het samenvoegen van klussen, de stand *bezig* bij een los klusje, het lang
-indrukken, en twee van de vier tabbladen. `opschonen()` zet oude gegevens bij
-het opstarten om, dus je raakt niets kwijt.
+Tot versie 28 hingen klussen aan een **opdracht**, en het geld ook. Die laag is
+weg. `uitOpdrachten()` zet een ouder boek om zodra je het opent of terugzet:
 
-## Van een oud boek naar opdrachten
+- elke klus gaat naar de klant van zijn opdracht
+- elke opdracht waar geld in omging of die verstuurd was, wordt een factuur met
+  de klussen die er klaar in stonden
+- de rest worden gewone klussen bij de klant
 
-Tot versie 6 hing een klus rechtstreeks aan een klant en stonden de betalingen
-bij de klus. Zet je zo'n back-up terug, dan zet `migreer()` alles om: per klant
-één opdracht met de naam *Eerder werk*, met alle klussen erin en de betalingen
-bij elkaar. Dat draait één keer, bij het opstarten en na het terugzetten.
+Dat gebeurt één keer en wordt meteen bewaard.
 
-## Bonnetjes
+## Bonnetjes en foto's
 
-Het boek zelf staat in `localStorage` en die lade is maar zo'n 5 MB groot:
-daar past geen foto in. De foto's van de bonnetjes gaan daarom in IndexedDB,
-een tweede lade op het toestel die voor bestanden bedoeld is. Ze worden bij
-het toevoegen verkleind naar ongeveer 1500 pixels en opnieuw opgeslagen als
-JPEG, zo'n 200 KB per stuk.
+Het boek zelf staat in `localStorage` en die lade is maar zo'n 5 MB groot: daar
+past geen foto in. Foto's gaan daarom in IndexedDB, een tweede lade op het
+toestel die voor bestanden bedoeld is. Ze worden bij het toevoegen verkleind
+naar ongeveer 1500 pixels en opnieuw opgeslagen als JPEG, zo'n 200 KB per stuk.
 
 **Ze zitten niet in het back-upbestand.** Dat is tekst; een foto niet. Een
-back-up terugzetten geeft je je boek terug, niet je bonnetjes. Wil je een
-bonnetje bewaren, tik het dan aan en gebruik Sturen.
+back-up terugzetten geeft je je boek terug, niet je foto's. Wil je er een
+bewaren, tik hem dan aan en gebruik Sturen.
 
 ## Nooit in deze repo
 
-Het back-upbestand uit de instellingen (`klusboek-JJJJ-MM-DD-uummss.json`). Daarin
-staan klantnamen, telefoonnummers en bedragen. `.gitignore` houdt ze tegen,
-maar kijk voor het uploaden of er niets tussen zit.
+Het back-upbestand uit de instellingen (`klusboek-JJJJ-MM-DD-uummss.json`).
+Daarin staan klantnamen, telefoonnummers en bedragen. `.gitignore` houdt ze
+tegen, maar kijk voor het uploaden of er niets tussen zit.
 
 ## Let op
 
