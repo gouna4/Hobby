@@ -337,7 +337,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='29', VERSIEDATUM='september 2026';
+var VERSIE='30', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -389,7 +389,7 @@ var T={
   bkHerinner:'هادي {n} يوم ما دريتيش نسخة احتياطية', bkNooit:'مازال ما درتي نسخة احتياطية', bkNu:'دير وحدة دابا',
   laatOpen:'{n} فاكتورات كايتسناو الخلاص من أكثر من شهر', laatOpen1:'فاكتورة كايتسنى الخلاص من أكثر من شهر',
   bekijkOpen:'شوفهم', klaarOp:'سالا فـ {d}', gefactureerd:'فالفاكتورة',
-  teVeel:'تخلص مقدما'
+  teVeel:'تخلص مقدما', opFactuur:'فالفاكتورات', ontvangen:'اللي تخلص'
  },
  nl:{
   app:'Klusboek', sub:'Klussen en klanten',
@@ -443,7 +443,7 @@ var T={
   laatOpen:'{n} facturen wachten al langer dan een maand op betaling',
   laatOpen1:'Een factuur wacht al langer dan een maand op betaling',
   bekijkOpen:'Bekijken', klaarOp:'klaar op {d}', gefactureerd:'op factuur',
-  teVeel:'Vooruitbetaald'
+  teVeel:'Vooruitbetaald', opFactuur:'Al gefactureerd', ontvangen:'Ontvangen'
  }
 };
 function t(k,vars){
@@ -461,7 +461,7 @@ var VAAK={
 var S={rate:10.8, lang:'ar', munt:'MAD', toonEuro:true, tab:'tedoen',
        klanten:[], klussen:[], facturen:[], soorten:[],
        pin:'', hide:false, snaps:[], lastBackup:''};
-var ui={lang:'ar', tab:'tedoen', q:'', zoekOpen:false, msg:'', confirm:'',
+var ui={lang:'ar', tab:'tedoen', q:'', zoekOpen:false, factOpen:false, msg:'', confirm:'',
         gekozen:{}, maand:'', jaar:''};
 
 var omgezet=false;
@@ -579,6 +579,7 @@ function factuurById(id){for(var i=0;i<S.facturen.length;i++)if(S.facturen[i].id
 function klussenVan(klantId){return S.klussen.filter(function(k){return k.klantId===klantId})}
 function teDoenVan(klantId){return klussenVan(klantId).filter(function(k){return !isKlaar(k)})}
 function klaarVan(klantId){return klussenVan(klantId).filter(function(k){return isKlaar(k)&&!k.factuurId})}
+function opFactuurVan(klantId){return klussenVan(klantId).filter(function(k){return k.factuurId})}
 function facturenVan(klantId){return S.facturen.filter(function(f){return f.klantId===klantId})}
 
 function factuurArbeid(f){var s=0;(f.regels||[]).forEach(function(r){s+=toDH(r.bedrag,r.cur||'MAD')});return s}
@@ -1003,7 +1004,9 @@ function openKlant(id,houdPlek){
   if(c.plaats||c.notitie)h+='<div class="note">'+esc([c.plaats,c.notitie].filter(Boolean).join(' — '))+'</div>';
   if(c.tel)h+='<button class="outline groen" data-act="wa" data-id="'+c.id+'">'+esc(t('whatsapp'))+' · '+esc(c.tel)+'</button>';
 
+  var ontv=0; fa.forEach(function(f){ontv+=factuurBetaald(f)});
   h+='<div class="rekening">'
+   + bedragRij(t('ontvangen'),ontv)
    + bedragRij(t('nogFactureren'),teF)
    + bedragRij(t('wachtBetaling'),open)
    + '<div class="row som"><span>'+esc(t('nogTeKrijgen'))+'</span><span class="r op">'+pv(dh(teF+open))
@@ -1055,6 +1058,21 @@ function openKlant(id,houdPlek){
        + '<div class="val">'+pv(dh(factuurTotaal(f)))
        +   (o2>0?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
        + '</div></button>';
+    });
+  }
+
+  var opF=opFactuurVan(id).sort(opDatum);
+  if(opF.length){
+    h+='<button class="outline quiet" data-act="factopen" data-id="'+c.id+'">'
+     + esc(t('opFactuur'))+' ('+opF.length+')'+(ui.factOpen?' ▲':' ▼')+'</button>';
+    if(ui.factOpen)opF.forEach(function(k){
+      h+='<div class="klusrij">'
+       + '<button class="vink af aan" data-act="klaartik" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
+       + '<div class="mid"><button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
+       +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
+       +   '<div class="sb">'+esc(k.klaarOp?t('klaarOp',{d:dat(k.klaarOp)}):dat(k.datum))
+       +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
+       + '<div class="val">'+pv(dh(klusTotaal(k)))+'</div></div>';
     });
   }
 
@@ -1141,8 +1159,12 @@ function openFactuur(fid){
 
   h+='<div class="rekening">';
   (f.regels||[]).forEach(function(r){
-    h+='<div class="row"><span>'+esc(r.titel||t('geenNaam'))+'</span>'
-     + '<span class="r">'+pv(dh(toDH(r.bedrag,r.cur||'MAD')))+'</span></div>';
+    var bestaat=r.klusId&&klusById(r.klusId);
+    h+=(bestaat?'<button class="row" style="width:100%;background:none;border:0;padding:9px 0 0" data-act="klus" data-id="'+r.klusId+'">'
+               :'<div class="row">')
+     + '<span>'+esc(r.titel||t('geenNaam'))+'</span>'
+     + '<span class="r">'+pv(dh(toDH(r.bedrag,r.cur||'MAD')))+'</span>'
+     + (bestaat?'</button>':'</div>');
   });
   if(factuurMat(f)>0)h+=bedragRij(t('materialen'),factuurMat(f));
   h+='<div class="row som"><span>'+esc(t('totaal'))+'</span><span class="r">'+pv(dh(factuurTotaal(f)))
@@ -1884,6 +1906,7 @@ document.addEventListener('click',function(e){
     window.open('https://wa.me/'+waNummer(c.tel),'_blank');
     return;
   }
+  if(act==='factopen'){ui.factOpen=!ui.factOpen;openKlant(id,true);return}
   if(act==='plakken'){openPlakken(id);return}
   if(act==='plakopslaan'){plakOpslaan(id);return}
 

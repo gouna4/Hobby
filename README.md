@@ -72,8 +72,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='29'` bovenaan het script
-2. `sw.js` — `klusboek-v29`
+1. `index.html` — `var VERSIE='30'` bovenaan het script
+2. `sw.js` — `klusboek-v30`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
