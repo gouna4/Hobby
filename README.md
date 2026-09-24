@@ -15,8 +15,9 @@ Zo eenvoudig als het kan:
 
     een KLANT heeft KLUSSEN
     een klus is af of niet, en heeft een bedrag, bonnetjes en foto's
-    wat af is en nog niet op een factuur staat, zet je op een FACTUUR
-    op die factuur komen de betalingen
+    wat af is bundel je tot een OPDRACHT
+    zeg je dat de factuur gestuurd is, dan wacht die opdracht op betaling
+    op die opdracht komen de betalingen
 
 Een bedrag staat op precies twee plekken: **bij de klus** (je arbeid) en **op
 het bonnetje** (je materiaal). Er is geen tweede bedrag dat daaroverheen gaat,
@@ -24,13 +25,17 @@ dus een totaal is altijd gewoon de optelsom.
 
 Bij een klant zie je drie groepen die de app zelf maakt:
 
-    Nog te doen                     wat er nog ligt
-    Klaar, nog niet gefactureerd    wat je kunt versturen
-    Facturen                        wat je verstuurd hebt
+    Nog te doen                  wat er nog ligt
+    Klaar, nog niet ingedeeld    wat je kunt bundelen
+    Opdrachten                   de bundels, met of zonder verstuurde factuur
 
-Een factuur is een momentopname: de klussen met hun bedrag en het materiaal bij
-elkaar. Een klus geldt alleen als gefactureerd zolang die factuur er ook echt
-is; verdwijnt de factuur, dan komt de klus vanzelf terug in de middelste groep. Pas je later een klus aan, dan blijft de factuur zoals je hem stuurde.
+Een opdracht is een momentopname: de klussen met hun bedrag en het materiaal bij
+elkaar. Een klus geldt alleen als ingedeeld zolang die opdracht er ook echt
+is; verdwijnt de opdracht, dan komt de klus vanzelf terug in de middelste groep.
+
+Een opdracht staat op **nog geen factuur gestuurd** tot je in het opdrachtscherm
+op *Factuur is gestuurd* tikt. Daarvoor telt het bedrag mee bij **nog
+factureren**, daarna bij **wacht op betaling**. Je kunt het terugdraaien. Pas je later een klus aan, dan blijft de factuur zoals je hem stuurde.
 Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 ## Wat het bijhoudt
@@ -73,8 +78,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='33'` bovenaan het script
-2. `sw.js` — `klusboek-v33`
+1. `index.html` — `var VERSIE='34'` bovenaan het script
+2. `sw.js` — `klusboek-v34`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 

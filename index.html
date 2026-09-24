@@ -337,7 +337,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='33', VERSIEDATUM='september 2026';
+var VERSIE='34', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -356,10 +356,13 @@ var T={
   bonFoto:'تصويرة ديال الفاكتورة',
   arbeid:'اليد العاملة', materialen:'مصاريف المواد', totaal:'المجموع',
   alBetaald:'المدفوع', openstaand:'الباقي', nogTeKrijgen:'الباقي لك',
-  teDoenKop:'باقي يتدار', klaarKop:'سالا، وما تفوترش', facturenKop:'الفاكتورات',
-  maakFactuur:'دير فاكتورة من {n}', factuur:'الفاكتورة', factuurVan:'فاتورة {d}',
+  teDoenKop:'باقي يتدار', klaarKop:'سالا، وما ترتبش', facturenKop:'الورشات',
+  maakFactuur:'دير ورشة من {n}', factuur:'الفاكتورة', factuurVan:'فاتورة {d}',
+  opdrachtNr:'ورشة {n}', nietVerstuurd:'مازال ماصيفطتيش الفاكتورة',
+  verstuurdOp:'الفاكتورة تصيفطات {d}', markeerVerstuurd:'صيفطت الفاكتورة',
+  tochNiet:'مازال ماصيفطتهاش', nogNietVerstuurd:'مازال ماكاينش فاكتورة',
   betalingen:'الخلاص', betAdd:'+ زيد خلاص', allesBetaald:'خلص كولشي', factuurWis:'مسح الفاكتورة',
-  factuurWisUitleg:'الأعمال كايرجعو للائحة ديال اللي خاصو يتفوتر.',
+  factuurWisUitleg:'الأعمال كايرجعو للائحة ديال اللي خاصو يترتب.',
   nogFactureren:'خاصك تفوتر', wachtBetaling:'كايتسنى الخلاص', dezeMaand:'مقبوض هاد الشهر',
   inPlanning:'خدمة مبرمجة', afgerond:'سالا هاد الشهر', voorgeschoten:'مواد من جيبك',
   ditJaar:'هاد العام', perMaand:'شهر بشهر', maandAf:'سالا', maandOnt:'تخلص', cijferLeeg:'ما كاين والو هنا',
@@ -390,12 +393,12 @@ var T={
   geenTel:'ما كاين تيليفون ديال هاد الزبون', nietsGekozen:'ما ختاريتي حتى عمل',
   bkHerinner:'هادي {n} يوم ما دريتيش نسخة احتياطية', bkNooit:'مازال ما درتي نسخة احتياطية', bkNu:'دير وحدة دابا',
   laatOpen:'{n} فاكتورات كايتسناو الخلاص من أكثر من شهر', laatOpen1:'فاكتورة كايتسنى الخلاص من أكثر من شهر',
-  bekijkOpen:'شوفهم', klaarOp:'سالا فـ {d}', gefactureerd:'فالفاكتورة',
+  bekijkOpen:'شوفهم', klaarOp:'سالا فـ {d}', gefactureerd:'ف ورشة',
   leesMislukt:'ما قدرتش نقرا هاد الملف. عاود جرب.',
   geenBackup:'هادي ماشي نسخة ديال التطبيق.',
   geenFacturen:'عنداك: فهاد الملف ماكاينش فاكتورات ولا خلصات. واش ختارتي الملف المزيان؟',
   terugMelding:'ترجع: {c} موالين · {k} خدمات · {f} فاكتورات · {b} خلصات',
-  teVeel:'تخلص مقدما', opFactuur:'فالفاكتورات', ontvangen:'اللي تخلص'
+  teVeel:'تخلص مقدما', opFactuur:'ف ورشة', ontvangen:'اللي تخلص'
  },
  nl:{
   app:'Klusboek', sub:'Klussen en klanten',
@@ -413,10 +416,13 @@ var T={
   matAdd:'+ Materiaal of bonnetje', bonFoto:'Foto van het bonnetje',
   arbeid:'Arbeid', materialen:'Materiaalkosten', totaal:'Totaal',
   alBetaald:'Betaald', openstaand:'Openstaand', nogTeKrijgen:'Nog te krijgen',
-  teDoenKop:'Nog te doen', klaarKop:'Klaar, nog niet gefactureerd', facturenKop:'Facturen',
-  maakFactuur:'Factuur maken van {n}', factuur:'Factuur', factuurVan:'Factuur {d}',
+  teDoenKop:'Nog te doen', klaarKop:'Klaar, nog niet ingedeeld', facturenKop:'Opdrachten',
+  maakFactuur:'Opdracht maken van {n}', factuur:'Factuur', factuurVan:'Factuur {d}',
+  opdrachtNr:'Opdracht {n}', nietVerstuurd:'nog geen factuur gestuurd',
+  verstuurdOp:'factuur gestuurd {d}', markeerVerstuurd:'Factuur is gestuurd',
+  tochNiet:'Toch nog niet gestuurd', nogNietVerstuurd:'Nog geen factuur gestuurd',
   betalingen:'Betalingen', betAdd:'+ Betaling', allesBetaald:'Alles betaald', factuurWis:'Factuur verwijderen',
-  factuurWisUitleg:'De klussen komen terug in de lijst die nog gefactureerd moet worden.',
+  factuurWisUitleg:'De klussen komen terug in de lijst die nog ingedeeld moet worden.',
   nogFactureren:'Nog factureren', wachtBetaling:'Wacht op betaling', dezeMaand:'Deze maand binnen',
   inPlanning:'Werk in de planning', afgerond:'Deze maand afgerond', voorgeschoten:'Materialen voorgeschoten',
   ditJaar:'Dit jaar', perMaand:'Maand voor maand', maandAf:'Afgerond', maandOnt:'Ontvangen',
@@ -450,12 +456,12 @@ var T={
   bkHerinner:'Je maakte al {n} dagen geen back-up', bkNooit:'Je hebt nog geen back-up gemaakt', bkNu:'Nu maken',
   laatOpen:'{n} facturen wachten al langer dan een maand op betaling',
   laatOpen1:'Een factuur wacht al langer dan een maand op betaling',
-  bekijkOpen:'Bekijken', klaarOp:'klaar op {d}', gefactureerd:'op factuur',
+  bekijkOpen:'Bekijken', klaarOp:'klaar op {d}', gefactureerd:'in een opdracht',
   leesMislukt:'Dit bestand kon ik niet lezen. Probeer het opnieuw.',
   geenBackup:'Dit is geen back-up van het Klusboek.',
   geenFacturen:'Let op: in dit bestand staan geen facturen en geen betalingen. Heb je het goede bestand gekozen?',
   terugMelding:'Teruggezet: {c} klanten · {k} klussen · {f} facturen · {b} betalingen',
-  teVeel:'Vooruitbetaald', opFactuur:'Al gefactureerd', ontvangen:'Ontvangen'
+  teVeel:'Vooruitbetaald', opFactuur:'Al in een opdracht', ontvangen:'Ontvangen'
  }
 };
 function t(k,vars){
@@ -498,6 +504,7 @@ function load(){
       /* een boek van voor versie 29 komt hier binnen met opdrachten */
       if(Array.isArray(d.opdrachten)&&d.opdrachten.length){uitOpdrachten(d.opdrachten);omgezet=true}
       if(herstelFactuurLinks())omgezet=true;
+      if(herstelVerstuurd())omgezet=true;
     }
   }catch(e){}
   ui.lang=S.lang;
@@ -506,6 +513,18 @@ function load(){
 /* Wijst een klus naar een factuur die niet meer bestaat, dan halen we die
    verwijzing weg. Anders blijft hij hangen als 'al gefactureerd' terwijl er
    geen factuur is, en lijkt aanvinken niets te doen. */
+/* Facturen van voor versie 34 weten niet of ze verstuurd zijn. Zat er al geld
+   op, dan is hij de deur uit geweest; zo niet, dan was het een bundel. */
+function herstelVerstuurd(){
+  var raak=0;
+  (S.facturen||[]).forEach(function(f){
+    if(typeof f.gestuurd==='undefined'){
+      f.gestuurd=(f.bet&&f.bet.length)?(f.datum||today()):'';
+      raak++;
+    }
+  });
+  return raak;
+}
 function herstelFactuurLinks(){
   var raak=0;
   (S.klussen||[]).forEach(function(k){
@@ -615,6 +634,16 @@ function factuurMat(f){return toDH(f.matBedrag,f.matCur||'MAD')}
 function factuurTotaal(f){return factuurArbeid(f)+factuurMat(f)}
 function factuurBetaald(f){var s=0;(f.bet||[]).forEach(function(b){s+=toDH(b.bedrag,b.cur||'MAD')});return s}
 function factuurOpen(f){var v=factuurTotaal(f)-factuurBetaald(f);return v>0.5?v:0}
+/* Een opdracht is een bundel klussen. Pas als jij zegt dat de factuur de deur
+   uit is, telt hij mee als 'wacht op betaling'; daarvoor staat hij bij 'nog
+   factureren'. */
+function isGestuurd(f){return !!(f&&f.gestuurd)}
+function opdrachtNr(f){
+  var lijst=facturenVan(f.klantId).slice().sort(opOud);
+  for(var i=0;i<lijst.length;i++)if(lijst[i].id===f.id)return i+1;
+  return lijst.length+1;
+}
+function opdrachtNaam(f){return t('opdrachtNr',{n:opdrachtNr(f)})}
 function factuurLaatst(f){
   var l=f.datum||'';
   (f.bet||[]).forEach(function(b){if((b.datum||'')>l)l=b.datum});
@@ -636,7 +665,9 @@ function totalen(){
   });
   S.facturen.forEach(function(f){
     var open=factuurOpen(f);
-    if(open>0){
+    if(!isGestuurd(f)){
+      factureren+=open; voorgeschoten+=factuurMat(f);
+    } else if(open>0){
       wacht+=open; nWacht++;
       if(dagenSinds(factuurLaatst(f))>30)oud++;
     }
@@ -674,7 +705,8 @@ function uitOpdrachten(opdrachten){
       return;
     }
     var f={id:uid(),klantId:o.klantId,datum:o.datum||today(),
-           naam:o.naam||'',regels:[],matBedrag:0,matCur:S.munt,bet:bet,at:o.at||Date.now()};
+           naam:o.naam||'',regels:[],matBedrag:0,matCur:S.munt,bet:bet,at:o.at||Date.now(),
+           gestuurd:(o.fase==='factuur'||o.fase==='betaald'||bet.length)?(o.datum||today()):''};
     var matDH=eigenMat;
     af.forEach(function(k){
       f.regels.push({klusId:k.id,titel:k.titel||'',bedrag:num(k.loon),cur:k.loonCur||S.munt});
@@ -995,7 +1027,7 @@ function klusKaart(k,toonKlant){
 function factuurKaart(f,toonKlant){
   var open=factuurOpen(f);
   var h='<button class="card" data-act="factuur" data-id="'+f.id+'">';
-  h+='<div class="chead"><div><div class="cname">'+esc(t('factuurVan',{d:dat(f.datum)}))+'</div>'
+  h+='<div class="chead"><div><div class="cname">'+esc(opdrachtNaam(f)+' · '+dat(f.datum))+'</div>'
    + '<div class="cmeta">'+(toonKlant?esc(klantNaam(f.klantId))+' · ':'')
    +   (f.regels||[]).length+' '+esc(t('klussen').toLowerCase())+'</div></div>'
    + '<span class="pill '+(open>0?'todo':'betaald')+'">'
@@ -1023,7 +1055,8 @@ function openKlant(id,houdPlek){
   var nGek=0, gSom=0;
   kl.forEach(function(k){if(gek[k.id]){nGek++;gSom+=klusTotaal(k)}});
   var teF=0; kl.forEach(function(k){teF+=klusTotaal(k)});
-  var open=0; fa.forEach(function(f){open+=factuurOpen(f)});
+  fa.forEach(function(f){if(!isGestuurd(f))teF+=factuurOpen(f)});
+  var open=0; fa.forEach(function(f){if(isGestuurd(f))open+=factuurOpen(f)});
 
   var h='<div class="sheet"><div class="sheet-in">';
   h+='<div class="shead"><button class="back" data-act="close">‹</button>'
@@ -1079,12 +1112,14 @@ function openKlant(id,houdPlek){
     h+='<div class="label">'+esc(t('facturenKop'))+' ('+fa.length+')</div>';
     fa.forEach(function(f){
       var o2=factuurOpen(f);
+      var stand=!isGestuurd(f)?dat(f.datum)+' · '+t('nietVerstuurd')
+                :t('verstuurdOp',{d:dat(f.gestuurd)})+' · '+(o2>0?t('wachtBetaling'):t('alBetaald'));
       h+='<button class="klusrij" style="width:100%" data-act="factuur" data-id="'+f.id+'">'
-       + '<div class="mid"><div class="nm">'+esc(t('factuurVan',{d:dat(f.datum)}))+'</div>'
+       + '<div class="mid"><div class="nm">'+esc(opdrachtNaam(f))+'</div>'
        +   '<div class="sb">'+(f.regels||[]).length+' '+esc(t('klussen').toLowerCase())
-       +   ' · '+esc(o2>0?t('wachtBetaling'):t('alBetaald'))+'</div></div>'
+       +   ' · '+esc(stand)+'</div></div>'
        + '<div class="val">'+pv(dh(factuurTotaal(f)))
-       +   (o2>0?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
+       +   (o2>0&&isGestuurd(f)?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
        + '</div></button>';
     });
   }
@@ -1162,7 +1197,7 @@ function maakFactuur(klantId){
   var gek=ui.gekozen[klantId]||{};
   var mee=klaarVan(klantId).filter(function(k){return gek[k.id]}).sort(opOud);
   if(!mee.length){ui.msg=t('nietsGekozen');render();openKlant(klantId,true);return}
-  var f={id:uid(),klantId:klantId,datum:today(),naam:'',regels:[],
+  var f={id:uid(),klantId:klantId,datum:today(),naam:'',gestuurd:'',regels:[],
          matBedrag:0,matCur:S.munt,bet:[],at:Date.now()};
   var matDH=0;
   mee.forEach(function(k){
@@ -1185,7 +1220,7 @@ function openFactuur(fid){
 
   var h='<div class="sheet"><div class="sheet-in">';
   h+='<div class="shead"><button class="back" data-act="klant" data-id="'+f.klantId+'">‹</button>'
-   + '<div class="t">'+esc(t('factuurVan',{d:dat(f.datum)}))+'</div></div>';
+   + '<div class="t">'+esc(opdrachtNaam(f))+'</div></div>';
   h+='<div class="note">'+esc(c?c.naam:'')+'</div>';
 
   h+='<div class="rekening">';
@@ -1208,6 +1243,8 @@ function openFactuur(fid){
    + '<button class="outline groen" data-act="betrest">'+esc(t('allesBetaald'))+'</button>';
 
   h+='<div class="divider"></div>';
+  h+='<button class="outline'+(isGestuurd(f)?' quiet':' groen')+'" data-act="verstuurd" data-id="'+fid+'">'
+   + esc(isGestuurd(f)?t('tochNiet'):t('markeerVerstuurd'))+'</button>';
   h+='<button class="outline" data-act="overzicht" data-id="'+fid+'">'+esc(t('overzicht'))+'</button>';
   h+='<button class="outline quiet" data-act="ovprint" data-id="'+fid+'">'+esc(t('afdrukken'))+'</button>';
   h+='<button class="outline gevaar" data-act="factuurwis" data-id="'+fid+'">'
@@ -1253,11 +1290,12 @@ function tekenOpen(){
   var bet=0; formBet.forEach(function(b){bet+=toDH(b.bedrag,b.cur||'MAD')});
   var open=factuurTotaal(f)-bet;
   var kop, waarde, kleur;
-  if(open>0.5){kop=t('openstaand'); waarde=open; kleur=''}
+  if(!isGestuurd(f)){kop=t('nogNietVerstuurd'); waarde=factuurTotaal(f)-bet; kleur='color:var(--dim)'}
+  else if(open>0.5){kop=t('openstaand'); waarde=open; kleur=''}
   else if(open<-0.5){kop=t('teVeel'); waarde=-open; kleur='color:var(--mint)'}
   else {kop=t('alBetaald'); waarde=bet; kleur='color:var(--mint)'}
   box.innerHTML='<span>'+esc(kop)+'</span>'
-   + '<span class="r'+(open>0.5?' op':'')+'" style="'+kleur+'">'+pv(dh(waarde))+'</span>';
+   + '<span class="r'+(open>0.5&&isGestuurd(f)?' op':'')+'" style="'+kleur+'">'+pv(dh(waarde))+'</span>';
 }
 function factuurOpslaan(fid){
   var f=factuurById(fid);
@@ -1508,7 +1546,7 @@ function cijferLijst(soort){
         if(maandVan(b.datum)!==nu)return;
         var bedrag=toDH(b.bedrag,b.cur||'MAD');
         if(Math.abs(bedrag)<0.5)return;
-        uit.push({titel:klantNaam(f.klantId),sub:t('factuurVan',{d:dat(f.datum)})+' · '+dat(b.datum),
+        uit.push({titel:klantNaam(f.klantId),sub:opdrachtNaam(f)+' · '+dat(b.datum),
                   bedrag:bedrag,soort:'factuur',id:f.id,datum:b.datum});
       });
     });
@@ -1523,12 +1561,21 @@ function cijferLijst(soort){
       uit.push({titel:k.titel||t('geenNaam'),sub:klantNaam(k.klantId)+' · '+t('nogFactureren'),
                 bedrag:bedrag,soort:'klus',id:k.id,datum:k.klaarOp||k.datum});
     });
+    /* een opdracht waar nog geen factuur van gestuurd is hoort hier ook bij */
+    S.facturen.forEach(function(f){
+      if(isGestuurd(f))return;
+      var open=factuurOpen(f);
+      if(open<0.5)return;
+      uit.push({titel:opdrachtNaam(f),sub:klantNaam(f.klantId)+' · '+t('nietVerstuurd'),
+                bedrag:open,soort:'factuur',id:f.id,datum:f.datum});
+    });
   }
   if(soort==='wacht'||soort==='open'){
     S.facturen.forEach(function(f){
+      if(!isGestuurd(f))return;
       var open=factuurOpen(f);
       if(open<0.5)return;
-      uit.push({titel:t('factuurVan',{d:dat(f.datum)}),sub:klantNaam(f.klantId)+' · '+t('wachtBetaling'),
+      uit.push({titel:opdrachtNaam(f),sub:klantNaam(f.klantId)+' · '+t('wachtBetaling'),
                 bedrag:open,soort:'factuur',id:f.id,datum:factuurLaatst(f)});
     });
   }
@@ -1840,7 +1887,7 @@ function zetTerug(tekst){
   if(typeof d.toonEuro==='boolean')S.toonEuro=d.toonEuro;
   if(d.lang)S.lang=ui.lang=d.lang;
   if(Array.isArray(d.opdrachten)&&d.opdrachten.length)uitOpdrachten(d.opdrachten);
-  herstelFactuurLinks();
+  herstelFactuurLinks(); herstelVerstuurd();
   var nb=0; S.facturen.forEach(function(f){nb+=(f.bet||[]).length});
   ui.msg=t('terugMelding',{c:S.klanten.length,k:S.klussen.length,f:S.facturen.length,b:nb});
   if(!S.facturen.length)ui.msg+=' — '+t('geenFacturen');
@@ -2082,6 +2129,11 @@ document.addEventListener('click',function(e){
   /* ── facturen ── */
   if(act==='maakfactuur'){maakFactuur(id);return}
   if(act==='factuur'){ui.confirm='';openFactuur(id);return}
+  if(act==='verstuurd'){
+    var vf=factuurById(id);
+    if(vf){vf.gestuurd=vf.gestuurd?'':today(); save(); openFactuur(id); render()}
+    return;
+  }
   if(act==='factuuropslaan'){factuurOpslaan(id);return}
   if(act==='factuurwis'){
     if(ui.confirm!=='fact'+id){ui.confirm='fact'+id;openFactuur(id);return}
