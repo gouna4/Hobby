@@ -360,7 +360,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='36', VERSIEDATUM='september 2026';
+var VERSIE='37', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -1279,11 +1279,12 @@ function zetBijOpdracht(klantId){
     save(); render(); openFactuur(f.id);
   });
 }
-function haalUitOpdracht(fid,klusId){
+function haalUitOpdracht(fid,klusId,stil){
   var f=factuurById(fid), k=klusById(klusId);
   if(!f)return;
   f.regels=(f.regels||[]).filter(function(r){return r.klusId!==klusId});
   if(k){matBij(f,-klusMat(k)); delete k.factuurId}
+  if(stil)return;
   save(); render(); openFactuur(fid);
 }
 function maakFactuur(klantId){
@@ -1549,6 +1550,8 @@ function klusOpslaan(){
   if(!titel){document.getElementById('k_titel').focus();return}
   var k=formKlusId?klusById(formKlusId):null;
   if(!k){k={id:uid(),at:Date.now()};S.klussen.push(k)}
+  /* onthouden wat het materiaal was, zodat de opdracht het verschil meekrijgt */
+  var matVoor=klusMat(k);
   k.klantId=document.getElementById('k_klant').value;
   k.titel=titel;
   k.datum=document.getElementById('k_datum').value||today();
@@ -1561,7 +1564,34 @@ function klusOpslaan(){
   k.mats=formMats.filter(function(m){return (m.naam&&String(m.naam).trim())||num(m.bedrag)||m.foto})
     .map(function(m){return {id:m.id,naam:String(m.naam||'').trim(),bedrag:num(m.bedrag),cur:m.cur||'MAD',foto:!!m.foto}});
   opruimenFotos(k);
+  volgtOpdracht(k,matVoor);
   save(); closeSheet(); render(); openKlant(k.klantId);
+}
+
+/* Zit een klus in een opdracht, dan moet die opdracht meebewegen als je het
+   bedrag, de naam of het materiaal van die klus verandert. Anders zie je een
+   totaal dat niet meer klopt met de regels eronder. Zet je de klus bij een
+   andere klant, dan hoort hij niet meer in die opdracht thuis. */
+function volgtOpdracht(k,matVoor){
+  if(!k.factuurId)return;
+  var f=factuurById(k.factuurId);
+  if(!f){delete k.factuurId;return}
+  if(f.klantId!==k.klantId){
+    f.regels=(f.regels||[]).filter(function(r){return r.klusId!==k.id});
+    matBij(f,-matVoor);
+    delete k.factuurId;
+    return;
+  }
+  var gevonden=false;
+  (f.regels||[]).forEach(function(r){
+    if(r.klusId!==k.id)return;
+    gevonden=true;
+    r.titel=k.titel||'';
+    r.bedrag=num(k.loon);
+    r.cur=k.loonCur||S.munt;
+  });
+  if(!gevonden){delete k.factuurId;return}
+  matBij(f,klusMat(k)-matVoor);
 }
 function opruimenFotos(k){
   var houden={};
@@ -1572,6 +1602,8 @@ function opruimenFotos(k){
 function klaarToggle(klusId,klantId){
   var k=klusById(klusId);
   if(!k)return;
+  /* iets wat je terugzet op 'nog te doen' hoort niet meer in een opdracht */
+  if(isKlaar(k)&&k.factuurId)haalUitOpdracht(k.factuurId,k.id,true);
   k.status=isKlaar(k)?'todo':'klaar';
   if(isKlaar(k))k.klaarOp=today(); else delete k.klaarOp;
   save();

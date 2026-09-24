@@ -65,6 +65,7 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
   weken geen back-up maakte
 - Alles wat weggooit vraagt het eerst, met een venster dat zegt wat er weggaat
 - Klaar werk bij een bestaande opdracht zetten, en er met het kruisje weer uit halen
+- Pas je een klus aan die in een opdracht zit, dan rekent die opdracht zichzelf opnieuw uit
 - Op een opdracht staan werkkosten en materiaalkosten apart, met het totaal eronder
 - Een knop om alle bedragen te verbergen, en een cijferslot van vier cijfers
 - Back-up maken en terugzetten, en vijf herstelpunten op het toestel zelf
@@ -81,8 +82,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='36'` bovenaan het script
-2. `sw.js` — `klusboek-v36`
+1. `index.html` — `var VERSIE='37'` bovenaan het script
+2. `sw.js` — `klusboek-v37`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
