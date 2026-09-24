@@ -29,7 +29,8 @@ Bij een klant zie je drie groepen die de app zelf maakt:
     Facturen                        wat je verstuurd hebt
 
 Een factuur is een momentopname: de klussen met hun bedrag en het materiaal bij
-elkaar. Pas je later een klus aan, dan blijft de factuur zoals je hem stuurde.
+elkaar. Een klus geldt alleen als gefactureerd zolang die factuur er ook echt
+is; verdwijnt de factuur, dan komt de klus vanzelf terug in de middelste groep. Pas je later een klus aan, dan blijft de factuur zoals je hem stuurde.
 Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 ## Wat het bijhoudt
@@ -72,8 +73,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='30'` bovenaan het script
-2. `sw.js` — `klusboek-v30`
+1. `index.html` — `var VERSIE='31'` bovenaan het script
+2. `sw.js` — `klusboek-v31`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
