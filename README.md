@@ -23,6 +23,10 @@ Een bedrag staat op precies twee plekken: **bij de klus** (je arbeid) en **op
 het bonnetje** (je materiaal). Er is geen tweede bedrag dat daaroverheen gaat,
 dus een totaal is altijd gewoon de optelsom.
 
+Op een opdracht staat het materiaal daarom in twee regels met ieder een eigen
+eigenaar: *bonnetjes bij de klussen* rekent de app uit, *extra materiaal* typ
+je zelf. Zo verandert jouw getal nooit achter je rug om.
+
 Bij een klant zie je drie groepen die de app zelf maakt:
 
     Open werk         wat nog moet, en wat af is maar nog nergens in zit
@@ -94,8 +98,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='44'` bovenaan het script
-2. `sw.js` — `klusboek-v44`
+1. `index.html` — `var VERSIE='45'` bovenaan het script
+2. `sw.js` — `klusboek-v45`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
