@@ -50,8 +50,9 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - Een klus is af of niet; de app onthoudt op welke dag je hem afvinkte
 - Tot zes foto's van het werk per klus
 - Materialen als lijst, met een foto van het bonnetje per regel
-- Facturen met hun betalingen, ook in delen. Betaal je meer dan er op staat,
-  dan heet dat *Vooruitbetaald*
+- Opdrachten met hun betalingen, ook in delen. Komt er meer binnen dan de
+  opdracht kost, dan heet dat *Vooruitbetaald*: dat staat bij de klant, op de
+  regel van de opdracht en in de balk op de hoofdpagina
 - Dirham of euro als hoofdmunt, met een instelbare koers; per bedrag kies je DH of €
 - Het overzicht naar de klant sturen via WhatsApp of het deelmenu, of afdrukken
   en als PDF bewaren
@@ -89,8 +90,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='41'` bovenaan het script
-2. `sw.js` — `klusboek-v41`
+1. `index.html` — `var VERSIE='42'` bovenaan het script
+2. `sw.js` — `klusboek-v42`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 

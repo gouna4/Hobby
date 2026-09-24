@@ -373,7 +373,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='41', VERSIEDATUM='september 2026';
+var VERSIE='42', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -707,6 +707,9 @@ function factuurMat(f){return toDH(f.matBedrag,f.matCur||'MAD')}
 function factuurTotaal(f){return factuurArbeid(f)+factuurMat(f)}
 function factuurBetaald(f){var s=0;(f.bet||[]).forEach(function(b){s+=toDH(b.bedrag,b.cur||'MAD')});return s}
 function factuurOpen(f){var v=factuurTotaal(f)-factuurBetaald(f);return v>0.5?v:0}
+/* Meer binnen dan de opdracht kost: dat geld staat vooruit voor werk dat nog
+   moet komen. Het is geen winst en het mag niet stil blijven staan. */
+function factuurVooruit(f){var v=factuurBetaald(f)-factuurTotaal(f);return v>0.5?v:0}
 /* Een opdracht is een bundel klussen. Pas als jij zegt dat de factuur de deur
    uit is, telt hij mee als 'wacht op betaling'; daarvoor staat hij bij 'nog
    factureren'. */
@@ -729,7 +732,7 @@ function opOud(a,b){return String(a.datum||'').localeCompare(String(b.datum||'')
 function soortenLijst(){return (VAAK[ui.lang]||VAAK.nl).concat(S.soorten||[])}
 
 function totalen(){
-  var factureren=0, wacht=0, maand=0, planning=0, afgerond=0, voorgeschoten=0, oud=0, nWacht=0;
+  var factureren=0, wacht=0, maand=0, planning=0, afgerond=0, voorgeschoten=0, oud=0, nWacht=0, vooruit=0;
   var nu=ui.maand||maandVan(today());
   S.klussen.forEach(function(k){
     if(!isKlaar(k)){planning+=klusLoon(k); return}
@@ -744,11 +747,12 @@ function totalen(){
       wacht+=open; nWacht++;
       if(dagenSinds(factuurLaatst(f))>30)oud++;
     }
+    vooruit+=factuurVooruit(f);
     (f.bet||[]).forEach(function(b){if(maandVan(b.datum)===nu)maand+=toDH(b.bedrag,b.cur||'MAD')});
   });
   return {factureren:factureren, wacht:wacht, maand:maand, planning:planning,
           afgerond:afgerond, voorgeschoten:voorgeschoten, oud:oud, nWacht:nWacht,
-          open:factureren+wacht};
+          vooruit:vooruit, open:factureren+wacht};
 }
 
 /* ── een boek van voor versie 29 omzetten ──
@@ -967,6 +971,7 @@ function render(){
    + '<div class="v mono">'+pv(dh(tot.open))+'</div>'
    + '<div class="s">'+(S.toonEuro?'<span class="mono">'+pv(euBij(tot.open))+'</span> · ':'')
    +   esc(t('nogFactureren'))+' '+pv(dh(tot.factureren))+' · '+esc(t('wachtBetaling'))+' '+pv(dh(tot.wacht))
+   +   (tot.vooruit>0.5?' · '+esc(t('teVeel'))+' '+pv(dh(tot.vooruit)):'')
    + '</div></button>';
 
   h+='<div class="zoekrij"><div class="tabs">'
@@ -1142,10 +1147,13 @@ function openKlant(id,houdPlek){
   if(c.tel)h+='<button class="outline groen" data-act="wa" data-id="'+c.id+'">'+esc(t('whatsapp'))+' · '+esc(c.tel)+'</button>';
 
   var ontv=0; fa.forEach(function(f){ontv+=factuurBetaald(f)});
+  var vooruit=0; fa.forEach(function(f){vooruit+=factuurVooruit(f)});
   h+='<div class="rekening">'
    + bedragRij(t('ontvangen'),ontv)
    + bedragRij(t('nogFactureren'),teF)
    + bedragRij(t('wachtBetaling'),open)
+   + (vooruit>0.5?'<div class="row"><span class="dim">'+esc(t('teVeel'))+'</span>'
+       + '<span class="r" style="color:var(--mint)">'+pv(dh(vooruit))+'</span></div>':'')
    + '<div class="row som"><span>'+esc(t('nogTeKrijgen'))+'</span><span class="r op">'+pv(dh(teF+open))
    +   (S.toonEuro?'<span class="euro">'+pv(euBij(teF+open))+'</span>':'')+'</span></div></div>';
 
@@ -1169,14 +1177,16 @@ function openKlant(id,houdPlek){
   }
   function opdrachtRij(f){
     var o2=factuurOpen(f);
+    var vr=factuurVooruit(f);
     var stand=!isGestuurd(f)?dat(f.datum)+' · '+t('nietVerstuurd')
-              :t('verstuurdOp',{d:dat(f.gestuurd)})+' · '+(o2>0?t('wachtBetaling'):t('alBetaald'));
+              :t('verstuurdOp',{d:dat(f.gestuurd)})+' · '+(o2>0?t('wachtBetaling'):(vr>0.5?t('teVeel'):t('alBetaald')));
     return '<button class="klusrij" style="width:100%" data-act="factuur" data-id="'+f.id+'">'
      + '<div class="mid"><div class="nm">'+esc(opdrachtNaam(f))+'</div>'
      +   '<div class="sb">'+(f.regels||[]).length+' '+esc(t('klussen').toLowerCase())
      +   ' · '+esc(stand)+'</div></div>'
      + '<div class="val">'+pv(dh(factuurTotaal(f)))
      +   (o2>0&&isGestuurd(f)?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
+     +   (vr>0.5?'<span class="s" style="color:var(--mint)">+'+pv(dh(vr))+'</span>':'')
      + '</div></button>';
   }
 
