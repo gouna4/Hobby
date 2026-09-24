@@ -280,6 +280,9 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
   background:var(--night) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a8178'/></svg>") no-repeat right 10px center}
 html[dir="rtl"] .betsoort{background-position:left 10px center}
 
+.fijn{font-size:12px;color:var(--dim);line-height:1.5;padding:1px 0 2px}
+.fijn:empty{display:none}
+
 .matrij{display:flex;align-items:center;gap:8px;justify-content:flex-end}
 .matrij input{width:104px;text-align:end;padding:8px 10px;font-size:14px;
   background:var(--night);border:1px solid var(--line);border-radius:10px;color:var(--sand);
@@ -377,7 +380,7 @@ html[dir="rtl"] .betsoort{background-position:left 10px center}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='43', VERSIEDATUM='september 2026';
+var VERSIE='44', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -1448,14 +1451,16 @@ function openFactuur(fid,houdPlek){
    +   curKnop('fmat',formMatCur)
    + '</span></div>';
   h+='<div class="row som"><span>'+esc(t('totaal'))+'</span><span class="r" id="f_tot"></span></div>';
+  h+='<div class="row" id="f_ontv"></div>';
+  h+='<div class="fijn" id="f_waarvan"></div>';
   h+='<div class="row" id="f_open"></div>';
+  h+='<div class="fijn" id="f_stand"></div>';
   h+='</div>';
 
   h+='<button class="outline" data-act="klusbij" data-id="'+fid+'">'+esc(t('klusErbij'))+'</button>';
   h+='<button class="outline quiet" data-act="nieuwinopdr" data-id="'+fid+'">'+esc(t('nieuwInOpdr'))+'</button>';
 
   h+='<div class="label">'+esc(t('betalingen'))+'</div><div id="f_bet"></div>'
-   + '<div class="note" id="f_bsom"></div>'
    + '<button class="matadd" data-act="betadd">'+esc(t('betAdd'))+'</button>'
    + '<button class="outline groen" data-act="betrest">'+esc(t('allesBetaald'))+'</button>';
 
@@ -1543,32 +1548,49 @@ function tekenOpen(){
     var k=b.soort||'betaling';
     perSoort[k]=(perSoort[k]||0)+w;
   });
-  var sb=document.getElementById('f_bsom');
-  if(sb){
+
+  /* wat er binnen is, en waarvoor het was */
+  var ob=document.getElementById('f_ontv');
+  if(ob)ob.innerHTML = bet>0.5
+    ? '<span class="dim">'+esc(t('ontvangen'))+'</span>'
+      + '<span class="r" style="color:var(--mint)">'+pv(dh(bet))+'</span>'
+    : '';
+  var wb=document.getElementById('f_waarvan');
+  if(wb){
     var stuk=[];
     BETSOORTEN.forEach(function(k){
-      if(k==='betaling')return;
       if(Math.abs(perSoort[k]||0)>0.5)stuk.push(betSoortNaam(k)+' '+dh(perSoort[k]));
     });
-    sb.textContent=stuk.length?t('waarvan')+': '+stuk.join(' \u00b7 '):'';
+    var alleenGewoon=(stuk.length===1&&Math.abs(perSoort.betaling||0)>0.5);
+    wb.textContent=(stuk.length&&!alleenGewoon)?t('waarvan')+': '+stuk.join(' \u00b7 '):'';
   }
+
+  /* en wat er dan nog moet komen, of juist te veel binnen is */
   var open=totaal-bet;
   var kop, waarde, kleur;
-  if(!isGestuurd(f)){kop=t('nogNietVerstuurd'); waarde=factuurTotaal(f)-bet; kleur='color:var(--dim)'}
-  else if(open>0.5){kop=t('openstaand'); waarde=open; kleur=''}
+  if(open>0.5){kop=t('openstaand'); waarde=open; kleur=''}
   else if(open<-0.5){kop=t('teVeel'); waarde=-open; kleur='color:var(--mint)'}
   else {kop=t('alBetaald'); waarde=bet; kleur='color:var(--mint)'}
   box.innerHTML='<span>'+esc(kop)+'</span>'
    + '<span class="r'+(open>0.5&&isGestuurd(f)?' op':'')+'" style="'+kleur+'">'+pv(dh(waarde))+'</span>';
+  var stb=document.getElementById('f_stand');
+  if(stb)stb.textContent=isGestuurd(f)?'':t('nogNietVerstuurd');
 }
-function factuurOpslaan(fid){
-  var f=factuurById(fid);
+/* Alles wat je in het opdrachtscherm hebt ingevuld overnemen. Doe dit ook
+   voordat het scherm om een andere reden opnieuw getekend wordt, anders ben
+   je je materiaalbedrag en je soorten kwijt. */
+function opdrachtUitForm(f){
   if(!f)return;
   var mv=document.getElementById('f_mat');
   if(mv){f.matBedrag=num(mv.value); f.matCur=formMatCur}
   f.bet=formBet.filter(function(b){return num(b.bedrag)!==0})
     .map(function(b){return {id:b.id,bedrag:num(b.bedrag),cur:b.cur||'MAD',datum:b.datum||today(),
                              soort:b.soort||'betaling'}});
+}
+function factuurOpslaan(fid){
+  var f=factuurById(fid);
+  if(!f)return;
+  opdrachtUitForm(f);
   save(); render(); openFactuur(fid,true);
 }
 function factuurWissen(fid){
@@ -2488,16 +2510,18 @@ document.addEventListener('click',function(e){
   /* ── facturen ── */
   if(act==='maakfactuur'){maakFactuur(id);return}
   if(act==='bijopdracht'){zetBijOpdracht(id);return}
-  if(act==='klusbij'){kiesKlusErbij(id);return}
+  if(act==='klusbij'){opdrachtUitForm(factuurById(id));kiesKlusErbij(id);return}
   if(act==='nieuwinopdr'){
     var nf2=factuurById(id);
     if(!nf2)return;
+    opdrachtUitForm(nf2); save();
     naarOpdracht=id;
     openKlusForm('',nf2.klantId);
     return;
   }
   if(act==='regeluit'){
     var ruK=b.dataset.k||'', ruF=id, ruKlus=klusById(ruK);
+    opdrachtUitForm(factuurById(ruF));
     vraag(t('vraagUit'),(ruKlus&&ruKlus.titel?ruKlus.titel+'. ':'')+t('uitUitleg'),t('jaUit'),function(){
       haalUitOpdracht(ruF,ruK);
     });
@@ -2506,7 +2530,7 @@ document.addEventListener('click',function(e){
   if(act==='factuur'){ui.confirm='';openFactuur(id);return}
   if(act==='verstuurd'){
     var vf=factuurById(id);
-    if(vf){vf.gestuurd=vf.gestuurd?'':today(); save(); render(); openFactuur(id,true)}
+    if(vf){opdrachtUitForm(vf); vf.gestuurd=vf.gestuurd?'':today(); save(); render(); openFactuur(id,true)}
     return;
   }
   if(act==='factuuropslaan'){factuurOpslaan(id);return}

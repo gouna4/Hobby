@@ -71,7 +71,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - Een strook bovenaan als een factuur langer dan een maand wacht, of als je twee
   weken geen back-up maakte
 - Bij elke betaling kies je waarvoor die was: betaling, voorschot, materiaal,
-  restbetaling, meerwerk of anders. Het verandert de som niet, het legt hem uit
+  restbetaling, meerwerk of anders. Het verandert de som niet, het legt hem uit;
+  in de rekening staat wat er binnen is en waarvoor het was
 - Alles wat weggooit vraagt het eerst, met een venster dat zegt wat er weggaat
 - Klaar werk bij een bestaande opdracht zetten, en er met het kruisje weer uit halen
 - Vanuit een opdracht zelf werk erbij halen, of er meteen een nieuwe klus in maken
@@ -93,8 +94,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='43'` bovenaan het script
-2. `sw.js` — `klusboek-v43`
+1. `index.html` — `var VERSIE='44'` bovenaan het script
+2. `sw.js` — `klusboek-v44`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
