@@ -268,6 +268,14 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
   padding:22px 20px 16px;max-width:340px;width:100%;text-align:center}
 .vraagbox .vt{font-size:17px;font-weight:700;line-height:1.35}
 .vraagbox .vu{font-size:13px;color:var(--dim);line-height:1.6;margin-top:10px}
+.vouwkop{display:flex;align-items:center;gap:10px;width:100%;background:none;
+  border:1px solid var(--line);border-radius:13px;padding:14px 15px;margin-top:11px;color:var(--sand)}
+.vouwkop.aan{background:var(--surface)}
+.vouwkop .vp{font-size:12px;color:var(--dim);width:11px;flex:none}
+.vouwkop .vn{flex:1;min-width:0;text-align:start;font-weight:700;font-size:15px}
+.vouwkop .vb{font-family:var(--mono);font-size:14px;flex:none}
+.vouwin{padding:2px 2px 6px}
+
 .regelrij{display:flex;align-items:center;gap:8px}
 .regelnm{flex:1;min-width:0;text-align:start;background:none;border:0;padding:0;color:var(--sand);font-size:15px}
 .regeluit{background:none;border:0;padding:0 2px 0 6px;color:var(--dim);font-size:19px;line-height:1}
@@ -360,7 +368,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='37', VERSIEDATUM='september 2026';
+var VERSIE='38', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -381,6 +389,9 @@ var T={
   alBetaald:'المدفوع', openstaand:'الباقي', nogTeKrijgen:'الباقي لك',
   teDoenKop:'باقي يتدار', klaarKop:'سالا، وما ترتبش', facturenKop:'الورشات',
   maakFactuur:'دير ورشة من {n}', factuur:'الفاكتورة', factuurVan:'فاتورة {d}',
+  groepOpen:'الخدمة اللي باقية', groepOpdrachten:'الورشات', groepBetaald:'تخلص',
+  groepOpenLeeg:'ما باقي والو عند هاد الزبون', groepOpdrLeeg:'ما كاين حتى ورشة خدامة',
+  groepBetLeeg:'مازال ما تخلص حتى واحد كامل',
   opdrachtNr:'ورشة {n}', nietVerstuurd:'مازال ماصيفطتيش الفاكتورة',
   verstuurdOp:'الفاكتورة تصيفطات {d}', markeerVerstuurd:'صيفطت الفاكتورة',
   tochNiet:'مازال ماصيفطتهاش', nogNietVerstuurd:'مازال ماكاينش فاكتورة',
@@ -453,6 +464,9 @@ var T={
   alBetaald:'Betaald', openstaand:'Openstaand', nogTeKrijgen:'Nog te krijgen',
   teDoenKop:'Nog te doen', klaarKop:'Klaar, nog niet ingedeeld', facturenKop:'Opdrachten',
   maakFactuur:'Opdracht maken van {n}', factuur:'Factuur', factuurVan:'Factuur {d}',
+  groepOpen:'Open werk', groepOpdrachten:'Opdrachten', groepBetaald:'Betaald',
+  groepOpenLeeg:'Er ligt niets open bij deze klant', groepOpdrLeeg:'Geen lopende opdrachten',
+  groepBetLeeg:'Nog niets helemaal betaald',
   opdrachtNr:'Opdracht {n}', nietVerstuurd:'nog geen factuur gestuurd',
   verstuurdOp:'factuur gestuurd {d}', markeerVerstuurd:'Factuur is gestuurd',
   tochNiet:'Toch nog niet gestuurd', nogNietVerstuurd:'Nog geen factuur gestuurd',
@@ -527,6 +541,7 @@ var S={rate:10.8, lang:'ar', munt:'MAD', toonEuro:true, tab:'tedoen',
        klanten:[], klussen:[], facturen:[], soorten:[],
        pin:'', hide:false, snaps:[], lastBackup:''};
 var ui={lang:'ar', tab:'tedoen', q:'', zoekOpen:false, factOpen:false, msg:'', confirm:'',
+        vouw:{open:true, opdr:true, bet:false},
         gekozen:{}, maand:'', jaar:''};
 
 var omgezet=false;
@@ -1120,76 +1135,94 @@ function openKlant(id,houdPlek){
    + '<div class="row som"><span>'+esc(t('nogTeKrijgen'))+'</span><span class="r op">'+pv(dh(teF+open))
    +   (S.toonEuro?'<span class="euro">'+pv(euBij(teF+open))+'</span>':'')+'</span></div></div>';
 
-  /* ── wat nog moet ── */
-  h+='<div class="label">'+esc(t('teDoenKop'))+' ('+td.length+')</div>';
-  if(!td.length){
-    h+='<div class="note">'+esc(t('niksTeDoenSub'))+'</div>';
-  } else td.forEach(function(k){
-    h+='<div class="klusrij">'
-     + '<button class="vink" data-act="klaartik" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
-     + '<div class="mid"><button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
-     +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
-     +   '<div class="sb">'+esc(dat(k.datum))
-     +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
-     + '<div class="val">'+(klusLoon(k)>0?pv(dh(klusLoon(k))):'<span class="dim">–</span>')+'</div></div>';
-  });
+  /* ── drie groepen: wat nog open ligt, de opdrachten, en wat betaald is ── */
+  var lopend=fa.filter(function(f){return !isGestuurd(f)||factuurOpen(f)>0});
+  var afbetaald=fa.filter(function(f){return isGestuurd(f)&&factuurOpen(f)<=0});
+  var openSom=0;
+  td.forEach(function(k){openSom+=klusTotaal(k)});
+  kl.forEach(function(k){openSom+=klusTotaal(k)});
+  var lopendSom=0; lopend.forEach(function(f){lopendSom+=factuurOpen(f)});
+  var betSom=0; afbetaald.forEach(function(f){betSom+=factuurTotaal(f)});
 
-  /* ── klaar, maar nog niet op een factuur ── */
-  h+='<div class="label">'+esc(t('klaarKop'))+' ('+kl.length+')</div>';
-  if(!kl.length){
-    h+='<div class="note">'+esc(t('cijferLeeg'))+'</div>';
-  } else {
-    kl.forEach(function(k){
-      var aan=!!gek[k.id];
-      h+='<div class="klusrij'+(aan?' aan':'')+'">'
-       + '<button class="vink" data-act="vink" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
-       + '<div class="mid"><button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
-       +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
-       +   '<div class="sb">'+esc(k.klaarOp?t('klaarOp',{d:dat(k.klaarOp)}):dat(k.datum))
-       +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
-       + '<div class="val">'+pv(dh(klusTotaal(k)))+'</div></div>';
-    });
-    h+='<button class="outline'+(nGek?'':' quiet')+'" data-act="maakfactuur" data-id="'+c.id+'"'
-     + (nGek?'':' disabled style="opacity:.5"')+'>'
-     + esc(t('maakFactuur',{n:nGek||kl.length}))+(nGek?' · '+pv(dh(gSom)):'')+'</button>';
-    if(facturenVan(c.id).length)
-      h+='<button class="outline quiet" data-act="bijopdracht" data-id="'+c.id+'"'
+  function vouwKop(sleutel,naam,aantal,bedrag,kleur){
+    var aan=!!ui.vouw[sleutel];
+    return '<button class="vouwkop'+(aan?' aan':'')+'" data-act="vouw" data-v="'+sleutel+'" data-id="'+c.id+'">'
+     + '<span class="vp">'+(aan?'▾':'▸')+'</span>'
+     + '<span class="vn">'+esc(naam)+' ('+aantal+')</span>'
+     + '<span class="vb"'+(kleur?' style="color:'+kleur+'"':'')+'>'+pv(dh(bedrag))+'</span></button>';
+  }
+  function opdrachtRij(f){
+    var o2=factuurOpen(f);
+    var stand=!isGestuurd(f)?dat(f.datum)+' · '+t('nietVerstuurd')
+              :t('verstuurdOp',{d:dat(f.gestuurd)})+' · '+(o2>0?t('wachtBetaling'):t('alBetaald'));
+    return '<button class="klusrij" style="width:100%" data-act="factuur" data-id="'+f.id+'">'
+     + '<div class="mid"><div class="nm">'+esc(opdrachtNaam(f))+'</div>'
+     +   '<div class="sb">'+(f.regels||[]).length+' '+esc(t('klussen').toLowerCase())
+     +   ' · '+esc(stand)+'</div></div>'
+     + '<div class="val">'+pv(dh(factuurTotaal(f)))
+     +   (o2>0&&isGestuurd(f)?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
+     + '</div></button>';
+  }
+
+  /* 1. open werk: wat nog gedaan moet worden en wat af is maar nog nergens in zit */
+  h+=vouwKop('open',t('groepOpen'),td.length+kl.length,openSom,'var(--saffron)');
+  if(ui.vouw.open){
+    h+='<div class="vouwin">';
+    if(!td.length&&!kl.length)h+='<div class="note">'+esc(t('groepOpenLeeg'))+'</div>';
+    if(td.length){
+      h+='<div class="label">'+esc(t('teDoenKop'))+' ('+td.length+')</div>';
+      td.forEach(function(k){
+        h+='<div class="klusrij">'
+         + '<button class="vink" data-act="klaartik" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
+         + '<div class="mid"><button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
+         +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
+         +   '<div class="sb">'+esc(dat(k.datum))
+         +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
+         + '<div class="val">'+(klusLoon(k)>0?pv(dh(klusLoon(k))):'<span class="dim">–</span>')+'</div></div>';
+      });
+    }
+    if(kl.length){
+      h+='<div class="label">'+esc(t('klaarKop'))+' ('+kl.length+')</div>';
+      kl.forEach(function(k){
+        var aan=!!gek[k.id];
+        h+='<div class="klusrij'+(aan?' aan':'')+'">'
+         + '<button class="vink" data-act="vink" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
+         + '<div class="mid"><button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
+         +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
+         +   '<div class="sb">'+esc(k.klaarOp?t('klaarOp',{d:dat(k.klaarOp)}):dat(k.datum))
+         +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
+         + '<div class="val">'+pv(dh(klusTotaal(k)))+'</div></div>';
+      });
+      h+='<button class="outline'+(nGek?'':' quiet')+'" data-act="maakfactuur" data-id="'+c.id+'"'
        + (nGek?'':' disabled style="opacity:.5"')+'>'
-       + esc(t('bijOpdracht',{n:nGek||kl.length}))+'</button>';
+       + esc(t('maakFactuur',{n:nGek||kl.length}))+(nGek?' · '+pv(dh(gSom)):'')+'</button>';
+      if(fa.length)
+        h+='<button class="outline quiet" data-act="bijopdracht" data-id="'+c.id+'"'
+         + (nGek?'':' disabled style="opacity:.5"')+'>'
+         + esc(t('bijOpdracht',{n:nGek||kl.length}))+'</button>';
+    }
+    h+='</div>';
   }
 
-  /* ── de facturen ── */
-  if(fa.length){
-    h+='<div class="label">'+esc(t('facturenKop'))+' ('+fa.length+')</div>';
-    fa.forEach(function(f){
-      var o2=factuurOpen(f);
-      var stand=!isGestuurd(f)?dat(f.datum)+' · '+t('nietVerstuurd')
-                :t('verstuurdOp',{d:dat(f.gestuurd)})+' · '+(o2>0?t('wachtBetaling'):t('alBetaald'));
-      h+='<button class="klusrij" style="width:100%" data-act="factuur" data-id="'+f.id+'">'
-       + '<div class="mid"><div class="nm">'+esc(opdrachtNaam(f))+'</div>'
-       +   '<div class="sb">'+(f.regels||[]).length+' '+esc(t('klussen').toLowerCase())
-       +   ' · '+esc(stand)+'</div></div>'
-       + '<div class="val">'+pv(dh(factuurTotaal(f)))
-       +   (o2>0&&isGestuurd(f)?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
-       + '</div></button>';
-    });
+  /* 2. de opdrachten die nog lopen */
+  h+=vouwKop('opdr',t('groepOpdrachten'),lopend.length,lopendSom,'');
+  if(ui.vouw.opdr){
+    h+='<div class="vouwin">';
+    if(!lopend.length)h+='<div class="note">'+esc(t('groepOpdrLeeg'))+'</div>';
+    lopend.forEach(function(f){h+=opdrachtRij(f)});
+    h+='</div>';
   }
 
-  var opF=opFactuurVan(id).sort(opDatum);
-  if(opF.length){
-    h+='<button class="outline quiet" data-act="factopen" data-id="'+c.id+'">'
-     + esc(t('opFactuur'))+' ('+opF.length+')'+(ui.factOpen?' ▲':' ▼')+'</button>';
-    if(ui.factOpen)opF.forEach(function(k){
-      h+='<div class="klusrij">'
-       + '<button class="vink af aan" data-act="klaartik" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
-       + '<div class="mid"><button class="nmbtn" data-act="klus" data-id="'+k.id+'">'
-       +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
-       +   '<div class="sb">'+esc(k.klaarOp?t('klaarOp',{d:dat(k.klaarOp)}):dat(k.datum))
-       +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
-       + '<div class="val">'+pv(dh(klusTotaal(k)))+'</div></div>';
-    });
+  /* 3. wat helemaal betaald is */
+  h+=vouwKop('bet',t('groepBetaald'),afbetaald.length,betSom,'var(--mint)');
+  if(ui.vouw.bet){
+    h+='<div class="vouwin">';
+    if(!afbetaald.length)h+='<div class="note">'+esc(t('groepBetLeeg'))+'</div>';
+    afbetaald.forEach(function(f){h+=opdrachtRij(f)});
+    h+='</div>';
   }
 
+  h+='<div class="divider"></div>';
   h+='<button class="outline" data-act="nieuwklus" data-id="'+c.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
   h+='<button class="outline quiet" data-act="plakken" data-id="'+c.id+'">'+esc(t('plakken'))+'</button>';
   h+='<div class="divider"></div>';
@@ -2159,7 +2192,7 @@ document.addEventListener('click',function(e){
     window.open('https://wa.me/'+waNummer(c.tel),'_blank');
     return;
   }
-  if(act==='factopen'){ui.factOpen=!ui.factOpen;openKlant(id,true);return}
+  if(act==='vouw'){var vs=b.dataset.v;ui.vouw[vs]=!ui.vouw[vs];openKlant(id,true);return}
   if(act==='plakken'){openPlakken(id);return}
   if(act==='plakopslaan'){plakOpslaan(id);return}
 

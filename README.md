@@ -25,9 +25,11 @@ dus een totaal is altijd gewoon de optelsom.
 
 Bij een klant zie je drie groepen die de app zelf maakt:
 
-    Nog te doen                  wat er nog ligt
-    Klaar, nog niet ingedeeld    wat je kunt bundelen
-    Opdrachten                   de bundels, met of zonder verstuurde factuur
+    Open werk    wat nog moet, en wat af is maar nog nergens in zit
+    Opdrachten   de bundels die nog niet helemaal betaald zijn
+    Betaald      de bundels waar niets meer op openstaat
+
+Alle drie klappen open en dicht; de app onthoudt wat je open had staan.
 
 Een opdracht is een momentopname: de klussen met hun bedrag en het materiaal bij
 elkaar. Een klus geldt alleen als ingedeeld zolang die opdracht er ook echt
@@ -82,8 +84,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='37'` bovenaan het script
-2. `sw.js` — `klusboek-v37`
+1. `index.html` — `var VERSIE='38'` bovenaan het script
+2. `sw.js` — `klusboek-v38`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
