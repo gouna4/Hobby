@@ -63,6 +63,9 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - Terugvegen gaat één scherm terug in plaats van de app te sluiten
 - Een strook bovenaan als een factuur langer dan een maand wacht, of als je twee
   weken geen back-up maakte
+- Alles wat weggooit vraagt het eerst, met een venster dat zegt wat er weggaat
+- Klaar werk bij een bestaande opdracht zetten, en er met het kruisje weer uit halen
+- Op een opdracht staan werkkosten en materiaalkosten apart, met het totaal eronder
 - Een knop om alle bedragen te verbergen, en een cijferslot van vier cijfers
 - Back-up maken en terugzetten, en vijf herstelpunten op het toestel zelf
 
@@ -78,8 +81,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='34'` bovenaan het script
-2. `sw.js` — `klusboek-v34`
+1. `index.html` — `var VERSIE='36'` bovenaan het script
+2. `sw.js` — `klusboek-v36`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
