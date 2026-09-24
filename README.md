@@ -67,7 +67,10 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - **Lijst plakken**: plak een lijstje uit de groepsapp en elke regel wordt een klus
 - Soorten werk als knopjes onder het invulveld, met een plusje om er zelf een
   bij te zetten
-- Zoeken door alles heen: klanten, klussen en facturen
+- Klussen zonder bedrag worden gemerkt, met een teller boven de lijst
+- Een voorschot vastleggen voordat er werk af is, als lege opdracht
+- Alle bonnetjes in een keer delen, want foto's zitten niet in de back-up
+- Zoeken door alles heen: klanten, klussen en opdrachten
 - Een klus kopiëren, en een klus naar een andere klant verplaatsen door in het
   formulier een andere klant te kiezen
 - Terugvegen gaat één scherm terug in plaats van de app te sluiten
@@ -98,8 +101,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='45'` bovenaan het script
-2. `sw.js` — `klusboek-v45`
+1. `index.html` — `var VERSIE='46'` bovenaan het script
+2. `sw.js` — `klusboek-v46`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 

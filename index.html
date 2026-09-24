@@ -62,11 +62,13 @@ input,select,textarea{font-family:inherit;font-size:16px}
 /* ── cijfers bovenaan ── */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
 /* de cijfers op een rij, zodat het werk hoger op het scherm begint */
-.cijfers{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cijfers{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
 .cijfers::-webkit-scrollbar{display:none}
-.cijfer{flex:0 0 auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  padding:9px 13px;text-align:start}
-.cijfer .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);white-space:nowrap}
+.cijfer{grid-column:span 2;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:9px 11px;text-align:start;min-width:0}
+.cijfer:nth-child(4),.cijfer:nth-child(5){grid-column:span 3}
+.cijfer .k{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cijfer .v{font-family:var(--mono);font-size:15px;font-weight:600;margin-top:3px;white-space:nowrap;
   direction:ltr;unicode-bidi:isolate}
 .zoekrij{display:flex;gap:8px;align-items:center;margin-top:20px}
@@ -291,6 +293,8 @@ button .ico{margin-inline-end:8px}
 .knoprij .rood{border-color:var(--clay);color:var(--clay)}
 .regeluit .ico{margin:0}
 
+.leegbedrag{color:var(--saffron);opacity:.85}
+.labelknop{display:block;width:100%;text-align:start;background:none;border:0}
 .fijn{font-size:12px;color:var(--dim);line-height:1.5;padding:1px 0 2px}
 .fijn:empty{display:none}
 
@@ -391,7 +395,7 @@ button .ico{margin-inline-end:8px}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='45', VERSIEDATUM='september 2026';
+var VERSIE='46', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -410,6 +414,11 @@ var T={
   bonFoto:'تصويرة ديال الفاكتورة',
   arbeid:'اليد العاملة', materialen:'مصاريف المواد', totaal:'المجموع',
   bonnenRij:'فاكتورات الشرا ديال الخدمات', extraMat:'مواد زايدة',
+  geenBedrag:'بلا ثمن', zonderBedrag:'{n} بلا ثمن',
+  voorschotKnop:'تسبيق مقبوض', voorschotUitleg:'ورشة خاوية باش تحط فيها الفلوس اللي خديتي قبل ما تسالي الخدمة.',
+  bonnenDelen:'شارك كاع الفاكتورات', bonnenGeen:'مازال ما كاين حتى فاكتورة',
+  bonnenBezig:'كانجمع الفاكتورات…', bonnenNiet:'ما يمكنش تشارك من هاد التليفون',
+  fotoUitleg:'الفاكتورات ما كايناش فالنسخة. شاركهم من وقت لوقت باش يبقاو عندك برا التطبيق.',
   alBetaald:'المدفوع', openstaand:'الباقي', nogTeKrijgen:'الباقي لك',
   teDoenKop:'باقي يتدار', klaarKop:'سالا، وما ترتبش', facturenKop:'الورشات',
   maakFactuur:'دير ورشة من {n}', factuur:'الفاكتورة', factuurVan:'فاتورة {d}',
@@ -494,6 +503,11 @@ var T={
   matAdd:'+ Materiaal of bonnetje', bonFoto:'Foto van het bonnetje',
   arbeid:'Werkkosten', materialen:'Materiaalkosten', totaal:'Totaal',
   bonnenRij:'Bonnetjes bij de klussen', extraMat:'Extra materiaal',
+  geenBedrag:'geen bedrag', zonderBedrag:'{n} zonder bedrag',
+  voorschotKnop:'Voorschot ontvangen', voorschotUitleg:'Een lege opdracht om geld op te zetten dat je krijgt voordat het werk af is.',
+  bonnenDelen:'Alle bonnetjes delen', bonnenGeen:'Er zijn nog geen bonnetjes',
+  bonnenBezig:'Bonnetjes verzamelen…', bonnenNiet:'Delen lukt niet op dit toestel',
+  fotoUitleg:'Bonnetjes zitten niet in de back-up. Deel ze af en toe, dan heb je ze ook buiten de app.',
   alBetaald:'Betaald', openstaand:'Openstaand', nogTeKrijgen:'Nog te krijgen',
   teDoenKop:'Nog te doen', klaarKop:'Klaar, nog niet ingedeeld', facturenKop:'Opdrachten',
   maakFactuur:'Opdracht maken van {n}', factuur:'Factuur', factuurVan:'Factuur {d}',
@@ -609,6 +623,7 @@ function load(){
       if(herstelFactuurLinks())omgezet=true;
       if(herstelVerstuurd())omgezet=true;
       if(herstelMateriaal())omgezet=true;
+      if(herstelRegels())omgezet=true;
     }
   }catch(e){}
   ui.lang=S.lang;
@@ -622,6 +637,20 @@ function load(){
 /* Tot versie 44 was het materiaal van een opdracht een bedrag in één keer,
    dat door de app werd bijgesteld als er een klus veranderde. Nu splitsen we
    het: alles wat er boven de bonnetjes uitstak, was van jou. */
+/* Oude opdrachten bewaarden per regel een kopie van de naam en het bedrag.
+   Bestaat de klus nog, dan is die kopie overbodig: weg ermee. */
+function herstelRegels(){
+  var raak=0;
+  (S.facturen||[]).forEach(function(f){
+    (f.regels||[]).forEach(function(r){
+      if(!regelKlus(r))return;
+      if('titel' in r||'bedrag' in r||'cur' in r){
+        delete r.titel; delete r.bedrag; delete r.cur; raak++;
+      }
+    });
+  });
+  return raak;
+}
 function herstelMateriaal(){
   var raak=0;
   (S.facturen||[]).forEach(function(f){
@@ -749,7 +778,13 @@ function klaarVan(klantId){return klussenVan(klantId).filter(function(k){return 
 function opFactuurVan(klantId){return klussenVan(klantId).filter(opFactuur)}
 function facturenVan(klantId){return S.facturen.filter(function(f){return f.klantId===klantId})}
 
-function factuurArbeid(f){var s=0;(f.regels||[]).forEach(function(r){s+=toDH(r.bedrag,r.cur||'MAD')});return s}
+/* Een regel op een opdracht wijst alleen naar een klus. Naam en bedrag komen
+   van die klus zelf, zodat ze niet uit de pas kunnen lopen. Oudere boeken
+   bewaarden er een kopie bij; die gebruiken we nog als de klus weg is. */
+function regelKlus(r){return r&&r.klusId?klusById(r.klusId):null}
+function regelTitel(r){var k=regelKlus(r);return (k?k.titel:r.titel)||''}
+function regelDH(r){var k=regelKlus(r);return k?klusLoon(k):toDH(r.bedrag,r.cur||'MAD')}
+function factuurArbeid(f){var s=0;(f.regels||[]).forEach(function(r){s+=regelDH(r)});return s}
 /* Materiaal van een opdracht bestaat uit twee stukken met ieder een eigen
    eigenaar: de bonnetjes die aan de klussen hangen (die rekent de app uit) en
    een bedrag dat je er zelf bij typt. Zo verandert jouw getal nooit vanzelf. */
@@ -909,6 +944,42 @@ function bonWis(id,cb){
       tx.oncomplete=function(){if(cb)cb()};
       tx.onerror=function(){if(cb)cb()};
     }catch(e){if(cb)cb()}
+  });
+}
+/* Foto's zitten niet in de back-up. Hiermee haal je ze in een keer uit de app
+   naar je Bestanden of je berichten. */
+function alleBonnen(){
+  var lijst=[];
+  S.klussen.forEach(function(k){
+    var kl=klantNaam(k.klantId).replace(/[^\w\u0600-\u06FF ]+/g,'').slice(0,20);
+    var ti=(k.titel||'').replace(/[^\w\u0600-\u06FF ]+/g,'').slice(0,28);
+    (k.mats||[]).forEach(function(m){
+      if(m.foto)lijst.push({id:m.id,naam:(kl+' '+ti+' '+(m.naam||'')).trim().replace(/\s+/g,' ')+'.jpg'});
+    });
+    (k.fotos||[]).forEach(function(fo,i){
+      lijst.push({id:fo.id,naam:(kl+' '+ti+' foto'+(i+1)).trim().replace(/\s+/g,' ')+'.jpg'});
+    });
+  });
+  return lijst;
+}
+function deelAlleBonnen(){
+  var lijst=alleBonnen();
+  if(!lijst.length){ui.msg=t('bonnenGeen');render();openSettings();return}
+  ui.msg=t('bonnenBezig');render();openSettings();
+  var files=[], klaar=0;
+  lijst.forEach(function(x){
+    bonLees(x.id,function(r){
+      if(r&&r.blob){try{files.push(new File([r.blob],x.naam,{type:'image/jpeg'}))}catch(e){}}
+      if(++klaar<lijst.length)return;
+      ui.msg='';
+      try{
+        if(files.length&&navigator.canShare&&navigator.canShare({files:files})){
+          navigator.share({files:files}).catch(function(){});
+          render(); openSettings(); return;
+        }
+      }catch(e){}
+      ui.msg=t('bonnenNiet'); render(); openSettings();
+    });
   });
 }
 function bonTotalen(cb){
@@ -1073,7 +1144,23 @@ function render(){
     var td=S.klussen.filter(function(k){return !isKlaar(k)}).sort(opOud);
     if(!td.length){
       h+='<div class="empty"><b>'+esc(t('niksTeDoen'))+'</b><span>'+esc(t('niksTeDoenSub'))+'</span></div>';
-    } else td.forEach(function(k){h+=klusKaart(k,true)});
+    } else {
+      /* per klant bij elkaar, anders is het een lange lijst door elkaar */
+      var perKlant={}, volgorde=[];
+      td.forEach(function(k){
+        if(!perKlant[k.klantId]){perKlant[k.klantId]=[];volgorde.push(k.klantId)}
+        perKlant[k.klantId].push(k);
+      });
+      volgorde.sort(function(a,b){return String(klantNaam(a)).localeCompare(String(klantNaam(b)))});
+      volgorde.forEach(function(kid){
+        var lijst=perKlant[kid];
+        var leeg=lijst.filter(function(k){return klusTotaal(k)<0.5}).length;
+        h+='<button class="label labelknop" data-act="klant" data-id="'+kid+'">'
+         + esc(klantNaam(kid))+' ('+lijst.length+')'
+         + (leeg?' · '+esc(t('zonderBedrag',{n:leeg})):'')+'</button>';
+        lijst.forEach(function(k){h+=klusKaart(k,false)});
+      });
+    }
   } else {
     var kl=S.klanten.slice().sort(function(a,b){return String(a.naam||'').localeCompare(String(b.naam||''))});
     if(!kl.length){
@@ -1165,7 +1252,8 @@ function klusKaart(k,toonKlant){
    + '<div class="cname">'+esc(k.titel||t('geenNaam'))+'</div>'
    + '<div class="cmeta">'+esc(k.klaarOp?t('klaarOp',{d:dat(k.klaarOp)}):dat(k.datum))
    + (toonKlant?' · '+esc(klantNaam(k.klantId)):'')
-   + (opFactuur(k)?' · '+esc(t('gefactureerd')):'')+'</div>';
+   + (opFactuur(k)?' · '+esc(t('gefactureerd')):'')
+   + (klusTotaal(k)<0.5?' · <span class="leegbedrag">'+esc(t('geenBedrag'))+'</span>':'')+'</div>';
   if(k.tekst)h+='<div class="cmeta" style="margin:10px 0 0;white-space:pre-wrap">'+esc(kort(k.tekst,150))+'</div>';
   if((k.fotos||[]).length)h+='<div class="row"><span class="dim">'+esc(t('werkFotos'))+'</span>'
    + '<span class="r">'+k.fotos.length+' 📷</span></div>';
@@ -1274,7 +1362,9 @@ function openKlant(id,houdPlek){
     h+='<div class="vouwin">';
     if(!td.length&&!kl.length)h+='<div class="note">'+esc(t('groepOpenLeeg'))+'</div>';
     if(td.length){
-      h+='<div class="label">'+esc(t('teDoenKop'))+' ('+td.length+')</div>';
+      var tdLeeg=td.filter(function(k){return klusTotaal(k)<0.5}).length;
+      h+='<div class="label">'+esc(t('teDoenKop'))+' ('+td.length+')'
+       + (tdLeeg?' · '+esc(t('zonderBedrag',{n:tdLeeg})):'')+'</div>';
       td.forEach(function(k){
         h+='<div class="klusrij">'
          + '<button class="vink" data-act="klaartik" data-k="'+k.id+'" data-id="'+c.id+'">✓</button>'
@@ -1338,6 +1428,8 @@ function openKlant(id,houdPlek){
   h+='<div class="divider"></div>';
   h+='<button class="outline" data-act="nieuwklus" data-id="'+c.id+'">'+ico('plus')+esc(t('nieuweKlus'))+'</button>';
   h+='<button class="outline quiet" data-act="plakken" data-id="'+c.id+'">'+ico('plak')+esc(t('plakken'))+'</button>';
+  h+='<button class="outline quiet" data-act="voorschot" data-id="'+c.id+'">'+ico('plus')+esc(t('voorschotKnop'))+'</button>';
+  h+='<div class="fijn">'+esc(t('voorschotUitleg'))+'</div>';
   h+='</div></div>';
   document.getElementById('sheet').innerHTML=h;
   terugAan(function(){closeSheet();render()});
@@ -1406,10 +1498,7 @@ function zetBijOpdracht(klantId){
   kiezen(t('kiesOpdracht'),opties,function(o){
     var f=factuurById(o.id);
     if(!f)return;
-    mee.forEach(function(k){
-      f.regels.push({klusId:k.id,titel:k.titel||'',bedrag:num(k.loon),cur:k.loonCur||S.munt});
-      k.factuurId=f.id;
-    });
+    mee.forEach(function(k){f.regels.push({klusId:k.id}); k.factuurId=f.id});
     ui.gekozen[klantId]={};
     ui.msg=t('verplaatst',{n:mee.length+' '+(mee.length===1?t('klusEnk'):t('klussen')).toLowerCase(),o:opdrachtNaam(f)});
     save(); render(); openFactuur(f.id);
@@ -1419,7 +1508,7 @@ function zetBijOpdracht(klantId){
    nergens in zit, of meteen een nieuwe klus aanmaken die erin belandt. */
 var naarOpdracht='';
 function klusInOpdracht(f,k){
-  f.regels.push({klusId:k.id,titel:k.titel||'',bedrag:num(k.loon),cur:k.loonCur||S.munt});
+  f.regels.push({klusId:k.id});
   k.factuurId=f.id;
 }
 function kiesKlusErbij(fid){
@@ -1448,16 +1537,21 @@ function haalUitOpdracht(fid,klusId,stil){
   if(stil)return;
   save(); render(); openFactuur(fid,true);
 }
+/* Geld dat binnenkomt voordat er werk af is heeft ook een plek nodig. Dit
+   maakt een opdracht zonder klussen waar je die betaling op zet. */
+function maakVoorschot(klantId){
+  var f={id:uid(),klantId:klantId,datum:today(),naam:'',gestuurd:'',regels:[],
+         matExtra:0,matCur:S.munt,bet:[],at:Date.now()};
+  S.facturen.push(f);
+  save(); render(); openFactuur(f.id);
+}
 function maakFactuur(klantId){
   var gek=ui.gekozen[klantId]||{};
   var mee=klaarVan(klantId).filter(function(k){return gek[k.id]}).sort(opOud);
   if(!mee.length){ui.msg=t('nietsGekozen');render();openKlant(klantId,true);return}
   var f={id:uid(),klantId:klantId,datum:today(),naam:'',gestuurd:'',regels:[],
          matExtra:0,matCur:S.munt,bet:[],at:Date.now()};
-  mee.forEach(function(k){
-    f.regels.push({klusId:k.id,titel:k.titel||'',bedrag:num(k.loon),cur:k.loonCur||S.munt});
-    k.factuurId=f.id;
-  });
+  mee.forEach(function(k){f.regels.push({klusId:k.id}); k.factuurId=f.id});
   S.facturen.push(f);
   ui.gekozen[klantId]={};
   save(); render(); openFactuur(f.id);
@@ -1484,9 +1578,9 @@ function openFactuur(fid,houdPlek){
   (f.regels||[]).forEach(function(r){
     var bestaat=r.klusId&&klusById(r.klusId);
     h+='<div class="row regelrij">'
-     + (bestaat?'<button class="regelnm" data-act="klus" data-id="'+r.klusId+'">'+esc(r.titel||t('geenNaam'))+'</button>'
-               :'<span class="regelnm">'+esc(r.titel||t('geenNaam'))+'</span>')
-     + '<span class="r">'+pv(dh(toDH(r.bedrag,r.cur||'MAD')))+'</span>'
+     + (bestaat?'<button class="regelnm" data-act="klus" data-id="'+r.klusId+'">'+esc(regelTitel(r)||t('geenNaam'))+'</button>'
+               :'<span class="regelnm">'+esc(regelTitel(r)||t('geenNaam'))+'</span>')
+     + '<span class="r">'+pv(dh(regelDH(r)))+'</span>'
      + '<button class="regeluit" data-act="regeluit" data-id="'+fid+'" data-k="'+esc(r.klusId||'')+'" aria-label="'+esc(t('vraagUit'))+'">'+ico('uit')+'</button>'
      + '</div>';
   });
@@ -1831,13 +1925,7 @@ function volgtOpdracht(k){
     return;
   }
   var gevonden=false;
-  (f.regels||[]).forEach(function(r){
-    if(r.klusId!==k.id)return;
-    gevonden=true;
-    r.titel=k.titel||'';
-    r.bedrag=num(k.loon);
-    r.cur=k.loonCur||S.munt;
-  });
+  (f.regels||[]).forEach(function(r){if(r.klusId===k.id)gevonden=true});
   if(!gevonden)delete k.factuurId;
 }
 function opruimenFotos(k){
@@ -2046,8 +2134,8 @@ function overzichtTekst(fid){
   r.push('');
   r.push(t('overzichtWerk'));
   (f.regels||[]).forEach(function(x,i){
-    var b=toDH(x.bedrag,x.cur||'MAD');
-    r.push((i+1)+'. '+(x.titel||'')+(b>0?' — '+dh(b):''));
+    var b=regelDH(x);
+    r.push((i+1)+'. '+regelTitel(x)+(b>0?' — '+dh(b):''));
   });
   r.push('');
   if(factuurArbeid(f)>0)r.push(t('arbeid')+': '+dh(factuurArbeid(f)));
@@ -2267,6 +2355,8 @@ function openSettings(){
    + '<button class="outline quiet" data-act="pinzet">'+esc(S.pin?t('codeUit'):t('codeAan'))+'</button>';
   h+='<div class="divider"></div><div class="label">'+esc(t('bonnetjes'))+'</div>'
    + '<div class="note" id="s_bon">…</div>';
+  h+='<button class="outline quiet" data-act="bonnendeel">'+ico('deel')+esc(t('bonnenDelen'))+'</button>';
+  h+='<div class="fijn">'+esc(t('fotoUitleg'))+'</div>';
   h+='<button class="outline gevaar" data-act="wisalles" style="margin-top:22px">'
    + ico('trash')+esc(t('wisAlles'))+'</button>';
   h+='<div class="ver">Klusboek v'+VERSIE+' · '+VERSIEDATUM+'</div>';
@@ -2301,7 +2391,7 @@ function zetTerug(tekst){
   if(d.lang)S.lang=ui.lang=d.lang;
   if(typeof d.pin==='string')S.pin=d.pin;
   if(Array.isArray(d.opdrachten)&&d.opdrachten.length)uitOpdrachten(d.opdrachten);
-  herstelFactuurLinks(); herstelVerstuurd(); herstelMateriaal();
+  herstelFactuurLinks(); herstelVerstuurd(); herstelMateriaal(); herstelRegels();
   var nb=0; S.facturen.forEach(function(f){nb+=(f.bet||[]).length});
   ui.msg=t('terugMelding',{c:S.klanten.length,k:S.klussen.length,f:S.facturen.length,b:nb});
   if(!S.facturen.length)ui.msg+=' — '+t('geenFacturen');
@@ -2556,6 +2646,7 @@ document.addEventListener('click',function(e){
 
   /* ── facturen ── */
   if(act==='maakfactuur'){maakFactuur(id);return}
+  if(act==='voorschot'){maakVoorschot(id);return}
   if(act==='bijopdracht'){zetBijOpdracht(id);return}
   if(act==='klusbij'){opdrachtUitForm(factuurById(id));kiesKlusErbij(id);return}
   if(act==='nieuwinopdr'){
@@ -2649,6 +2740,7 @@ document.addEventListener('click',function(e){
   }
 
   /* ── instellingen ── */
+  if(act==='bonnendeel'){deelAlleBonnen();return}
   if(act==='muntzet'){S.munt=b.dataset.v;save();render();openSettings();return}
   if(act==='euro'){S.toonEuro=!S.toonEuro;save();render();openSettings();return}
   if(act==='bkdeel'){
