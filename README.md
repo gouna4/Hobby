@@ -25,11 +25,14 @@ dus een totaal is altijd gewoon de optelsom.
 
 Bij een klant zie je drie groepen die de app zelf maakt:
 
-    Open werk    wat nog moet, en wat af is maar nog nergens in zit
-    Opdrachten   de bundels die nog niet helemaal betaald zijn
-    Betaald      de bundels waar niets meer op openstaat
+    Open werk         wat nog moet, en wat af is maar nog nergens in zit
+    Opdrachten        gebundeld, factuur nog niet gestuurd
+    Factuur gestuurd  de deur uit, wacht op betaling
+    Betaald           er staat niets meer open
 
-Alle drie klappen open en dicht; de app onthoudt wat je open had staan.
+Een opdracht zakt vanzelf naar de volgende groep: zodra je zegt dat de factuur
+gestuurd is, en zodra het laatste bedrag binnen is. Alle vier klappen open en
+dicht; de app onthoudt wat je open had staan.
 
 Een opdracht is een momentopname: de klussen met hun bedrag en het materiaal bij
 elkaar. Een klus geldt alleen als ingedeeld zolang die opdracht er ook echt
@@ -63,12 +66,14 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - Een klus kopiëren, en een klus naar een andere klant verplaatsen door in het
   formulier een andere klant te kiezen
 - Terugvegen gaat één scherm terug in plaats van de app te sluiten
+- Bewaren brengt je terug naar het scherm waar je vandaan kwam, op dezelfde plek
 - Een strook bovenaan als een factuur langer dan een maand wacht, of als je twee
   weken geen back-up maakte
 - Alles wat weggooit vraagt het eerst, met een venster dat zegt wat er weggaat
 - Klaar werk bij een bestaande opdracht zetten, en er met het kruisje weer uit halen
 - Pas je een klus aan die in een opdracht zit, dan rekent die opdracht zichzelf opnieuw uit
-- Op een opdracht staan werkkosten en materiaalkosten apart, met het totaal eronder
+- Op een opdracht staan werkkosten en materiaalkosten apart, met het totaal eronder;
+  de materiaalkosten vul je daar zelf in, in dirham of euro
 - Een knop om alle bedragen te verbergen, en een cijferslot van vier cijfers
 - Back-up maken en terugzetten, en vijf herstelpunten op het toestel zelf
 
@@ -84,8 +89,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='38'` bovenaan het script
-2. `sw.js` — `klusboek-v38`
+1. `index.html` — `var VERSIE='41'` bovenaan het script
+2. `sw.js` — `klusboek-v41`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
