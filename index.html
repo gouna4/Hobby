@@ -337,7 +337,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='31', VERSIEDATUM='september 2026';
+var VERSIE='33', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -367,6 +367,8 @@ var T={
   bewaar:'سجل', annuleer:'لا', wis:'مسح', wisZeker:'دوس ثاني باش تمسح',
   kopie:'دير نسخة من هاد العمل', kopieSuffix:'(نسخة)',
   klantWis:'مسح الزبون', klantWisUitleg:'كولشي ديالو غادي يمشي معاه.',
+  klantLeeg:'مسح الخدمات والفاكتورات',
+  klantLeegUitleg:'بدا من اللول مع هاد الزبون. السمية والتيليفون والملاحظة غادي يبقاو؛ كولشي ديال الخدمات والفاكتورات والخلصات غادي يمشي. الزبائن الآخرين ماغادييتبدلوش.',
   whatsapp:'واتساب', deel:'صيفط', kopieer:'نسخ', gekopieerd:'تنسخ', afdrukken:'طبع ولا PDF',
   overzicht:'صيفط الحساب', overzichtKop:'الحساب', factuurKop:'بيان الأشغال',
   overzichtHallo:'السلام عليكم {k}', overzichtWerk:'الأعمال:', overzichtDank:'شكرا بزاف',
@@ -389,6 +391,9 @@ var T={
   bkHerinner:'هادي {n} يوم ما دريتيش نسخة احتياطية', bkNooit:'مازال ما درتي نسخة احتياطية', bkNu:'دير وحدة دابا',
   laatOpen:'{n} فاكتورات كايتسناو الخلاص من أكثر من شهر', laatOpen1:'فاكتورة كايتسنى الخلاص من أكثر من شهر',
   bekijkOpen:'شوفهم', klaarOp:'سالا فـ {d}', gefactureerd:'فالفاكتورة',
+  leesMislukt:'ما قدرتش نقرا هاد الملف. عاود جرب.',
+  geenBackup:'هادي ماشي نسخة ديال التطبيق.',
+  geenFacturen:'عنداك: فهاد الملف ماكاينش فاكتورات ولا خلصات. واش ختارتي الملف المزيان؟',
   terugMelding:'ترجع: {c} موالين · {k} خدمات · {f} فاكتورات · {b} خلصات',
   teVeel:'تخلص مقدما', opFactuur:'فالفاكتورات', ontvangen:'اللي تخلص'
  },
@@ -419,6 +424,8 @@ var T={
   bewaar:'Bewaren', annuleer:'Terug', wis:'Verwijderen', wisZeker:'Nog een keer tikken om te wissen',
   kopie:'Kopie van deze klus', kopieSuffix:'(kopie)',
   klantWis:'Klant verwijderen', klantWisUitleg:'Alles van deze klant gaat mee weg.',
+  klantLeeg:'Klussen en facturen wissen',
+  klantLeegUitleg:'Begin opnieuw bij deze klant. Naam, telefoon en notitie blijven staan; alle klussen, facturen, betalingen en bonnetjes van deze klant gaan weg. Andere klanten blijven zoals ze zijn.',
   whatsapp:'WhatsApp', deel:'Sturen', kopieer:'Kopiëren', gekopieerd:'Gekopieerd', afdrukken:'Afdrukken of PDF',
   overzicht:'Overzicht sturen', overzichtKop:'Overzicht', factuurKop:'Overzicht werkzaamheden',
   overzichtHallo:'Hallo {k}', overzichtWerk:'Het werk:', overzichtDank:'Bedankt',
@@ -444,6 +451,9 @@ var T={
   laatOpen:'{n} facturen wachten al langer dan een maand op betaling',
   laatOpen1:'Een factuur wacht al langer dan een maand op betaling',
   bekijkOpen:'Bekijken', klaarOp:'klaar op {d}', gefactureerd:'op factuur',
+  leesMislukt:'Dit bestand kon ik niet lezen. Probeer het opnieuw.',
+  geenBackup:'Dit is geen back-up van het Klusboek.',
+  geenFacturen:'Let op: in dit bestand staan geen facturen en geen betalingen. Heb je het goede bestand gekozen?',
   terugMelding:'Teruggezet: {c} klanten · {k} klussen · {f} facturen · {b} betalingen',
   teVeel:'Vooruitbetaald', opFactuur:'Al gefactureerd', ontvangen:'Ontvangen'
  }
@@ -1097,6 +1107,9 @@ function openKlant(id,houdPlek){
   h+='<button class="outline" data-act="nieuwklus" data-id="'+c.id+'">＋ '+esc(t('nieuweKlus'))+'</button>';
   h+='<button class="outline quiet" data-act="plakken" data-id="'+c.id+'">'+esc(t('plakken'))+'</button>';
   h+='<div class="divider"></div>';
+  h+='<button class="outline gevaar" data-act="klantleeg" data-id="'+c.id+'">'
+   + esc(ui.confirm==='leeg'+c.id?t('wisZeker'):t('klantLeeg'))+'</button>';
+  h+='<div class="note">'+esc(t('klantLeegUitleg'))+'</div>';
   h+='<button class="outline gevaar" data-act="klantwis" data-id="'+c.id+'">'
    + esc(ui.confirm==='klant'+c.id?t('wisZeker'):t('klantWis'))+'</button>';
   h+='<div class="note">'+esc(t('klantWisUitleg'))+'</div>';
@@ -1816,8 +1829,8 @@ function backupTekst(){
 }
 function zetTerug(tekst){
   var d;
-  try{d=JSON.parse(tekst)}catch(e){ui.msg='✕';render();return}
-  if(!d||!Array.isArray(d.klussen)){ui.msg='✕';render();return}
+  try{d=JSON.parse(tekst)}catch(e){ui.msg=t('geenBackup');render();return}
+  if(!d||!Array.isArray(d.klussen)){ui.msg=t('geenBackup');render();return}
   S.klanten=Array.isArray(d.klanten)?d.klanten:[];
   S.klussen=d.klussen;
   S.facturen=Array.isArray(d.facturen)?d.facturen:[];
@@ -1830,6 +1843,7 @@ function zetTerug(tekst){
   herstelFactuurLinks();
   var nb=0; S.facturen.forEach(function(f){nb+=(f.bet||[]).length});
   ui.msg=t('terugMelding',{c:S.klanten.length,k:S.klussen.length,f:S.facturen.length,b:nb});
+  if(!S.facturen.length)ui.msg+=' — '+t('geenFacturen');
   save(); closeSheet(); render(); controleerBonnen();
 }
 
@@ -1910,6 +1924,18 @@ document.addEventListener('click',function(e){
   if(act==='nieuwklant'){openKlantForm('');return}
   if(act==='klantbew'){openKlantForm(id);return}
   if(act==='klantopslaan'){klantOpslaan(id);return}
+  /* Opnieuw beginnen bij een klant: zijn werk gaat weg, hijzelf blijft staan. */
+  if(act==='klantleeg'){
+    if(ui.confirm!=='leeg'+id){ui.confirm='leeg'+id;openKlant(id);return}
+    klussenVan(id).forEach(function(k){
+      (k.mats||[]).forEach(function(m){if(m.foto){bonCacheWeg(m.id);bonWis(m.id)}});
+      (k.fotos||[]).forEach(function(f){bonCacheWeg(f.id);bonWis(f.id)});
+    });
+    S.klussen=S.klussen.filter(function(k){return k.klantId!==id});
+    S.facturen=S.facturen.filter(function(f){return f.klantId!==id});
+    if(ui.gekozen)delete ui.gekozen[id];
+    ui.confirm=''; save(); render(); openKlant(id); return;
+  }
   if(act==='klantwis'){
     if(ui.confirm!=='klant'+id){ui.confirm='klant'+id;openKlant(id);return}
     klussenVan(id).forEach(function(k){
@@ -2189,11 +2215,13 @@ document.addEventListener('click',function(e){
   if(!inp)return;
   inp.addEventListener('change',function(){
     var f=inp.files&&inp.files[0];
-    inp.value='';
-    if(!f)return;
+    if(!f){inp.value='';return}
     var r=new FileReader();
-    r.onload=function(){zetTerug(String(r.result||''))};
-    r.readAsText(f);
+    /* het invoerveld pas leegmaken als het bestand binnen is; doe je dat
+       eerder, dan raakt Safari het bestand soms kwijt en gebeurt er niets */
+    r.onload=function(){inp.value='';zetTerug(String(r.result||''))};
+    r.onerror=function(){inp.value='';ui.msg=t('leesMislukt');render()};
+    try{r.readAsText(f)}catch(e){inp.value='';ui.msg=t('leesMislukt');render()}
   });
 })();
 
