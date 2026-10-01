@@ -70,6 +70,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
   bij te zetten
 - Klussen zonder bedrag worden gemerkt, met een teller boven de lijst
 - Een voorschot vastleggen voordat er werk af is, als lege opdracht
+- Een rooster met alle bonnetjes, per opdracht of in een keer alles; tik er een
+  aan om hem groot te zien, te delen of weg te gooien
 - Alle bonnetjes in een keer delen, want foto's zitten niet in de back-up;
   ze krijgen een naam als `2026-09-16 Zusters oum Loodgieter 30,77.jpg`
 - Zoeken door alles heen: klanten, klussen en opdrachten
@@ -103,8 +105,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='48'` bovenaan het script
-2. `sw.js` — `klusboek-v48`
+1. `index.html` — `var VERSIE='49'` bovenaan het script
+2. `sw.js` — `klusboek-v49`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
