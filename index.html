@@ -224,6 +224,9 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 .melding .x{flex:0 0 auto;color:var(--dim);padding:0 2px;font-size:18px;line-height:1}
 
 /* ── materiaalregels en bonnetjes ── */
+.bongroot{display:block;width:100%;aspect-ratio:4/3;border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;background:var(--night);padding:0;margin-top:10px}
+.bongroot img{width:100%;height:100%;object-fit:contain;display:block}
 .galerij{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .gfoto{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:12px;
   overflow:hidden;background:var(--night);padding:0;display:block}
@@ -295,6 +298,11 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 html[dir="rtl"] .betsoort{background-position:left 10px center}
 
 .ico{flex:none;vertical-align:-3px}
+.chev{flex:0 0 auto;display:flex;align-items:center;color:var(--dim);opacity:.65;margin-inline-start:2px}
+html[dir="rtl"] .chev{transform:scaleX(-1)}
+.klusrij.open{cursor:pointer}
+.klusrij.open:active{background:var(--surface)}
+.regelrij .regelnm{text-decoration:none}
 button .ico{margin-inline-end:8px}
 .knoprij{display:flex;gap:9px;margin-top:11px}
 .knoprij button{flex:1;display:flex;align-items:center;justify-content:center;gap:0;
@@ -407,7 +415,7 @@ button .ico{margin-inline-end:8px}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='50', VERSIEDATUM='september 2026';
+var VERSIE='52', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -431,7 +439,17 @@ var T={
   matOpdrUitleg:'اللي شريتي ل هاد الورشة وما كيتعلقش بخدمة وحدة.', samenMat:'كاع مصاريف المواد',
   bonnenKop:'الفاكتورات', kopKlussen:'الخدمات', kopMat:'المواد والفاكتورات',
   kopBet:'الخلاص', kopGeld:'الفلوس واللغة', kopBack:'النسخة', kopSlot:'الرمز والإخفاء',
-  hulpKnop:'كيفاش خدام؟', hulpTekst:'كيفاش خدام\n\nالزبون -> الخدمات -> الورشة -> الفاكتورة -> تخلص\n\n1. الخدمة هي شي حاجة صغيرة عند الزبون، بثمنها والفاكتورات ديال الشرا. علّمها ملي تسالي.\n\n2. اللي سالا كتجمعو ف ورشة. علّم شي خدمات ودوس دير ورشة؛ إلا ما علّمتي والو، غادي يدخلو كاملين.\n\n3. ملي تصيفط الفاكتورة للزبون، دوس صيفطت الفاكتورة. غير من بعد غادي يتحسب ف كايتسنى الخلاص.\n\n4. ملي يوصل كاع الفلوس، الورشة كتهبط وحدها ل تخلص.\n\nالفاكتورات ديال الشرا\nكتعلق بخدمة، ولا بالورشة إلا ما كانتش ديال خدمة وحدة. دوس على التصويرة باش تزيد وحدة.\nعندك: التصاور ما كايناش فالنسخة. شاركهم من وقت لوقت.\n\nالفلوس\nالثمن كاين ف جوج بلايص: عند الخدمة (الخدمة ديالك) وعند الفاكتورة ديال الشرا (المواد). كولشي فوق هادشي هو غير الجمع.\nإلا خديتي فلوس قبل ما تسالي، استعمل تسبيق مقبوض.', bonnenKnop:'شوف الفاكتورات ({n})', bonnenAlle:'شوف كاع الفاكتورات ({n})',
+  hulpKnop:'كيفاش خدام؟',
+  tikOpdracht:'دوس على ورشة باش تحلها',
+  snelBon:'فاكتورة', losseKop:'مازال ماترتبوش',
+  losseKnop:'فاكتورات مازال ماترتبوش ({n})',
+  losseUitleg:'تصاور صورتي فالطريق. حطهم من بعد ف الخدمة المناسبة.',
+  losseGeen:'ما كاين حتى واحد',
+  kiesPlek:'فين خاصها تمشي؟', kiesKlant:'أشمن زبون؟',
+  bonGezet:'تزادت ف {n}', eerstKlant:'ختار الزبون قبل',
+  zetBij:'حطها ف خدمة ولا ورشة',
+  perKlusAan:'زيد الثمن ديال كل خدمة', perKlusUit:'بلا الثمن ديال كل خدمة',
+  tikKlus:'دوس على خدمة باش تحلها ولا تبدلها', hulpTekst:'كيفاش خدام\n\nالزبون -> الخدمات -> الورشة -> الفاكتورة -> تخلص\n\n1. الخدمة هي شي حاجة صغيرة عند الزبون، بثمنها والفاكتورات ديال الشرا. علّمها ملي تسالي.\n\n2. اللي سالا كتجمعو ف ورشة. علّم شي خدمات ودوس دير ورشة؛ إلا ما علّمتي والو، غادي يدخلو كاملين.\n\n3. ملي تصيفط الفاكتورة للزبون، دوس صيفطت الفاكتورة. غير من بعد غادي يتحسب ف كايتسنى الخلاص.\n\n4. ملي يوصل كاع الفلوس، الورشة كتهبط وحدها ل تخلص.\n\nالفاكتورات ديال الشرا\nكتعلق بخدمة، ولا بالورشة إلا ما كانتش ديال خدمة وحدة. دوس على التصويرة باش تزيد وحدة.\nعندك: التصاور ما كايناش فالنسخة. شاركهم من وقت لوقت.\n\nالفلوس\nالثمن كاين ف جوج بلايص: عند الخدمة (الخدمة ديالك) وعند الفاكتورة ديال الشرا (المواد). كولشي فوق هادشي هو غير الجمع.\nإلا خديتي فلوس قبل ما تسالي، استعمل تسبيق مقبوض.', bonnenKnop:'شوف الفاكتورات ({n})', bonnenAlle:'شوف كاع الفاكتورات ({n})',
   bonnenLeeg:'مازال ما كاين حتى تصويرة ديال فاكتورة',
   bonnenTik:'دوس على فاكتورة باش تشوفها كبيرة ولا تشاركها ولا تمسحها.',
   geenBedrag:'بلا ثمن', zonderBedrag:'{n} بلا ثمن',
@@ -526,7 +544,17 @@ var T={
   matOpdrUitleg:'Wat je voor deze opdracht kocht zonder dat het aan een losse klus hangt.', samenMat:'Alle materiaalkosten',
   bonnenKop:'Bonnetjes', kopKlussen:'Klussen', kopMat:'Materiaal en bonnetjes',
   kopBet:'Betalingen', kopGeld:'Geld en taal', kopBack:'Back-up', kopSlot:'Code en verbergen',
-  hulpKnop:'Hoe werkt het?', hulpTekst:'Zo zit het in elkaar\n\nKLANT -> KLUSSEN -> OPDRACHT -> FACTUUR -> BETAALD\n\n1. Een KLUS is een stukje werk bij een klant, met een bedrag en eventueel bonnetjes. Vink hem af als hij klaar is.\n\n2. Wat klaar is zet je samen in een OPDRACHT. Dat is gewoon een bundeltje klussen. Vink er een paar aan en druk op Opdracht maken; vink je niets aan, dan gaan ze er allemaal in.\n\n3. Stuur je de factuur naar de klant, tik dan op Factuur is gestuurd. Pas daarna telt het mee bij Wacht op betaling. Daarvoor staat het bij Nog factureren.\n\n4. Zodra al het geld binnen is, zakt de opdracht vanzelf naar Betaald.\n\nBij een klant zie je dus vier kopjes: Open werk, Opdrachten, Factuur gestuurd en Betaald. Een opdracht schuift er vanzelf doorheen.\n\nBonnetjes\nEen bonnetje hangt aan een klus, of aan de opdracht zelf als het er niet bij een losse klus hoort. Tik op het camera-knopje om er een foto bij te zetten. Met Bonnetjes bekijken zie je ze allemaal als kleine plaatjes.\nLet op: foto’s zitten NIET in de back-up. Deel ze af en toe naar je telefoon.\n\nGeld\nEen bedrag staat op twee plekken: bij de klus (je werk) en op het bonnetje (je materiaal). Alles daarboven is gewoon de optelsom.\nKrijg je geld voordat het werk af is, gebruik dan Voorschot ontvangen. Komt er meer binnen dan de opdracht kost, dan heet dat Vooruitbetaald.\n\nHandig\nLijst plakken: plak een lijstje uit de groepsapp, elke regel wordt een klus.\nTerugvegen gaat een scherm terug in plaats van de app te sluiten.\nHet oogje rechtsboven verbergt alle bedragen.', bonnenKnop:'Bonnetjes bekijken ({n})', bonnenAlle:'Alle bonnetjes bekijken ({n})',
+  hulpKnop:'Hoe werkt het?',
+  tikOpdracht:'Tik een opdracht aan om hem te openen',
+  snelBon:'Bonnetje', losseKop:'Nog in te delen',
+  losseKnop:'Bonnetjes nog in te delen ({n})',
+  losseUitleg:'Foto\u2019s die je onderweg maakte. Zet ze later bij de juiste klus of opdracht.',
+  losseGeen:'Er ligt niets te wachten',
+  kiesPlek:'Waar hoort dit bonnetje bij?', kiesKlant:'Bij welke klant?',
+  bonGezet:'Bonnetje bij {n} gezet', eerstKlant:'Kies eerst een klant',
+  zetBij:'Zet bij een klus of opdracht',
+  perKlusAan:'Bedragen per klus erbij', perKlusUit:'Bedragen per klus weglaten',
+  tikKlus:'Tik een klus aan om hem te openen of te wijzigen', hulpTekst:'Zo zit het in elkaar\n\nKLANT -> KLUSSEN -> OPDRACHT -> FACTUUR -> BETAALD\n\n1. Een KLUS is een stukje werk bij een klant, met een bedrag en eventueel bonnetjes. Vink hem af als hij klaar is.\n\n2. Wat klaar is zet je samen in een OPDRACHT. Dat is gewoon een bundeltje klussen. Vink er een paar aan en druk op Opdracht maken; vink je niets aan, dan gaan ze er allemaal in.\n\n3. Stuur je de factuur naar de klant, tik dan op Factuur is gestuurd. Pas daarna telt het mee bij Wacht op betaling. Daarvoor staat het bij Nog factureren.\n\n4. Zodra al het geld binnen is, zakt de opdracht vanzelf naar Betaald.\n\nBij een klant zie je dus vier kopjes: Open werk, Opdrachten, Factuur gestuurd en Betaald. Een opdracht schuift er vanzelf doorheen.\n\nBonnetjes\nEen bonnetje hangt aan een klus, of aan de opdracht zelf als het er niet bij een losse klus hoort. Tik op het camera-knopje om er een foto bij te zetten. Met Bonnetjes bekijken zie je ze allemaal als kleine plaatjes.\nLet op: foto’s zitten NIET in de back-up. Deel ze af en toe naar je telefoon.\n\nGeld\nEen bedrag staat op twee plekken: bij de klus (je werk) en op het bonnetje (je materiaal). Alles daarboven is gewoon de optelsom.\nKrijg je geld voordat het werk af is, gebruik dan Voorschot ontvangen. Komt er meer binnen dan de opdracht kost, dan heet dat Vooruitbetaald.\n\nHandig\nLijst plakken: plak een lijstje uit de groepsapp, elke regel wordt een klus.\nTerugvegen gaat een scherm terug in plaats van de app te sluiten.\nHet oogje rechtsboven verbergt alle bedragen.', bonnenKnop:'Bonnetjes bekijken ({n})', bonnenAlle:'Alle bonnetjes bekijken ({n})',
   bonnenLeeg:'Hier zitten nog geen foto\u2019s van bonnetjes bij',
   bonnenTik:'Tik een bonnetje aan om hem groot te zien, te delen of te verwijderen.',
   geenBedrag:'geen bedrag', zonderBedrag:'{n} zonder bedrag',
@@ -617,7 +645,7 @@ var VAAK={
 
 /* ── wat er bewaard wordt ── */
 var S={rate:10.8, lang:'ar', munt:'MAD', toonEuro:true, tab:'tedoen',
-       klanten:[], klussen:[], facturen:[], soorten:[],
+       klanten:[], klussen:[], facturen:[], soorten:[], losse:[], perKlus:false,
        pin:'', hide:false, snaps:[], lastBackup:''};
 var ui={lang:'ar', tab:'tedoen', q:'', zoekOpen:false, msg:'', confirm:'',
         vouw:{open:false, opdr:false, gest:false, bet:false,
@@ -640,6 +668,8 @@ function load(){
       if(Array.isArray(d.klussen))S.klussen=d.klussen;
       if(Array.isArray(d.facturen))S.facturen=d.facturen;
       if(Array.isArray(d.soorten))S.soorten=d.soorten;
+      if(Array.isArray(d.losse))S.losse=d.losse;
+      if(typeof d.perKlus==='boolean')S.perKlus=d.perKlus;
       if(d.pin)S.pin=d.pin;
       if(d.hide)S.hide=d.hide;
       if(Array.isArray(d.snaps))S.snaps=d.snaps;
@@ -745,7 +775,8 @@ function save(){
     try{
       localStorage.setItem(KEY,JSON.stringify({v:3,rate:S.rate,lang:ui.lang,munt:S.munt,tab:ui.tab,
         toonEuro:S.toonEuro,klanten:S.klanten,klussen:S.klussen,facturen:S.facturen,
-        soorten:S.soorten,pin:S.pin,hide:S.hide,snaps:S.snaps,lastBackup:S.lastBackup}));
+        soorten:S.soorten,pin:S.pin,hide:S.hide,snaps:S.snaps,lastBackup:S.lastBackup,
+        losse:S.losse,perKlus:S.perKlus}));
       return true;
     }catch(e){
       if(S.snaps&&S.snaps.length){S.snaps.pop();continue;}
@@ -1043,6 +1074,112 @@ function bonLijst(fid){
 }
 
 /* Een rooster met kleine bonnetjes. Tik er een aan en hij gaat groot open. */
+/* Een bonnetje dat je in de winkel fotografeert hoort nog nergens bij. Het
+   wacht in dit bakje tot je het bij een klus of een opdracht zet. */
+function losById(id){for(var i=0;i<S.losse.length;i++)if(S.losse[i].id===id)return S.losse[i];return null}
+function losDH(b){return toDH(b.bedrag,b.cur||'MAD')}
+
+function openLosBon(id){
+  var b=losById(id);
+  if(!b){closeSheet();render();return}
+  var h='<div class="sheet"><div class="sheet-in">';
+  h+='<div class="shead"><button class="back" data-act="losselijst">\u2039</button>'
+   + '<div class="t">'+esc(t('snelBon'))+'</div></div>';
+  h+='<button class="bongroot" data-act="bonkijk" data-k="'+b.id+'" data-bon="'+b.id+'"></button>';
+  h+='<div class="label">'+esc(t('kiesKlant'))+'</div>';
+  h+='<select class="in" id="lb_klant">';
+  h+='<option value=""'+(b.klantId?'':' selected')+'>\u2014</option>';
+  S.klanten.slice().sort(function(x,y){return String(x.naam||'').localeCompare(String(y.naam||''))})
+   .forEach(function(c){
+    h+='<option value="'+c.id+'"'+(b.klantId===c.id?' selected':'')+'>'+esc(c.naam||'')+'</option>';
+  });
+  h+='</select>';
+  h+='<div class="label">'+esc(t('matNaam'))+'</div><input class="in" id="lb_naam" value="'+esc(b.naam||'')+'">';
+  h+='<div class="label">'+esc(t('matBedrag'))+'</div>'
+   + '<div class="op"><input class="in mono" id="lb_bedrag" inputmode="decimal" placeholder="0" value="'+esc(num(b.bedrag)?String(b.bedrag):'')+'">'
+   + curKnop('losbon',b.cur||'MAD')+'</div>';
+  h+='<div class="label">'+esc(t('datum'))+'</div><input class="in mono" id="lb_datum" type="date" value="'+esc(b.datum||today())+'">';
+  h+='<div class="divider"></div>';
+  h+='<button class="outline" data-act="loszet" data-id="'+b.id+'">'+ico('uit')+esc(t('zetBij'))+'</button>';
+  h+='<button class="outline gevaar" data-act="loswis" data-id="'+b.id+'">'+ico('trash')+esc(t('wis'))+'</button>';
+  h+='</div><div class="sbar"><div class="sbar-in">'
+   + '<button class="cancel" data-act="losselijst">'+esc(t('annuleer'))+'</button>'
+   + '<button class="save" data-act="losopslaan" data-id="'+b.id+'">'+esc(t('bewaar'))+'</button>'
+   + '</div></div></div>';
+  formLosCur=b.cur||'MAD';
+  document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){openLosse()});
+  window.scrollTo(0,0);
+  vulBonnen();
+}
+function losOpslaan(id,daarna){
+  var b=losById(id);
+  if(!b)return;
+  var k=document.getElementById('lb_klant');
+  if(k)b.klantId=k.value;
+  var nm=document.getElementById('lb_naam'); if(nm)b.naam=nm.value.trim();
+  var bd=document.getElementById('lb_bedrag'); if(bd)b.bedrag=num(bd.value);
+  var dt=document.getElementById('lb_datum'); if(dt)b.datum=dt.value||today();
+  b.cur=formLosCur;
+  save();
+  if(daarna)daarna(b); else {closeSheet(); render(); openLosse()}
+}
+function losZetten(id){
+  losOpslaan(id,function(b){
+    if(!b.klantId){ui.msg=t('eerstKlant');render();openLosBon(id);return}
+    var opties=[];
+    facturenVan(b.klantId).slice().sort(opOud).forEach(function(f){
+      opties.push({soort:'f',id:f.id,titel:opdrachtNaam(f),
+                   sub:dat(f.datum)+' \u00b7 '+(f.regels||[]).length+' '+t('klussen').toLowerCase()});
+    });
+    /* alle opdrachten, maar niet alle klussen: een lijst van veertig is niet te doen */
+    klussenVan(b.klantId).slice().sort(opDatum).slice(0,12).forEach(function(k){
+      opties.push({soort:'k',id:k.id,titel:k.titel||t('geenNaam'),
+                   sub:dat(k.datum)+' \u00b7 '+(isKlaar(k)?t('klaar'):t('todo'))});
+    });
+    if(!opties.length){ui.msg=t('geenLosseKlus');render();openLosBon(id);return}
+    kiezen(t('kiesPlek'),opties,function(o){
+      var regel={id:b.id,naam:b.naam||'',bedrag:num(b.bedrag),cur:b.cur||'MAD',foto:true};
+      var naam='';
+      if(o.soort==='f'){
+        var f=factuurById(o.id);
+        if(!f)return;
+        f.mats=(f.mats||[]).concat([regel]); naam=opdrachtNaam(f);
+      } else {
+        var k=klusById(o.id);
+        if(!k)return;
+        k.mats=(k.mats||[]).concat([regel]); naam=k.titel||t('geenNaam');
+      }
+      S.losse=S.losse.filter(function(x){return x.id!==b.id});
+      ui.msg=t('bonGezet',{n:naam});
+      save(); closeSheet(); render(); openLosse();
+    });
+  });
+}
+function openLosse(){
+  var h='<div class="sheet"><div class="sheet-in">';
+  h+='<div class="shead"><button class="back" data-act="close">\u2039</button>'
+   + '<div class="t">'+esc(t('losseKop'))+' ('+S.losse.length+')</div></div>';
+  h+='<div class="fijn">'+esc(t('losseUitleg'))+'</div>';
+  if(!S.losse.length){
+    h+='<div class="empty"><b>'+esc(t('losseGeen'))+'</b></div>';
+  } else {
+    h+='<div class="galerij">';
+    S.losse.slice().sort(function(a,b){return String(b.datum||'').localeCompare(String(a.datum||''))})
+     .forEach(function(b){
+      h+='<button class="gfoto" data-act="losbon" data-id="'+b.id+'" data-bon="'+b.id+'">'
+       + '<span class="gtx"><span class="gb">'+(num(b.bedrag)?pv(dh(losDH(b))):'')+'</span>'
+       + '<span class="gn">'+esc(b.klantId?klantNaam(b.klantId):t('kiesKlant'))+'</span></span></button>';
+    });
+    h+='</div>';
+  }
+  h+='</div></div>';
+  document.getElementById('sheet').innerHTML=h;
+  terugAan(function(){closeSheet();render()});
+  window.scrollTo(0,0);
+  vulBonnen();
+}
+
 function openBonnen(fid){
   var f=fid?factuurById(fid):null;
   var lijst=bonLijst(fid);
@@ -1235,6 +1372,10 @@ function render(){
    +   (tot.voorgeschoten>0.5?' · '+esc(t('voorgeschoten'))+' '+pv(dh(tot.voorgeschoten)):'')
    + '</div></button>';
 
+  if(S.losse.length)
+    h+='<button class="outline" data-act="losselijst" style="margin-top:12px">'
+     + ico('camera')+esc(t('losseKnop',{n:S.losse.length}))+'</button>';
+
   h+='<div class="zoekrij"><div class="tabs">'
    + tabBtn('tedoen',t('teDoen')+' ('+nTeDoen+')')
    + tabBtn('klanten',t('klanten')+' ('+S.klanten.length+')')
@@ -1303,6 +1444,7 @@ function render(){
   h+='<div class="bar"><div class="bar-in">'
    + '<button class="primary" data-act="nieuwklus">＋ '+esc(t('nieuweKlus'))+'</button>'
    + '<button class="second" data-act="nieuwklant">＋ '+esc(t('nieuweKlant'))+'</button>'
+   + '<button class="icon-btn" data-act="snelbon" aria-label="'+esc(t('snelBon'))+'">'+ico('camera')+'</button>'
    + '</div></div>';
 
   document.getElementById('app').innerHTML=h;
@@ -1340,7 +1482,9 @@ function ico(naam){
     stuur:'<path d="M21 4L3 11l7 3 3 7 8-17z"/>',
     vink:'<path d="M5 13l4 4L19 7"/>',
     terug:'<path d="M15 5l-7 7 7 7"/>',
-    fotos:'<path d="M3 5h18v14H3zM3 15l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="9" r="1.4"/>'
+    fotos:'<path d="M3 5h18v14H3zM3 15l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="9" r="1.4"/>',
+    chev:'<path d="M9 5l7 7-7 7"/>',
+    camera:'<path d="M3 7h4l2-2h6l2 2h4v12H3z"/><circle cx="12" cy="13" r="3.4"/>'
   }[naam]||'';
   return '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" '
    + 'stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'
@@ -1486,20 +1630,21 @@ function openKlant(id,houdPlek){
     var vr=factuurVooruit(f);
     var stand=!isGestuurd(f)?dat(f.datum)+' · '+t('nietVerstuurd')
               :t('verstuurdOp',{d:dat(f.gestuurd)})+' · '+(o2>0?t('wachtBetaling'):(vr>0.5?t('teVeel'):t('alBetaald')));
-    return '<button class="klusrij" style="width:100%" data-act="factuur" data-id="'+f.id+'">'
+    return '<button class="klusrij open" style="width:100%" data-act="factuur" data-id="'+f.id+'">'
      + '<div class="mid"><div class="nm">'+esc(opdrachtNaam(f))+'</div>'
      +   '<div class="sb">'+(f.regels||[]).length+' '+esc(t('klussen').toLowerCase())
      +   ' · '+esc(stand)+'</div></div>'
      + '<div class="val">'+pv(dh(factuurTotaal(f)))
      +   (o2>0&&isGestuurd(f)?'<span class="s" style="color:var(--saffron)">'+pv(dh(o2))+'</span>':'')
      +   (vr>0.5?'<span class="s" style="color:var(--mint)">+'+pv(dh(vr))+'</span>':'')
-     + '</div></button>';
+     + '</div><span class="chev">'+ico('chev')+'</span></button>';
   }
 
   /* 1. open werk: wat nog gedaan moet worden en wat af is maar nog nergens in zit */
   h+=vouwKop('open',t('groepOpen'),td.length+kl.length,openSom,'var(--saffron)');
   if(ui.vouw.open){
     h+='<div class="vouwin">';
+    if(td.length||kl.length)h+='<div class="fijn">'+esc(t('tikKlus'))+'</div>';
     if(!td.length&&!kl.length)h+='<div class="note">'+esc(t('groepOpenLeeg'))+'</div>';
     if(td.length){
       var tdLeeg=td.filter(function(k){return klusTotaal(k)<0.5}).length;
@@ -1512,7 +1657,8 @@ function openKlant(id,houdPlek){
          +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
          +   '<div class="sb">'+esc(dat(k.datum))
          +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
-         + '<div class="val">'+(klusLoon(k)>0?pv(dh(klusLoon(k))):'<span class="dim">–</span>')+'</div></div>';
+         + '<div class="val">'+(klusLoon(k)>0?pv(dh(klusLoon(k))):'<span class="dim">–</span>')+'</div>'
+         + '<button class="chev" data-act="klus" data-id="'+k.id+'">'+ico('chev')+'</button></div>';
       });
     }
     if(kl.length){
@@ -1525,7 +1671,8 @@ function openKlant(id,houdPlek){
          +   '<div class="nm">'+esc(k.titel||t('geenNaam'))+'</div></button>'
          +   '<div class="sb">'+esc(k.klaarOp?t('klaarOp',{d:dat(k.klaarOp)}):dat(k.datum))
          +   (klusMat(k)>0?' · '+esc(t('materialen'))+' '+pv(dh(klusMat(k))):'')+'</div></div>'
-         + '<div class="val">'+pv(dh(klusTotaal(k)))+'</div></div>';
+         + '<div class="val">'+pv(dh(klusTotaal(k)))+'</div>'
+         + '<button class="chev" data-act="klus" data-id="'+k.id+'">'+ico('chev')+'</button></div>';
       });
       var alleSom=0; kl.forEach(function(k){alleSom+=klusTotaal(k)});
       h+='<button class="outline" data-act="maakfactuur" data-id="'+c.id+'">'
@@ -1541,6 +1688,7 @@ function openKlant(id,houdPlek){
   h+=vouwKop('opdr',t('groepOpdrachten'),teSturen.length,sturenSom,'var(--saffron)');
   if(ui.vouw.opdr){
     h+='<div class="vouwin">';
+    if(teSturen.length)h+='<div class="fijn">'+esc(t('tikOpdracht'))+'</div>';
     if(!teSturen.length)h+='<div class="note">'+esc(t('groepOpdrLeeg'))+'</div>';
     teSturen.forEach(function(f){h+=opdrachtRij(f)});
     h+='</div>';
@@ -1550,6 +1698,7 @@ function openKlant(id,houdPlek){
   h+=vouwKop('gest',t('groepGestuurd'),gestuurd.length,gestSom,'');
   if(ui.vouw.gest){
     h+='<div class="vouwin">';
+    if(gestuurd.length)h+='<div class="fijn">'+esc(t('tikOpdracht'))+'</div>';
     if(!gestuurd.length)h+='<div class="note">'+esc(t('groepGestLeeg'))+'</div>';
     gestuurd.forEach(function(f){h+=opdrachtRij(f)});
     h+='</div>';
@@ -1559,6 +1708,7 @@ function openKlant(id,houdPlek){
   h+=vouwKop('bet',t('groepBetaald'),afbetaald.length,betSom,'var(--mint)');
   if(ui.vouw.bet){
     h+='<div class="vouwin">';
+    if(afbetaald.length)h+='<div class="fijn">'+esc(t('tikOpdracht'))+'</div>';
     if(!afbetaald.length)h+='<div class="note">'+esc(t('groepBetLeeg'))+'</div>';
     afbetaald.forEach(function(f){h+=opdrachtRij(f)});
     h+='</div>';
@@ -1619,7 +1769,7 @@ function klantOpslaan(id){
    Een factuur bevriest wat je hebt gestuurd: de klussen met hun bedrag en het
    materiaal bij elkaar. Verandert er later iets aan een klus, dan blijft de
    factuur zoals je hem verstuurde. */
-var formBet=[], formOmats=[], formFactuurId='', formMatCur='MAD';
+var formBet=[], formOmats=[], formFactuurId='', formMatCur='MAD', formLosCur='MAD';
 
 function opdrachtLijst(klantId){
   return facturenVan(klantId).slice().sort(opOud).map(function(f){
@@ -1742,6 +1892,7 @@ function openFactuur(fid,houdPlek){
        + (bestaat?'<button class="regelnm" data-act="klus" data-id="'+r.klusId+'">'+esc(regelTitel(r)||t('geenNaam'))+'</button>'
                  :'<span class="regelnm">'+esc(regelTitel(r)||t('geenNaam'))+'</span>')
        + '<span class="r">'+pv(dh(regelDH(r)))+'</span>'
+       + (bestaat?'<span class="chev">'+ico('chev')+'</span>':'')
        + '<button class="regeluit" data-act="regeluit" data-id="'+fid+'" data-k="'+esc(r.klusId||'')+'" aria-label="'+esc(t('vraagUit'))+'">'+ico('uit')+'</button>'
        + '</div>';
     });
@@ -2326,7 +2477,7 @@ function overzichtTekst(fid){
   r.push(t('overzichtWerk'));
   (f.regels||[]).forEach(function(x,i){
     var b=regelDH(x);
-    r.push((i+1)+'. '+regelTitel(x)+(b>0?' — '+dh(b):''));
+    r.push((i+1)+'. '+regelTitel(x)+((S.perKlus&&b>0)?' — '+dh(b):''));
   });
   r.push('');
   if(factuurArbeid(f)>0)r.push(t('arbeid')+': '+dh(factuurArbeid(f)));
@@ -2351,6 +2502,9 @@ function openOverzicht(fid){
   h+='<button class="outline" data-act="ovdeel" data-id="'+fid+'">'+esc(t('deel'))+'</button>';
   h+='<button class="outline quiet" data-act="ovkopie" data-id="'+fid+'">'+esc(t('kopieer'))+'</button>';
   h+='<button class="outline quiet" data-act="ovprint" data-id="'+fid+'">'+esc(t('afdrukken'))+'</button>';
+  h+='<div class="divider"></div>';
+  h+='<button class="outline quiet" data-act="perklus" data-id="'+fid+'">'
+   + esc(S.perKlus?t('perKlusUit'):t('perKlusAan'))+'</button>';
   h+='</div></div>';
   document.getElementById('sheet').innerHTML=h;
   terugAan(function(){openFactuur(fid)});
@@ -2363,9 +2517,11 @@ function drukAf(fid){
   var h='<h1>'+esc(t('factuurKop'))+'</h1>';
   h+='<div class="kl">'+esc(c?c.naam:'')+' · '+esc(dat(f.datum))+'</div><table>';
   (f.regels||[]).forEach(function(x,i){
-    var b=toDH(x.bedrag,x.cur||'MAD');
-    h+='<tr><td>'+(i+1)+'. '+esc(x.titel||'')+'</td><td class="r">'+(b>0?dh(b):'')+'</td></tr>';
+    var b=regelDH(x);
+    h+='<tr><td>'+(i+1)+'. '+esc(regelTitel(x))+'</td><td class="r">'
+     + ((S.perKlus&&b>0)?dh(b):'')+'</td></tr>';
   });
+  h+='<tr><td>'+esc(t('arbeid'))+'</td><td class="r">'+dh(factuurArbeid(f))+'</td></tr>';
   if(factuurMat(f)>0)h+='<tr><td>'+esc(t('materialen'))+'</td><td class="r">'+dh(factuurMat(f))+'</td></tr>';
   h+='<tr class="som"><td>'+esc(t('totaal'))+'</td><td class="r">'+dh(factuurTotaal(f))+'</td></tr>';
   var bet=factuurBetaald(f);
@@ -2595,7 +2751,7 @@ function openSettings(){
 function backupTekst(){
   return JSON.stringify({v:3,rate:S.rate,munt:S.munt,toonEuro:S.toonEuro,lang:ui.lang,
     pin:S.pin||'',
-    klanten:S.klanten,klussen:S.klussen,facturen:S.facturen,soorten:S.soorten});
+    klanten:S.klanten,klussen:S.klussen,facturen:S.facturen,soorten:S.soorten,losse:S.losse});
 }
 function zetTerug(tekst){
   var d;
@@ -2605,6 +2761,7 @@ function zetTerug(tekst){
   S.klussen=d.klussen;
   S.facturen=Array.isArray(d.facturen)?d.facturen:[];
   if(Array.isArray(d.soorten))S.soorten=d.soorten;
+  S.losse=Array.isArray(d.losse)?d.losse:[];
   if(d.rate)S.rate=d.rate;
   if(d.munt)S.munt=d.munt;
   if(typeof d.toonEuro==='boolean')S.toonEuro=d.toonEuro;
@@ -2627,6 +2784,7 @@ function controleerBonnen(){
     if((k.fotos||[]).length)iets=true;
   });
   S.facturen.forEach(function(f){(f.mats||[]).forEach(function(m){if(m.foto)iets=true})});
+  if(S.losse.length)iets=true;
   if(!iets)return;
   fotoDB(function(db){
     if(!db)return;
@@ -2803,6 +2961,7 @@ document.addEventListener('click',function(e){
   if(act==='cur'){
     var veld=b.dataset.veld, v=b.dataset.v;
     if(veld==='loon')formLoonCur=v;
+    else if(veld==='losbon')formLosCur=v;
     else if(veld==='fmat')formMatCur=v;
     else if(veld.indexOf('omat')===0)formOmats[+veld.slice(4)].cur=v;
     else if(veld.indexOf('mat')===0)formMats[+veld.slice(3)].cur=v;
@@ -2930,6 +3089,7 @@ document.addEventListener('click',function(e){
     if(rest>0.5){formBet.push({id:uid(),bedrag:uitDH(rest),cur:S.munt,datum:today()});tekenBet()}
     return;
   }
+  if(act==='perklus'){S.perKlus=!S.perKlus;save();openOverzicht(id);return}
   if(act==='overzicht'){openOverzicht(id);return}
   if(act==='ovprint'){drukAf(id);return}
   if(act==='ovwa'){
@@ -2952,6 +3112,20 @@ document.addEventListener('click',function(e){
   }
 
   /* ── bonnetje groot ── */
+  if(act==='snelbon'){bonDoel=uid()+uid();bonDoelSoort='los';document.getElementById('bonIn').click();return}
+  if(act==='losselijst'){closeSheet();render();openLosse();return}
+  if(act==='losbon'){openLosBon(id);return}
+  if(act==='losopslaan'){losOpslaan(id);return}
+  if(act==='loszet'){losZetten(id);return}
+  if(act==='loswis'){
+    var lb=losById(id);
+    vraag(t('vraagFoto'),(lb&&lb.naam?lb.naam+'. ':'')+t('nietTerug'),t('jaWis'),function(){
+      bonCacheWeg(id); bonWis(id);
+      S.losse=S.losse.filter(function(x){return x.id!==id});
+      save(); closeSheet(); render(); openLosse();
+    });
+    return;
+  }
   if(act==='hulp'){openHulp();return}
   if(act==='bonnen'){openBonnen(id);return}
   if(act==='factuurterug'){openFactuur(id,true);return}
@@ -3061,6 +3235,12 @@ document.addEventListener('click',function(e){
     verklein(f,function(blob){
       bonSchrijf(doel,blob,function(ok){
         if(!ok){ui.msg=t('opslaanMislukt');render();return}
+        if(soort==='los'){
+          S.losse.push({id:doel,klantId:'',naam:'',bedrag:'',cur:S.munt,datum:today(),at:Date.now()});
+          formLosCur=S.munt;
+          save(); bonCacheWeg(doel); closeSheet(); render(); openLosBon(doel);
+          return;
+        }
         if(soort==='klusfoto')formFotos.push({id:doel});
         formMats.forEach(function(m){if(m.id===doel)m.foto=true});
         formOmats.forEach(function(m){if(m.id===doel)m.foto=true});

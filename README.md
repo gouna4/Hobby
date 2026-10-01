@@ -75,6 +75,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - Alle bonnetjes in een keer delen, want foto's zitten niet in de back-up;
   ze krijgen een naam als `2026-09-16 Zusters oum Loodgieter 30,77.jpg`
 - Een uitlegscherm in de instellingen: hoe klant, klus, opdracht en factuur samenhangen
+- Onderweg een bonnetje fotograferen met de klant erbij; later zet je het bij de juiste klus
+- Het overzicht en de afdruk laten de bedragen per klus weg, met een knop om ze te tonen
 - Zoeken door alles heen: klanten, klussen en opdrachten
 - Een klus kopiëren, en een klus naar een andere klant verplaatsen door in het
   formulier een andere klant te kiezen
@@ -106,8 +108,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='50'` bovenaan het script
-2. `sw.js` — `klusboek-v50`
+1. `index.html` — `var VERSIE='52'` bovenaan het script
+2. `sw.js` — `klusboek-v52`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
