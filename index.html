@@ -224,6 +224,15 @@ select.in{appearance:none;-webkit-appearance:none;background-image:none}
 .melding .x{flex:0 0 auto;color:var(--dim);padding:0 2px;font-size:18px;line-height:1}
 
 /* ── materiaalregels en bonnetjes ── */
+.bonrij{display:flex;align-items:center;gap:10px;padding:8px 2px}
+.bonrij .bon.leeg{display:flex;align-items:center;justify-content:center;width:42px;height:42px;
+  border:1px dashed var(--line);border-radius:10px;font-size:15px;opacity:.5;flex:none}
+.bonrij .bonnm{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+  background:none;border:0;padding:0;text-align:start;color:var(--sand)}
+.bonrij .bt{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.bonrij .bs{font-size:11.5px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.bonrij .bv{font-family:var(--mono);font-size:14px;flex:none}
+
 .matrow{background:var(--night);border:1px solid var(--line);border-radius:14px;padding:11px;margin-top:9px}
 .matrow .op{display:flex;align-items:center;gap:8px;margin-top:8px}
 .matrow .op input{flex:1;min-width:0}
@@ -395,7 +404,7 @@ button .ico{margin-inline-end:8px}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='47', VERSIEDATUM='september 2026';
+var VERSIE='48', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -414,8 +423,10 @@ var T={
   bonFoto:'تصويرة ديال الفاكتورة',
   arbeid:'اليد العاملة', materialen:'مصاريف المواد', totaal:'المجموع',
   bonnenRij:'فاكتورات الشرا ديال الخدمات', extraMat:'المواد ديال هاد الورشة',
-  matOpdrKop:'المواد والفاكتورات ديال هاد الورشة',
+  matOpdrKop:'المواد والفاكتورات', matUitKlus:'من الخدمات ديال هاد الورشة',
+  matEigenKop:'ديال الورشة بوحدها',
   matOpdrUitleg:'اللي شريتي ل هاد الورشة وما كيتعلقش بخدمة وحدة.',
+  geenBon:'مازال بلا تصويرة', samenMat:'كاع مصاريف المواد',
   geenBedrag:'بلا ثمن', zonderBedrag:'{n} بلا ثمن',
   voorschotKnop:'تسبيق مقبوض', voorschotUitleg:'ورشة خاوية باش تحط فيها الفلوس اللي خديتي قبل ما تسالي الخدمة.',
   bonnenDelen:'شارك كاع الفاكتورات', bonnenGeen:'مازال ما كاين حتى فاكتورة',
@@ -505,8 +516,10 @@ var T={
   matAdd:'+ Materiaal of bonnetje', bonFoto:'Foto van het bonnetje',
   arbeid:'Werkkosten', materialen:'Materiaalkosten', totaal:'Totaal',
   bonnenRij:'Bonnetjes bij de klussen', extraMat:'Materiaal van deze opdracht',
-  matOpdrKop:'Materialen en bonnetjes van deze opdracht',
+  matOpdrKop:'Materialen en bonnetjes', matUitKlus:'Van de klussen in deze opdracht',
+  matEigenKop:'Van de opdracht zelf',
   matOpdrUitleg:'Wat je voor deze opdracht kocht zonder dat het aan een losse klus hangt.',
+  geenBon:'nog geen foto', samenMat:'Alle materiaalkosten',
   geenBedrag:'geen bedrag', zonderBedrag:'{n} zonder bedrag',
   voorschotKnop:'Voorschot ontvangen', voorschotUitleg:'Een lege opdracht om geld op te zetten dat je krijgt voordat het werk af is.',
   bonnenDelen:'Alle bonnetjes delen', bonnenGeen:'Er zijn nog geen bonnetjes',
@@ -1640,9 +1653,38 @@ function openFactuur(fid,houdPlek){
   h+='</div>';
 
   h+='<div class="label">'+esc(t('matOpdrKop'))+'</div>';
-  h+='<div class="fijn">'+esc(t('matOpdrUitleg'))+'</div>';
+
+  /* alles wat via de klussen binnenkomt: zelfde opdracht, dus hier zichtbaar */
+  var uitKlussen=[];
+  (f.regels||[]).forEach(function(r){
+    var k=regelKlus(r);
+    if(!k)return;
+    (k.mats||[]).forEach(function(m){
+      if(!num(m.bedrag)&&!m.foto)return;
+      uitKlussen.push({m:m,k:k});
+    });
+  });
+  if(uitKlussen.length){
+    h+='<div class="fijn">'+esc(t('matUitKlus'))+'</div>';
+    uitKlussen.forEach(function(x){
+      h+='<div class="bonrij">'
+       + (x.m.foto
+          ? '<button class="bon heeft" data-act="bonkijk" data-k="'+x.m.id+'" data-bon="'+x.m.id+'"></button>'
+          : '<span class="bon leeg">\uD83D\uDCF7</span>')
+       + '<button class="bonnm" data-act="klus" data-id="'+x.k.id+'">'
+       +   '<span class="bt">'+esc(x.m.naam||t('geenNaam'))+'</span>'
+       +   '<span class="bs">'+esc(x.k.titel||'')+(x.m.foto?'':' \u00b7 '+esc(t('geenBon')))+'</span>'
+       + '</button>'
+       + '<span class="bv">'+pv(dh(toDH(x.m.bedrag,x.m.cur||'MAD')))+'</span>'
+       + '</div>';
+    });
+  }
+
+  h+='<div class="fijn" style="margin-top:12px">'+esc(t('matEigenKop'))+' \u2014 '+esc(t('matOpdrUitleg'))+'</div>';
   h+='<div id="o_mats"></div>';
   h+='<button class="matadd" data-act="omatadd">'+esc(t('matAdd'))+'</button>';
+  h+='<div class="row som" style="margin-top:12px"><span>'+esc(t('samenMat'))+'</span>'
+   + '<span class="r" id="f_matsom"></span></div>';
 
   h+='<button class="outline" data-act="klusbij" data-id="'+fid+'">'+ico('plus')+esc(t('klusErbij'))+'</button>';
   h+='<button class="outline quiet" data-act="nieuwinopdr" data-id="'+fid+'">'+ico('plus')+esc(t('nieuwInOpdr'))+'</button>';
@@ -1756,6 +1798,8 @@ function tekenOpen(){
   var totaal=factuurArbeid(f)+factuurBonnen(f)+opdrachtExtraDH();
   var eb=document.getElementById('f_eigen');
   if(eb)eb.innerHTML=pv(dh(opdrachtExtraDH()));
+  var msb=document.getElementById('f_matsom');
+  if(msb)msb.innerHTML=pv(dh(factuurBonnen(f)+opdrachtExtraDH()));
   var tb=document.getElementById('f_tot');
   if(tb)tb.innerHTML=pv(dh(totaal))+(S.toonEuro?'<span class="euro">'+pv(euBij(totaal))+'</span>':'');
   var bet=0, perSoort={};
