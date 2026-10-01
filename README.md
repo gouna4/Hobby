@@ -53,7 +53,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 - Klussen met een datum, een omschrijving en je arbeidsbedrag
 - Een klus is af of niet; de app onthoudt op welke dag je hem afvinkte
 - Tot zes foto's van het werk per klus
-- Materialen als lijst, met een foto van het bonnetje per regel
+- Materialen als lijst, met een foto van het bonnetje per regel — bij een klus
+  en ook bij de opdracht zelf, voor wat je niet aan een losse klus kunt hangen
 - Opdrachten met hun betalingen, ook in delen. Komt er meer binnen dan de
   opdracht kost, dan heet dat *Vooruitbetaald*: dat staat bij de klant, op de
   regel van de opdracht en in de balk op de hoofdpagina
@@ -69,7 +70,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
   bij te zetten
 - Klussen zonder bedrag worden gemerkt, met een teller boven de lijst
 - Een voorschot vastleggen voordat er werk af is, als lege opdracht
-- Alle bonnetjes in een keer delen, want foto's zitten niet in de back-up
+- Alle bonnetjes in een keer delen, want foto's zitten niet in de back-up;
+  ze krijgen een naam als `2026-09-16 Zusters oum Loodgieter 30,77.jpg`
 - Zoeken door alles heen: klanten, klussen en opdrachten
 - Een klus kopiëren, en een klus naar een andere klant verplaatsen door in het
   formulier een andere klant te kiezen
@@ -101,8 +103,8 @@ Verwijder je een factuur, dan komen die klussen terug in de middelste groep.
 
 Verhoog het nummer op twee plekken, anders zie je je eigen wijziging niet:
 
-1. `index.html` — `var VERSIE='46'` bovenaan het script
-2. `sw.js` — `klusboek-v46`
+1. `index.html` — `var VERSIE='47'` bovenaan het script
+2. `sw.js` — `klusboek-v47`
 
 Het nummer verschijnt vanzelf onder de titel en onderaan de instellingen.
 
