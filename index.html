@@ -415,7 +415,7 @@ button .ico{margin-inline-end:8px}
    Alles blijft op het toestel zelf: geen server, geen account.
    Het versienummer staat hier en in sw.js; verhoog ze samen.
    ══════════════════════════════════════════════════════════════════ */
-var VERSIE='52', VERSIEDATUM='september 2026';
+var VERSIE='54', VERSIEDATUM='september 2026';
 var KEY='klusboek_v1';
 
 var T={
@@ -447,7 +447,7 @@ var T={
   losseGeen:'ما كاين حتى واحد',
   kiesPlek:'فين خاصها تمشي؟', kiesKlant:'أشمن زبون؟',
   bonGezet:'تزادت ف {n}', eerstKlant:'ختار الزبون قبل',
-  zetBij:'حطها ف خدمة ولا ورشة',
+  zetBij:'حطها ف خدمة ولا ورشة', gereed:'سالا',
   perKlusAan:'زيد الثمن ديال كل خدمة', perKlusUit:'بلا الثمن ديال كل خدمة',
   tikKlus:'دوس على خدمة باش تحلها ولا تبدلها', hulpTekst:'كيفاش خدام\n\nالزبون -> الخدمات -> الورشة -> الفاكتورة -> تخلص\n\n1. الخدمة هي شي حاجة صغيرة عند الزبون، بثمنها والفاكتورات ديال الشرا. علّمها ملي تسالي.\n\n2. اللي سالا كتجمعو ف ورشة. علّم شي خدمات ودوس دير ورشة؛ إلا ما علّمتي والو، غادي يدخلو كاملين.\n\n3. ملي تصيفط الفاكتورة للزبون، دوس صيفطت الفاكتورة. غير من بعد غادي يتحسب ف كايتسنى الخلاص.\n\n4. ملي يوصل كاع الفلوس، الورشة كتهبط وحدها ل تخلص.\n\nالفاكتورات ديال الشرا\nكتعلق بخدمة، ولا بالورشة إلا ما كانتش ديال خدمة وحدة. دوس على التصويرة باش تزيد وحدة.\nعندك: التصاور ما كايناش فالنسخة. شاركهم من وقت لوقت.\n\nالفلوس\nالثمن كاين ف جوج بلايص: عند الخدمة (الخدمة ديالك) وعند الفاكتورة ديال الشرا (المواد). كولشي فوق هادشي هو غير الجمع.\nإلا خديتي فلوس قبل ما تسالي، استعمل تسبيق مقبوض.', bonnenKnop:'شوف الفاكتورات ({n})', bonnenAlle:'شوف كاع الفاكتورات ({n})',
   bonnenLeeg:'مازال ما كاين حتى تصويرة ديال فاكتورة',
@@ -552,7 +552,7 @@ var T={
   losseGeen:'Er ligt niets te wachten',
   kiesPlek:'Waar hoort dit bonnetje bij?', kiesKlant:'Bij welke klant?',
   bonGezet:'Bonnetje bij {n} gezet', eerstKlant:'Kies eerst een klant',
-  zetBij:'Zet bij een klus of opdracht',
+  zetBij:'Zet bij een klus of opdracht', gereed:'Klaar',
   perKlusAan:'Bedragen per klus erbij', perKlusUit:'Bedragen per klus weglaten',
   tikKlus:'Tik een klus aan om hem te openen of te wijzigen', hulpTekst:'Zo zit het in elkaar\n\nKLANT -> KLUSSEN -> OPDRACHT -> FACTUUR -> BETAALD\n\n1. Een KLUS is een stukje werk bij een klant, met een bedrag en eventueel bonnetjes. Vink hem af als hij klaar is.\n\n2. Wat klaar is zet je samen in een OPDRACHT. Dat is gewoon een bundeltje klussen. Vink er een paar aan en druk op Opdracht maken; vink je niets aan, dan gaan ze er allemaal in.\n\n3. Stuur je de factuur naar de klant, tik dan op Factuur is gestuurd. Pas daarna telt het mee bij Wacht op betaling. Daarvoor staat het bij Nog factureren.\n\n4. Zodra al het geld binnen is, zakt de opdracht vanzelf naar Betaald.\n\nBij een klant zie je dus vier kopjes: Open werk, Opdrachten, Factuur gestuurd en Betaald. Een opdracht schuift er vanzelf doorheen.\n\nBonnetjes\nEen bonnetje hangt aan een klus, of aan de opdracht zelf als het er niet bij een losse klus hoort. Tik op het camera-knopje om er een foto bij te zetten. Met Bonnetjes bekijken zie je ze allemaal als kleine plaatjes.\nLet op: foto’s zitten NIET in de back-up. Deel ze af en toe naar je telefoon.\n\nGeld\nEen bedrag staat op twee plekken: bij de klus (je werk) en op het bonnetje (je materiaal). Alles daarboven is gewoon de optelsom.\nKrijg je geld voordat het werk af is, gebruik dan Voorschot ontvangen. Komt er meer binnen dan de opdracht kost, dan heet dat Vooruitbetaald.\n\nHandig\nLijst plakken: plak een lijstje uit de groepsapp, elke regel wordt een klus.\nTerugvegen gaat een scherm terug in plaats van de app te sluiten.\nHet oogje rechtsboven verbergt alle bedragen.', bonnenKnop:'Bonnetjes bekijken ({n})', bonnenAlle:'Alle bonnetjes bekijken ({n})',
   bonnenLeeg:'Hier zitten nog geen foto\u2019s van bonnetjes bij',
@@ -1942,8 +1942,7 @@ function openFactuur(fid,houdPlek){
    + '<button class="rood" data-act="factuurwis" data-id="'+fid+'">'+ico('trash')+esc(t('factuurWis'))+'</button>'
    + '</div>';
   h+='</div><div class="sbar"><div class="sbar-in">'
-   + '<button class="cancel" data-act="klantterug" data-id="'+f.klantId+'">'+esc(t('annuleer'))+'</button>'
-   + '<button class="save" data-act="factuuropslaan" data-id="'+fid+'">'+esc(t('bewaar'))+'</button>'
+   + '<button class="save" data-act="opdrachtklaar" data-id="'+f.klantId+'">'+esc(t('gereed'))+'</button>'
    + '</div></div></div>';
   document.getElementById('sheet').innerHTML=h;
   terugAan(function(){openKlant(f.klantId,true)});
@@ -1987,7 +1986,7 @@ function tekenBet(){
     var pak=function(){
       var i=+el.getAttribute('data-i');
       formBet[i][el.getAttribute('data-bet')]=el.value;
-      tekenOpen();
+      tekenOpen(); opdrachtBewaar();
     };
     el.addEventListener('input',pak);
     el.addEventListener('change',pak);
@@ -2055,6 +2054,15 @@ function tekenOpen(){
 /* Alles wat je in het opdrachtscherm hebt ingevuld overnemen. Doe dit ook
    voordat het scherm om een andere reden opnieuw getekend wordt, anders ben
    je je materiaalbedrag en je soorten kwijt. */
+/* Een opdracht is geen formulier dat je invult en dan bewaart: het is een
+   scherm waar je dingen aan- en afzet. Alles wat je wijzigt gaat daarom
+   meteen in het boek, net als op de klantpagina. */
+function opdrachtBewaar(){
+  var f=factuurById(formFactuurId);
+  if(!f)return;
+  opdrachtUitForm(f);
+  save();
+}
 function opdrachtUitForm(f){
   if(!f)return;
   if(document.getElementById('o_mats')){
@@ -2212,7 +2220,7 @@ function tekenMatLijst(vak,lijst,voor,na){
   na();
 }
 function tekenMats(){tekenMatLijst('k_mats',formMats,'mat',function(){if(document.getElementById('k_som'))tekenSom()})}
-function tekenOmats(){tekenMatLijst('o_mats',formOmats,'omat',tekenOpen)}
+function tekenOmats(){tekenMatLijst('o_mats',formOmats,'omat',function(){tekenOpen();opdrachtBewaar()})}
 function formLoonDH(){var el=document.getElementById('k_loon');return toDH(el?el.value:0,formLoonCur)}
 function formMatDH(){var s=0;formMats.forEach(function(m){s+=toDH(m.bedrag,m.cur||'MAD')});return s}
 function tekenSom(){
@@ -2540,6 +2548,20 @@ function terugAan(fn){
 }
 function terugUit(){terugNu=null;terugKlaar=false}
 window.addEventListener('popstate',function(){
+  /* Ligt er een foto of een vraagvenster overheen, dan bedoel je dat, en niet
+     het scherm eronder. Anders sloot je per ongeluk het hele scherm en bleef
+     de foto boven iets heel anders zweven. */
+  var fo=document.getElementById('foto'), vr=document.getElementById('vraag');
+  if(vr&&vr.innerHTML){
+    vraagWeg();
+    try{history.pushState({kb:1},'')}catch(e){}
+    return;
+  }
+  if(fo&&fo.innerHTML){
+    fo.innerHTML='';
+    try{history.pushState({kb:1},'')}catch(e){}
+    return;
+  }
   if(!terugKlaar)return;
   terugKlaar=false;
   var fn=terugNu; terugNu=null;
@@ -2970,7 +2992,7 @@ document.addEventListener('click',function(e){
       el.className=(el.dataset.v===v?'on':'');
     });
     if(document.getElementById('k_som'))tekenSom();
-    if(document.getElementById('o_mats'))tekenOpen();
+    if(document.getElementById('o_mats')){tekenOpen();opdrachtBewaar()}
     if(document.getElementById('f_open'))tekenOpen();
     return;
   }
@@ -3060,6 +3082,7 @@ document.addEventListener('click',function(e){
     });
     return;
   }
+  if(act==='opdrachtklaar'){opdrachtBewaar();closeSheet();render();openKlant(id,true);return}
   if(act==='factuur'){ui.confirm='';openFactuur(id);return}
   if(act==='verstuurd'){
     var vf=factuurById(id);
@@ -3073,12 +3096,12 @@ document.addEventListener('click',function(e){
     factuurWissen(id);
     }); return;
   }
-  if(act==='betadd'){formBet.push({id:uid(),bedrag:'',cur:S.munt,datum:today(),soort:'betaling'});tekenBet();return}
+  if(act==='betadd'){formBet.push({id:uid(),bedrag:'',cur:S.munt,datum:today(),soort:'betaling'});tekenBet();opdrachtBewaar();return}
   if(act==='betweg'){
     var bi2=+b.dataset.i, bb=formBet[bi2];
-    if(!bb||!num(bb.bedrag)){formBet.splice(bi2,1);tekenBet();return}
+    if(!bb||!num(bb.bedrag)){formBet.splice(bi2,1);tekenBet();opdrachtBewaar();return}
     vraag(t('vraagBet'),pv(dh(toDH(bb.bedrag,bb.cur||'MAD')))+(bb.datum?' · '+dat(bb.datum):''),t('jaWis'),
-      function(){formBet.splice(bi2,1);tekenBet();tekenOpen()});
+      function(){formBet.splice(bi2,1);tekenBet();tekenOpen();opdrachtBewaar()});
     return;
   }
   if(act==='betrest'){
@@ -3155,13 +3178,13 @@ document.addEventListener('click',function(e){
   }
 
   /* ── instellingen ── */
-  if(act==='omatadd'){formOmats.push({id:uid()+uid(),naam:'',bedrag:'',cur:S.munt,foto:false});tekenOmats();return}
+  if(act==='omatadd'){formOmats.push({id:uid()+uid(),naam:'',bedrag:'',cur:S.munt,foto:false});tekenOmats();opdrachtBewaar();return}
   if(act==='omatweg'){
     var oi=+b.dataset.i, om=formOmats[oi];
     var leegO=!om||(!String(om.naam||'').trim()&&!num(om.bedrag)&&!om.foto);
     var weg=function(){
       if(om&&om.foto){bonCacheWeg(om.id);bonWis(om.id)}
-      formOmats.splice(oi,1); tekenOmats();
+      formOmats.splice(oi,1); tekenOmats(); opdrachtBewaar();
     };
     if(leegO){weg();return}
     vraag(t('vraagRegel'),(om.naam?om.naam+'. ':'')+(om.foto?t('metBon'):''),t('jaWis'),weg);
